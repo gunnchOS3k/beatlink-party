@@ -1,0 +1,682 @@
+{
+  "id": "demo-track-1",
+  "songId": "demo-neon-groove",
+  "version": "1.0.0",
+  "bpm": 120,
+  "offsetMs": 0,
+  "durationMs": 45000,
+  "difficulty": "casual",
+  "licenseStatus": "demo_generated_royalty_free",
+  "sections": [
+    {
+      "id": "intro",
+      "label": "Intro",
+      "startMs": 0,
+      "endMs": 6750
+    },
+    {
+      "id": "verse",
+      "label": "Verse",
+      "startMs": 6750,
+      "endMs": 20250
+    },
+    {
+      "id": "chorus",
+      "label": "Chorus",
+      "startMs": 20250,
+      "endMs": 33750
+    },
+    {
+      "id": "outro",
+      "label": "Outro",
+      "startMs": 33750,
+      "endMs": 45000
+    }
+  ],
+  "notes": [
+    {
+      "id": "note-0",
+      "timeMs": 2000,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-1",
+      "timeMs": 2500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-2",
+      "timeMs": 3000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-3",
+      "timeMs": 3500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-4",
+      "timeMs": 4000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-5",
+      "timeMs": 4500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-6",
+      "timeMs": 5000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-7",
+      "timeMs": 5500,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-8",
+      "timeMs": 6000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-9",
+      "timeMs": 6500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-10",
+      "timeMs": 7000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-11",
+      "timeMs": 7500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-12",
+      "timeMs": 8000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-13",
+      "timeMs": 8500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-14",
+      "timeMs": 9000,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-15",
+      "timeMs": 9500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-16",
+      "timeMs": 10000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-17",
+      "timeMs": 10500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-18",
+      "timeMs": 11000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-19",
+      "timeMs": 11500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-20",
+      "timeMs": 12000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-21",
+      "timeMs": 12500,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-22",
+      "timeMs": 13000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-23",
+      "timeMs": 13500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-24",
+      "timeMs": 14000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-25",
+      "timeMs": 14500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-26",
+      "timeMs": 15000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-27",
+      "timeMs": 15500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-28",
+      "timeMs": 16000,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-29",
+      "timeMs": 16500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-30",
+      "timeMs": 17000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-31",
+      "timeMs": 17500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-32",
+      "timeMs": 18000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-33",
+      "timeMs": 18500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-34",
+      "timeMs": 19000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-35",
+      "timeMs": 19500,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-36",
+      "timeMs": 20000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-37",
+      "timeMs": 20500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-38",
+      "timeMs": 21000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-39",
+      "timeMs": 21500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-40",
+      "timeMs": 22000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-41",
+      "timeMs": 22500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-42",
+      "timeMs": 23000,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-43",
+      "timeMs": 23500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-44",
+      "timeMs": 24000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-45",
+      "timeMs": 24500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-46",
+      "timeMs": 25000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-47",
+      "timeMs": 25500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-48",
+      "timeMs": 26000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-49",
+      "timeMs": 26500,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-50",
+      "timeMs": 27000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-51",
+      "timeMs": 27500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-52",
+      "timeMs": 28000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-53",
+      "timeMs": 28500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-54",
+      "timeMs": 29000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-55",
+      "timeMs": 29500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-56",
+      "timeMs": 30000,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-57",
+      "timeMs": 30500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-58",
+      "timeMs": 31000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-59",
+      "timeMs": 31500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-60",
+      "timeMs": 32000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-61",
+      "timeMs": 32500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-62",
+      "timeMs": 33000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-63",
+      "timeMs": 33500,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-64",
+      "timeMs": 34000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-65",
+      "timeMs": 34500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-66",
+      "timeMs": 35000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-67",
+      "timeMs": 35500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-68",
+      "timeMs": 36000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-69",
+      "timeMs": 36500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-70",
+      "timeMs": 37000,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-71",
+      "timeMs": 37500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-72",
+      "timeMs": 38000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-73",
+      "timeMs": 38500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-74",
+      "timeMs": 39000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-75",
+      "timeMs": 39500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-76",
+      "timeMs": 40000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-77",
+      "timeMs": 40500,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 1000
+    },
+    {
+      "id": "note-78",
+      "timeMs": 41000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-79",
+      "timeMs": 41500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-80",
+      "timeMs": 42000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-81",
+      "timeMs": 42500,
+      "type": "tap",
+      "role": "beat_tapper"
+    }
+  ],
+  "vocalPrompts": [
+    {
+      "id": "vocal-0",
+      "timeMs": 6429,
+      "text": "Sing the hook!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-1",
+      "timeMs": 12857,
+      "text": "Echo the crowd!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-2",
+      "timeMs": 19286,
+      "text": "Hold this phrase!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-3",
+      "timeMs": 25714,
+      "text": "Call and response!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-4",
+      "timeMs": 32143,
+      "text": "Bring the energy!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-5",
+      "timeMs": 38571,
+      "text": "Hit the chorus!",
+      "durationMs": 3000
+    }
+  ],
+  "hypeEvents": [
+    {
+      "id": "hype-0",
+      "timeMs": 3000,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-1",
+      "timeMs": 5000,
+      "type": "lights"
+    },
+    {
+      "id": "hype-2",
+      "timeMs": 7000,
+      "type": "boost"
+    },
+    {
+      "id": "hype-3",
+      "timeMs": 9000,
+      "type": "combo_save"
+    },
+    {
+      "id": "hype-4",
+      "timeMs": 11000,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-5",
+      "timeMs": 13000,
+      "type": "lights"
+    },
+    {
+      "id": "hype-6",
+      "timeMs": 15000,
+      "type": "boost"
+    },
+    {
+      "id": "hype-7",
+      "timeMs": 17000,
+      "type": "combo_save"
+    },
+    {
+      "id": "hype-8",
+      "timeMs": 19000,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-9",
+      "timeMs": 21000,
+      "type": "lights"
+    },
+    {
+      "id": "hype-10",
+      "timeMs": 23000,
+      "type": "boost"
+    },
+    {
+      "id": "hype-11",
+      "timeMs": 25000,
+      "type": "combo_save"
+    },
+    {
+      "id": "hype-12",
+      "timeMs": 27000,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-13",
+      "timeMs": 29000,
+      "type": "lights"
+    },
+    {
+      "id": "hype-14",
+      "timeMs": 31000,
+      "type": "boost"
+    },
+    {
+      "id": "hype-15",
+      "timeMs": 33000,
+      "type": "combo_save"
+    },
+    {
+      "id": "hype-16",
+      "timeMs": 35000,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-17",
+      "timeMs": 37000,
+      "type": "lights"
+    },
+    {
+      "id": "hype-18",
+      "timeMs": 39000,
+      "type": "boost"
+    },
+    {
+      "id": "hype-19",
+      "timeMs": 41000,
+      "type": "combo_save"
+    }
+  ]
+}

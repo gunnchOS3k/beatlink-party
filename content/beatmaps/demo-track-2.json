@@ -1,0 +1,646 @@
+{
+  "id": "demo-track-2",
+  "songId": "demo-crowd-anthem",
+  "version": "1.0.0",
+  "bpm": 128,
+  "offsetMs": 0,
+  "durationMs": 40000,
+  "difficulty": "casual",
+  "licenseStatus": "demo_generated_royalty_free",
+  "sections": [
+    {
+      "id": "intro",
+      "label": "Intro",
+      "startMs": 0,
+      "endMs": 6000
+    },
+    {
+      "id": "verse",
+      "label": "Verse",
+      "startMs": 6000,
+      "endMs": 18000
+    },
+    {
+      "id": "chorus",
+      "label": "Chorus",
+      "startMs": 18000,
+      "endMs": 30000
+    },
+    {
+      "id": "outro",
+      "label": "Outro",
+      "startMs": 30000,
+      "endMs": 40000
+    }
+  ],
+  "notes": [
+    {
+      "id": "note-0",
+      "timeMs": 2000,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-1",
+      "timeMs": 2469,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-2",
+      "timeMs": 2938,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-3",
+      "timeMs": 3406,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-4",
+      "timeMs": 3875,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-5",
+      "timeMs": 4344,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-6",
+      "timeMs": 4813,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-7",
+      "timeMs": 5281,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-8",
+      "timeMs": 5750,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-9",
+      "timeMs": 6219,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-10",
+      "timeMs": 6688,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-11",
+      "timeMs": 7156,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-12",
+      "timeMs": 7625,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-13",
+      "timeMs": 8094,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-14",
+      "timeMs": 8563,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-15",
+      "timeMs": 9031,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-16",
+      "timeMs": 9500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-17",
+      "timeMs": 9969,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-18",
+      "timeMs": 10438,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-19",
+      "timeMs": 10906,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-20",
+      "timeMs": 11375,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-21",
+      "timeMs": 11844,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-22",
+      "timeMs": 12313,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-23",
+      "timeMs": 12781,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-24",
+      "timeMs": 13250,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-25",
+      "timeMs": 13719,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-26",
+      "timeMs": 14188,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-27",
+      "timeMs": 14656,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-28",
+      "timeMs": 15125,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-29",
+      "timeMs": 15594,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-30",
+      "timeMs": 16063,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-31",
+      "timeMs": 16531,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-32",
+      "timeMs": 17000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-33",
+      "timeMs": 17469,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-34",
+      "timeMs": 17938,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-35",
+      "timeMs": 18406,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-36",
+      "timeMs": 18875,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-37",
+      "timeMs": 19344,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-38",
+      "timeMs": 19813,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-39",
+      "timeMs": 20281,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-40",
+      "timeMs": 20750,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-41",
+      "timeMs": 21219,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-42",
+      "timeMs": 21688,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-43",
+      "timeMs": 22156,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-44",
+      "timeMs": 22625,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-45",
+      "timeMs": 23094,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-46",
+      "timeMs": 23563,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-47",
+      "timeMs": 24031,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-48",
+      "timeMs": 24500,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-49",
+      "timeMs": 24969,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-50",
+      "timeMs": 25438,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-51",
+      "timeMs": 25906,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-52",
+      "timeMs": 26375,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-53",
+      "timeMs": 26844,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-54",
+      "timeMs": 27313,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-55",
+      "timeMs": 27781,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-56",
+      "timeMs": 28250,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-57",
+      "timeMs": 28719,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-58",
+      "timeMs": 29188,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-59",
+      "timeMs": 29656,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-60",
+      "timeMs": 30125,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-61",
+      "timeMs": 30594,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-62",
+      "timeMs": 31063,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-63",
+      "timeMs": 31531,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-64",
+      "timeMs": 32000,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-65",
+      "timeMs": 32469,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-66",
+      "timeMs": 32938,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-67",
+      "timeMs": 33406,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-68",
+      "timeMs": 33875,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-69",
+      "timeMs": 34344,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-70",
+      "timeMs": 34813,
+      "type": "hold",
+      "role": "beat_tapper",
+      "durationMs": 937.5
+    },
+    {
+      "id": "note-71",
+      "timeMs": 35281,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-72",
+      "timeMs": 35750,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-73",
+      "timeMs": 36219,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-74",
+      "timeMs": 36688,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-75",
+      "timeMs": 37156,
+      "type": "tap",
+      "role": "beat_tapper"
+    },
+    {
+      "id": "note-76",
+      "timeMs": 37625,
+      "type": "tap",
+      "role": "beat_tapper"
+    }
+  ],
+  "vocalPrompts": [
+    {
+      "id": "vocal-0",
+      "timeMs": 5714,
+      "text": "Sing the hook!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-1",
+      "timeMs": 11429,
+      "text": "Echo the crowd!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-2",
+      "timeMs": 17143,
+      "text": "Hold this phrase!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-3",
+      "timeMs": 22857,
+      "text": "Call and response!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-4",
+      "timeMs": 28571,
+      "text": "Bring the energy!",
+      "durationMs": 3000
+    },
+    {
+      "id": "vocal-5",
+      "timeMs": 34286,
+      "text": "Hit the chorus!",
+      "durationMs": 3000
+    }
+  ],
+  "hypeEvents": [
+    {
+      "id": "hype-0",
+      "timeMs": 3000,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-1",
+      "timeMs": 4875,
+      "type": "lights"
+    },
+    {
+      "id": "hype-2",
+      "timeMs": 6750,
+      "type": "boost"
+    },
+    {
+      "id": "hype-3",
+      "timeMs": 8625,
+      "type": "combo_save"
+    },
+    {
+      "id": "hype-4",
+      "timeMs": 10500,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-5",
+      "timeMs": 12375,
+      "type": "lights"
+    },
+    {
+      "id": "hype-6",
+      "timeMs": 14250,
+      "type": "boost"
+    },
+    {
+      "id": "hype-7",
+      "timeMs": 16125,
+      "type": "combo_save"
+    },
+    {
+      "id": "hype-8",
+      "timeMs": 18000,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-9",
+      "timeMs": 19875,
+      "type": "lights"
+    },
+    {
+      "id": "hype-10",
+      "timeMs": 21750,
+      "type": "boost"
+    },
+    {
+      "id": "hype-11",
+      "timeMs": 23625,
+      "type": "combo_save"
+    },
+    {
+      "id": "hype-12",
+      "timeMs": 25500,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-13",
+      "timeMs": 27375,
+      "type": "lights"
+    },
+    {
+      "id": "hype-14",
+      "timeMs": 29250,
+      "type": "boost"
+    },
+    {
+      "id": "hype-15",
+      "timeMs": 31125,
+      "type": "combo_save"
+    },
+    {
+      "id": "hype-16",
+      "timeMs": 33000,
+      "type": "cheer"
+    },
+    {
+      "id": "hype-17",
+      "timeMs": 34875,
+      "type": "lights"
+    },
+    {
+      "id": "hype-18",
+      "timeMs": 36750,
+      "type": "boost"
+    }
+  ]
+}
