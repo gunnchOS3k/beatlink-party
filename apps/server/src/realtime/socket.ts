@@ -30,17 +30,17 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
     socket.on(
       'room.join',
       (
-        data: { code: string; name: string; playerId?: string },
-        cb?: (result: { ok: boolean; error?: string; player?: unknown; room?: unknown }) => void,
+        data: { code: string; name: string; playerId?: string; playerToken?: string },
+        cb?: (result: { ok: boolean; error?: string; player?: unknown; room?: unknown; playerToken?: string }) => void,
       ) => {
         const code = data.code.toUpperCase();
-        if (data.playerId) {
-          const player = roomManager.reconnectPlayer(code, data.playerId, socket.id);
+        if (data.playerId && data.playerToken) {
+          const player = roomManager.reconnectPlayer(code, data.playerId, data.playerToken, socket.id);
           if (player) {
             socket.join(code);
             const room = roomManager.getRoom(code);
             io.to(code).emit('room.player_joined', { player, room: roomManager.stripInternal(room!) });
-            cb?.({ ok: true, player, room: roomManager.stripInternal(room!) });
+            cb?.({ ok: true, player, room: roomManager.stripInternal(room!), playerToken: data.playerToken });
             return;
           }
         }
@@ -51,7 +51,7 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
         }
         socket.join(code);
         io.to(code).emit('room.player_joined', { player: result.player, room: result.room });
-        cb?.({ ok: true, player: result.player, room: result.room });
+        cb?.({ ok: true, player: result.player, room: result.room, playerToken: result.playerToken });
       },
     );
 
