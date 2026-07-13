@@ -1,16 +1,33 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCreateRoom } from '../lib/socket';
+import { useCreateRoom, useSocket } from '../lib/socket';
 import { isBackendConfigured } from '../lib/api';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const createRoom = useCreateRoom();
+  const { connected } = useSocket();
   const backendReady = isBackendConfigured();
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
-    if (!backendReady) return;
-    const code = await createRoom();
-    navigate(`/host/${code}`);
+    if (!backendReady) {
+      setError(
+        'BeatLink could not reach the room server. Configure VITE_API_URL and VITE_WS_URL at build time, or run the dev server on your network.',
+      );
+      return;
+    }
+    setCreating(true);
+    setError(null);
+    try {
+      const code = await createRoom();
+      navigate(`/host/${code}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create room');
+    } finally {
+      setCreating(false);
+    }
   }
 
   return (
@@ -28,9 +45,23 @@ export default function LandingPage() {
             offline.
           </div>
         )}
+        {error && (
+          <div className="compliance-banner" style={{ marginBottom: '1rem', borderColor: 'var(--accent)' }}>
+            <strong>Could not create room.</strong> {error}
+          </div>
+        )}
+        {backendReady && !connected && !creating && (
+          <div className="compliance-banner" style={{ marginBottom: '1rem' }}>
+            Connecting to room server…
+          </div>
+        )}
         <div className="stack" style={{ maxWidth: 400, margin: '0 auto' }}>
-          <button className="btn-primary btn-large" onClick={handleCreate} disabled={!backendReady}>
-            Create Room (Host)
+          <button
+            className="btn-primary btn-large"
+            onClick={handleCreate}
+            disabled={!backendReady || creating}
+          >
+            {creating ? 'Creating room…' : 'Create Room (Host)'}
           </button>
           <button className="btn-secondary btn-large" onClick={() => navigate('/join')}>
             Join with Code (Player)

@@ -95,16 +95,49 @@ export function useRoomEvents(
   }, [code, socket, handlers]);
 }
 
+const ROOM_CREATE_TIMEOUT_MS = 12_000;
+
+function waitForSocketConnection(socket: Socket, timeoutMs: number): Promise<void> {
+  if (socket.connected) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      socket.off('connect', onConnect);
+      reject(
+        new Error(
+          'BeatLink could not reach the room server. Confirm the host service is running and that this phone can reach it.',
+        ),
+      );
+    }, timeoutMs);
+    const onConnect = () => {
+      window.clearTimeout(timer);
+      socket.off('connect', onConnect);
+      resolve();
+    };
+    socket.on('connect', onConnect);
+    socket.connect();
+  });
+}
+
 export function useCreateRoom() {
   const { socket } = useSocket();
   return useCallback(
-    () =>
-      new Promise<string>((resolve, reject) => {
-        socket.emit('room.create', (data: { code: string }) => {
+    async () => {
+      await waitForSocketConnection(socket, ROOM_CREATE_TIMEOUT_MS);
+      return new Promise<string>((resolve, reject) => {
+        const timer = window.setTimeout(() => {
+          reject(
+            new Error(
+              'BeatLink could not reach the room server. Confirm the host service is running and that this phone can reach it.',
+            ),
+          );
+        }, ROOM_CREATE_TIMEOUT_MS);
+        socket.emit('room.create', (data: { code?: string; error?: string }) => {
+          window.clearTimeout(timer);
           if (data?.code) resolve(data.code);
-          else reject(new Error('Failed to create room'));
+          else reject(new Error(data?.error ?? 'Failed to create room'));
         });
-      }),
+      });
+    },
     [socket],
   );
 }

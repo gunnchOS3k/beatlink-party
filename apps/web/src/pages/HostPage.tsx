@@ -16,9 +16,18 @@ export default function HostPage() {
   const [linkResult, setLinkResult] = useState<LinkResolveResult | null>(null);
   const [gameTimeMs, setGameTimeMs] = useState(0);
   const [results, setResults] = useState<GameResults | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [songsError, setSongsError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchSongs().then((d) => setSongs(d.songs)).catch(console.error);
+    fetchSongs()
+      .then((d) => {
+        setSongs(d.songs);
+        setSongsError(null);
+      })
+      .catch((err) => {
+        setSongsError(err instanceof Error ? err.message : 'Failed to load songs');
+      });
   }, []);
 
   useEffect(() => {
@@ -26,10 +35,15 @@ export default function HostPage() {
       setCode(roomCode.toUpperCase());
       socket.emit('room.subscribe', { code: roomCode.toUpperCase() });
     } else if (!code) {
-      createRoom().then((c) => {
-        setCode(c);
-        window.history.replaceState(null, '', `/host/${c}`);
-      }).catch(console.error);
+      createRoom()
+        .then((c) => {
+          setCode(c);
+          setCreateError(null);
+          window.history.replaceState(null, '', `/host/${c}`);
+        })
+        .catch((err) => {
+          setCreateError(err instanceof Error ? err.message : 'Failed to create room');
+        });
     }
   }, [roomCode, code, createRoom, socket]);
 
@@ -99,10 +113,22 @@ export default function HostPage() {
   if (!code) {
     return (
       <div className="page">
-        <p>Creating room...</p>
+        {createError ? (
+          <div className="card stack" style={{ maxWidth: 520, margin: '2rem auto' }}>
+            <h2>Could not create room</h2>
+            <p style={{ color: 'var(--muted)' }}>{createError}</p>
+            <Link to="/" className="btn-secondary">
+              Back to Home
+            </Link>
+          </div>
+        ) : (
+          <p>Creating room…</p>
+        )}
       </div>
     );
   }
+
+  const qrUrl = `https://quickchart.io/qr?size=220&margin=1&text=${encodeURIComponent(joinUrl)}`;
 
   return (
     <div className="page">
@@ -118,10 +144,23 @@ export default function HostPage() {
           <div className="card" style={{ marginBottom: '1.5rem' }}>
             <p className="label">Room Code — share with players</p>
             <div className="room-code">{code}</div>
-            <p style={{ textAlign: 'center', color: 'var(--muted)' }}>
-              Players join at: <strong>{joinUrl}</strong>
-            </p>
+            <div className="row" style={{ justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+              <img src={qrUrl} alt={`QR code for ${joinUrl}`} width={220} height={220} />
+              <div>
+                <p style={{ color: 'var(--muted)', marginBottom: '0.5rem' }}>
+                  Players join at: <strong>{joinUrl}</strong>
+                </p>
+                <p style={{ color: 'var(--muted)' }}>
+                  Connection: {socket.connected ? '✓ Room server connected' : '… Connecting'}
+                </p>
+              </div>
+            </div>
           </div>
+          {songsError && (
+            <div className="compliance-banner" style={{ marginBottom: '1rem' }}>
+              Song catalog unavailable: {songsError}
+            </div>
+          )}
 
           <div className="grid-2">
             <div className="card stack">
