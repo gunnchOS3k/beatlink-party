@@ -125,6 +125,17 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
       if (room) io.to(data.code).emit('room.state', room);
     });
 
+    socket.on('room.end', (data: { code: string }, cb?: (result: { ok: boolean; error?: string }) => void) => {
+      const room = roomManager.endRoom(data.code, socket.id);
+      if (!room) {
+        cb?.({ ok: false, error: 'Unable to end room (host only / not found)' });
+        return;
+      }
+      io.to(data.code).emit('room.ended', { room });
+      io.in(data.code).socketsLeave(data.code);
+      cb?.({ ok: true });
+    });
+
     socket.on('game.tick', (data: { code: string }) => {
       const gameTimeMs = roomManager.getGameTimeMs(data.code);
       const room = roomManager.getRoom(data.code);

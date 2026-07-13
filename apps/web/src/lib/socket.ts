@@ -46,13 +46,15 @@ export function useRoomEvents(
 ) {
   const { socket } = useSocket();
 
+  const handlersRef = useRef(handlers);
+  handlersRef.current = handlers;
+
   useEffect(() => {
     if (!code) return;
 
-    const h = handlers;
-    const onState = (room: RoomState) => h.onState?.(room);
+    const onState = (room: RoomState) => handlersRef.current.onState?.(room);
     const onCountdown = ({ room, countdown }: { room: RoomState; countdown: number | null }) =>
-      h.onCountdown?.(room, countdown);
+      handlersRef.current.onCountdown?.(room, countdown);
     const onStarted = ({
       room,
       beatmap,
@@ -61,18 +63,21 @@ export function useRoomEvents(
       room: RoomState;
       beatmap: Beatmap;
       startTime: number;
-    }) => h.onStarted?.(room, beatmap, startTime);
+    }) => handlersRef.current.onStarted?.(room, beatmap, startTime);
     const onScore = ({
       room,
       scoreEvent,
     }: {
       room: RoomState;
       scoreEvent: ScoreEvent | null;
-    }) => h.onScore?.(room, scoreEvent);
+    }) => handlersRef.current.onScore?.(room, scoreEvent);
     const onEnded = ({ room, results }: { room: RoomState; results: GameResults }) =>
-      h.onEnded?.(room, results);
-    const onPlayerJoined = ({ room }: { room: RoomState }) => h.onPlayerJoined?.(room);
-    const onPlayerLeft = ({ room }: { room: RoomState }) => h.onPlayerLeft?.(room);
+      handlersRef.current.onEnded?.(room, results);
+    const onPlayerJoined = ({ room }: { room: RoomState }) =>
+      handlersRef.current.onPlayerJoined?.(room);
+    const onPlayerLeft = ({ room }: { room: RoomState }) =>
+      handlersRef.current.onPlayerLeft?.(room);
+    const onReady = ({ room }: { room: RoomState }) => handlersRef.current.onState?.(room);
 
     socket.on('room.state', onState);
     socket.on('game.countdown', onCountdown);
@@ -81,7 +86,7 @@ export function useRoomEvents(
     socket.on('game.ended', onEnded);
     socket.on('room.player_joined', onPlayerJoined);
     socket.on('room.player_left', onPlayerLeft);
-    socket.on('room.ready_changed', ({ room }: { room: RoomState }) => h.onState?.(room));
+    socket.on('room.ready_changed', onReady);
 
     return () => {
       socket.off('room.state', onState);
@@ -91,8 +96,9 @@ export function useRoomEvents(
       socket.off('game.ended', onEnded);
       socket.off('room.player_joined', onPlayerJoined);
       socket.off('room.player_left', onPlayerLeft);
+      socket.off('room.ready_changed', onReady);
     };
-  }, [code, socket, handlers]);
+  }, [code, socket]);
 }
 
 const ROOM_CREATE_TIMEOUT_MS = 12_000;
@@ -145,20 +151,21 @@ export function useCreateRoom() {
 export function useJoinRoom() {
   const { socket } = useSocket();
   return useCallback(
-    (code: string, name: string, playerId?: string) =>
-      new Promise<{ player: import('@beatlink/shared').Player; room: RoomState }>(
+    (code: string, name: string, playerId?: string, playerToken?: string) =>
+      new Promise<{ player: import('@beatlink/shared').Player; room: RoomState; playerToken?: string }>(
         (resolve, reject) => {
           socket.emit(
             'room.join',
-            { code, name, playerId },
+            { code, name, playerId, playerToken },
             (result: {
               ok: boolean;
               error?: string;
               player?: import('@beatlink/shared').Player;
               room?: RoomState;
+              playerToken?: string;
             }) => {
               if (result.ok && result.player && result.room) {
-                resolve({ player: result.player, room: result.room });
+                resolve({ player: result.player, room: result.room, playerToken: result.playerToken });
               } else {
                 reject(new Error(result.error ?? 'Join failed'));
               }

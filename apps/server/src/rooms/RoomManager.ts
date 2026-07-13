@@ -188,6 +188,23 @@ export class RoomManager {
     return this.stripInternal(room);
   }
 
+  endRoom(code: string, hostSocketId: string): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    if (room.hostId !== hostSocketId) return null;
+    for (const player of room.players) {
+      this.playerToRoom.delete(player.id);
+      room.playerTokens.delete(player.id);
+    }
+    for (const [socketId, playerId] of [...this.socketToPlayer.entries()]) {
+      if (room.players.some((p) => p.id === playerId)) {
+        this.socketToPlayer.delete(socketId);
+      }
+    }
+    this.rooms.delete(code.toUpperCase());
+    return this.stripInternal({ ...room, phase: 'closed' as RoomState['phase'], players: [] });
+  }
+
   setRole(code: string, playerId: string, role: Player['role']): RoomState | null {
     const room = this.getRoom(code);
     if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;

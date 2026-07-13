@@ -1,19 +1,34 @@
 # Acceptance Checklist — BeatLink Party
 
-| Gate | Status |
-|------|--------|
-| Stable server (no watch loop) | **Verified** — `server:device` + health OK |
-| Create Room UI | **Implemented** — not device-tested |
-| Two-client multiplayer round | **Not started** |
-| Release/debug APK | **Missing** — AAPT2/disk blocked |
-| Cleartext LAN (debug) | **Implemented** — debug manifest overlay |
-| `device:test:android` script | **Created** — not run end-to-end |
-| PR | **No** |
+**Updated:** 2026-07-13
 
-## Server health evidence
+| Gate | Status | Evidence |
+|------|--------|----------|
+| Stable server without watch | **PASS** | `PORT=3001 node dist/index.js` → `/health` ok |
+| Create Room loading feedback | **PASS** | Button shows “Creating room…” |
+| Host lobby + room code + QR | **PASS** | Room `CQ9V5` + QR in browser screenshot |
+| Two-client join | **PASS** | PixelPlayer joined host lobby |
+| Role + ready | **PASS** | Beat Tapper · Ready |
+| Demo track select + countdown | **PASS** | Neon Groove → LIVE |
+| Synchronized play | **PASS** | Player TAP UI while host LIVE |
+| Server-authoritative scores | **PASS** | Score 300 · Accuracy 75% · streak 2 |
+| Results on host + player | **PASS** | Round Complete + Your Results screenshots |
+| Disconnect / reconnect | **PASS** | Socket test room `2XWWD`: same player id after reconnect |
+| End room + reject reuse | **PASS** | `room.end` ok; rejoin → `Room not found or full` |
+| Android APK + Pixel | **NOT STARTED** | Pixel ADB absent at session start |
+| PR | **No** | Gates remaining |
 
-```json
-{"status":"ok","service":"beatlink-party"}
-```
+## Browser round (CQ9V5)
 
-Command: `node --import tsx src/index.ts` → `curl http://127.0.0.1:3001/health`
+- Host: `http://127.0.0.1:5173/host/CQ9V5`
+- Player: `http://127.0.0.1:5173/play/CQ9V5?name=PixelPlayer`
+- Track: Neon Groove (demo)
+- Results: team 300, crowd 52%, MVP + Best Beat → PixelPlayer
+
+## Fixes applied this pass
+
+- Stable `handlersRef` socket listeners (stop missed `game.started` / `game.ended`)
+- Player `onEnded` / `onStarted` update `room` phase
+- Reconnect stores `playerToken`
+- Host `End Room` + server `room.end`
+- Song items are real `<button>` elements

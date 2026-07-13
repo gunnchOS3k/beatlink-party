@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import type {
   Beatmap,
@@ -35,28 +35,46 @@ export default function PlayerPage() {
   const [results, setResults] = useState<GameResults | null>(null);
   const [currentPrompt, setCurrentPrompt] = useState<VocalPrompt | null>(null);
   const [hypeCooldown, setHypeCooldown] = useState(false);
+  const playerIdRef = useRef<string | undefined>(undefined);
+  playerIdRef.current = player?.id;
 
-  const handlers = useCallback(
+  const handlers = useMemo(
     () => ({
-      onState: setRoom,
-      onStarted: (_r: RoomState, bm: Beatmap, startTime: number) => {
+      onState: (next: RoomState) => {
+        setRoom(next);
+        const me = next.players.find((p) => p.id === playerIdRef.current);
+        if (me) setPlayer(me);
+      },
+      onCountdown: (next: RoomState) => {
+        setRoom(next);
+      },
+      onStarted: (next: RoomState, bm: Beatmap, startTime: number) => {
+        setRoom(next);
         setBeatmap(bm);
         setGameStartTime(startTime);
         setResults(null);
       },
-      onScore: (_r: RoomState, ev: ScoreEvent | null) => {
-        if (ev && ev.playerId === player?.id) {
+      onScore: (next: RoomState, ev: ScoreEvent | null) => {
+        setRoom(next);
+        const me = next.players.find((p) => p.id === playerIdRef.current);
+        if (me) setPlayer(me);
+        if (ev && ev.playerId === playerIdRef.current) {
           setFeedback(ev.message);
           setFeedbackClass(ev.grade);
           setTimeout(() => setFeedback(''), 800);
         }
       },
-      onEnded: (_r: RoomState, res: GameResults) => setResults(res),
+      onEnded: (next: RoomState, res: GameResults) => {
+        setRoom(next);
+        setResults(res);
+      },
+      onPlayerJoined: setRoom,
+      onPlayerLeft: setRoom,
     }),
-    [player?.id],
+    [],
   );
 
-  useRoomEvents(joined ? code : undefined, handlers());
+  useRoomEvents(joined ? code : undefined, handlers);
 
   useEffect(() => {
     if (!joined || room?.phase !== 'playing') return;
@@ -79,15 +97,20 @@ export default function PlayerPage() {
     const stored = localStorage.getItem(PLAYER_STORAGE_KEY);
     const parsed = stored ? JSON.parse(stored) : null;
     const playerId = parsed?.roomCode === code ? parsed.playerId : undefined;
+    const playerToken = parsed?.roomCode === code ? parsed.playerToken : undefined;
 
     try {
-      const result = await joinRoom(code, name.trim(), playerId);
+      const result = await joinRoom(code, name.trim(), playerId, playerToken);
       setPlayer(result.player);
       setRoom(result.room);
       setJoined(true);
       localStorage.setItem(
         PLAYER_STORAGE_KEY,
-        JSON.stringify({ roomCode: code, playerId: result.player.id }),
+        JSON.stringify({
+          roomCode: code,
+          playerId: result.player.id,
+          playerToken: result.playerToken ?? playerToken,
+        }),
       );
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Join failed');

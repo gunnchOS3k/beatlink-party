@@ -105,6 +105,16 @@ export default function HostPage() {
     setGameTimeMs(0);
   }
 
+  function endRoom() {
+    socket.emit('room.end', { code }, (result?: { ok?: boolean; error?: string }) => {
+      if (result && result.ok === false) {
+        setCreateError(result.error ?? 'Failed to end room');
+        return;
+      }
+      window.location.href = '/';
+    });
+  }
+
   const joinUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/join`
@@ -186,7 +196,8 @@ export default function HostPage() {
               <h3>Select Song</h3>
               <div className="song-list">
                 {songs.map((s) => (
-                  <div
+                  <button
+                    type="button"
                     key={s.id}
                     className={`song-item ${room?.selectedSongId === s.id ? 'selected' : ''}`}
                     onClick={() => selectSong(s.id)}
@@ -195,7 +206,7 @@ export default function HostPage() {
                     <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
                       {s.artist} · {Math.round(s.durationMs / 1000)}s · {s.bpm} BPM
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
 
@@ -340,6 +351,9 @@ export default function HostPage() {
 
           <button className="btn-primary btn-large" onClick={replay}>
             Replay / Next Song
+          </button>
+          <button className="btn-secondary btn-large" onClick={endRoom}>
+            End Room
           </button>
         </div>
       )}
