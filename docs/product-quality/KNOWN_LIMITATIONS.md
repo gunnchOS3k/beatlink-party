@@ -8,3 +8,8 @@
 - Mac-host → Pixel-join full round not fully re-recorded after KJRFW Pixel-host round
 - No independent acceptance-verifier run yet
 - No PR (gated)
+
+
+- Pixel Direction A/B retained results screenshots showed **0%** team scores despite awards/round-complete UI; browser path scores correctly. Treat Pixel scoring confirmation as open until a non-zero scored Pixel round is re-captured.
+- AcceptNav broadcast is RC acceptance harness for WebView form fill; QR/manual join remains the product path.
+- `10-room-ended.png` in Direction A archive is mislabeled (song picker) — rely on Direction B `k8-end.png` / Mac end-room frames for room-ended proof.

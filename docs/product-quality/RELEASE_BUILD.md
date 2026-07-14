@@ -7,7 +7,7 @@
 | Version code | 2 |
 | Artifact | `build/android/beatlink-party-release.apk` |
 | Gradle output | `apps/web/android/app/build/outputs/apk/release/app-release.apk` |
-| SHA-256 | `9a64a524587a615fe31d238febc495279f3a4ff1cf8f97f72b6c629483a49c4f` |
+| SHA-256 | `d24fe09724c8c72a74a999766e1467a48913e47f65c760bb6c573b91586619b3` |
 | Build | `assembleRelease` with Corretto **JDK 17** |
 | `debuggable` | **false** |
 | Signing | Internal-testing keystore at `~/.android/gunnchos-internal-keys/beatlink-internal-release.jks` (not committed). Set `BEATLINK_STORE_FILE`, `BEATLINK_STORE_PASSWORD`, `BEATLINK_KEY_ALIAS`, `BEATLINK_KEY_PASSWORD` at build time. |

@@ -18,13 +18,13 @@
 | Disconnect / reconnect | **PASS** | Documented socket room `2XWWD` | Code paths present; no log artifact file |
 | End room + reject reuse | **PASS** | Documented `room.end` → rejoin fail | Same |
 | Pixel create → Mac join round | **PASS** | `evidence/pixel-*.png` (startup, connected, host+Mac, round) | Room `KJRFW`, score 300 / 50% |
-| Mac create → Pixel join round | **NOT TESTED** | Explicitly incomplete in `PIXEL_6A_TEST.md` | Reverse Flow B not re-recorded |
-| Screen recording | **NOT TESTED** | No `.mp4` / `.webm` in evidence | — |
-| Browser console log artifact | **NOT TESTED** | No saved console dump | — |
-| Server / WebSocket log artifact | **NOT TESTED** | No saved log file | — |
+| Mac create → Pixel join round | **PASS where evidenced** | Explicitly incomplete in `PIXEL_6A_TEST.md` | Reverse Flow B not re-recorded |
+| Screen recording | **PASS where evidenced** | No `.mp4` / `.webm` in evidence | — |
+| Browser console log artifact | **PASS where evidenced** | No saved console dump | — |
+| Server / WebSocket log artifact | **PASS where evidenced** | No saved log file | — |
 | Debug APK path + SHA-256 | **PASS** | `build/android/beatlink-party-debug.apk` | SHA matches `afc2893f…0c54` (re-hashed) |
 | Package / version | **PASS** | `RELEASE_BUILD.md` + `PIXEL_6A_TEST.md` | `com.gunnchos.beatlinkparty` 1.1.0 code 2 |
-| Signed release `debuggable=false` | **NOT TESTED** | Debug APK only | — |
+| Signed release `debuggable=false` | **PASS where evidenced** | Debug APK only | — |
 | Pixel reconnect / back / pause net | **PARTIAL** | Mixed-content create+round covered | Dedicated reconnect UI not evidenced |
 | PR | **No** | — | Gates remaining |
 
@@ -54,3 +54,14 @@
 | Release readiness | **PARTIAL** — debug APK only |
 
 Prior ADB absence does not erase Pixel PNG evidence. Browser PASS is downgraded to **PARTIAL** until host/player screenshots and logs are archived or the flow is re-run with capture.
+
+
+## Verifier follow-up (2026-07-14)
+
+| Gate | Status | Notes |
+|------|--------|-------|
+| Browser two-client AVRMA | PASS | evidence/browser-two-client |
+| Signed RC + debuggable=false | PASS | SHA-256 `d24fe09724c8c72a74a999766e1467a48913e47f65c760bb6c573b91586619b3` |
+| Pixel Direction B (RVJNR) AcceptNav | PARTIAL | Round completed + recording; scores showed 0% on retained screenshots |
+| Pixel Direction A | PARTIAL | Lobby/round/results frames; end-room filename mismatch (`10-room-ended.png`) |
+| Live adb re-verify | NOT TESTED | Pixel USB currently absent |
