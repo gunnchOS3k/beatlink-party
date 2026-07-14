@@ -1,0 +1,34 @@
+{
+  "songs": [
+    {
+      "id": "demo-neon-groove",
+      "title": "Neon Groove",
+      "artist": "BeatLink Demo Ensemble",
+      "durationMs": 45000,
+      "bpm": 120,
+      "beatmapId": "demo-track-1",
+      "license": "demo_generated",
+      "description": "Upbeat royalty-free demo track for party rhythm testing."
+    },
+    {
+      "id": "demo-crowd-anthem",
+      "title": "Crowd Anthem",
+      "artist": "BeatLink Demo Ensemble",
+      "durationMs": 40000,
+      "bpm": 128,
+      "beatmapId": "demo-track-2",
+      "license": "demo_generated",
+      "description": "High-energy chorus-focused demo for vocalist and hype roles."
+    },
+    {
+      "id": "demo-midnight-pulse",
+      "title": "Midnight Pulse",
+      "artist": "BeatLink Demo Ensemble",
+      "durationMs": 50000,
+      "bpm": 110,
+      "beatmapId": "demo-track-3",
+      "license": "demo_generated",
+      "description": "Slower groove demo with longer hold notes and hype windows."
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def beatlinkStoreFile = System.getenv("BEATLINK_STORE_FILE") ?: (project.hasProperty("BEATLINK_STORE_FILE") ? project.property("BEATLINK_STORE_FILE") : null)
+def beatlinkStorePassword = System.getenv("BEATLINK_STORE_PASSWORD") ?: (project.hasProperty("BEATLINK_STORE_PASSWORD") ? project.property("BEATLINK_STORE_PASSWORD") : null)
+def beatlinkKeyAlias = System.getenv("BEATLINK_KEY_ALIAS") ?: (project.hasProperty("BEATLINK_KEY_ALIAS") ? project.property("BEATLINK_KEY_ALIAS") : null)
+def beatlinkKeyPassword = System.getenv("BEATLINK_KEY_PASSWORD") ?: (project.hasProperty("BEATLINK_KEY_PASSWORD") ? project.property("BEATLINK_KEY_PASSWORD") : null)
+def hasInternalReleaseKey = beatlinkStoreFile && beatlinkStorePassword && beatlinkKeyAlias && beatlinkKeyPassword && file(beatlinkStoreFile).exists()
+
 android {
     namespace "com.gunnchos.beatlinkparty"
     compileSdk rootProject.ext.compileSdkVersion
@@ -16,11 +22,28 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (hasInternalReleaseKey) {
+            release {
+                storeFile file(beatlinkStoreFile)
+                storePassword beatlinkStorePassword
+                keyAlias beatlinkKeyAlias
+                keyPassword beatlinkKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            debuggable false
+            if (hasInternalReleaseKey) {
+                signingConfig signingConfigs.release
+            } else {
+                // Fallback only for broken local env; CI/internal RC must set BEATLINK_* env vars.
+                signingConfig signingConfigs.debug
+                logger.warn("BeatLink release signing: BEATLINK_* not set; using debug keystore")
+            }
         }
     }
 }

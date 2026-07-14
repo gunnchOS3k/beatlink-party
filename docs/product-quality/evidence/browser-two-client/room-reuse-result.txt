@@ -1,0 +1,1 @@
+Room join on closed code AVRMA returned error "Room not found or full" (websocket-transitions.log). UI remained on Enter Lobby after rejected join.
