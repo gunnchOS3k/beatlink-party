@@ -1,0 +1,26 @@
+← Home
+HOST MODE
+
+ROOM CODE — SHARE WITH PLAYERS
+
+KBRED
+
+Players join at: http://127.0.0.1:5173/join
+
+Connection: ✓ Room server connected
+
+Players (0/6)
+
+Waiting for players to join...
+
+Select Song
+Neon Groove
+BeatLink Demo Ensemble · 45s · 120 BPM
+Crowd Anthem
+BeatLink Demo Ensemble · 40s · 128 BPM
+Midnight Pulse
+BeatLink Demo Ensemble · 50s · 110 BPM
+PASTE MUSIC LINK (METADATA ONLY)
+Resolve
+Start Countdown
+End Room

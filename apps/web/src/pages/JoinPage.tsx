@@ -1,10 +1,22 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function JoinPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
+
+  useEffect(() => {
+    const qCode = (searchParams.get('code') ?? '').trim().toUpperCase();
+    const qName = (searchParams.get('name') ?? '').trim();
+    const auto = searchParams.get('auto') === '1';
+    if (qCode) setCode(qCode);
+    if (qName) setName(qName);
+    if (auto && qCode && qName) {
+      navigate(`/play/${qCode}?name=${encodeURIComponent(qName)}`, { replace: true });
+    }
+  }, [navigate, searchParams]);
 
   function handleJoin(e: React.FormEvent) {
     e.preventDefault();

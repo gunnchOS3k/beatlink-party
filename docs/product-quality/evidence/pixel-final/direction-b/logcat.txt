@@ -1,0 +1,105 @@
+--------- beginning of main
+07-13 22:26:18.977 E/msys    (13800): E[N MQTT]onConnectError(562)=>Connect Error: folly::AsyncSocketException: AsyncSocketException: connect timed out after 199998ms, type = Timed out
+07-13 22:26:18.978 E/msys    (13800): E[N mccw.liger]onConnectError(588)=>connect/error - address: 2a03:2880:f275:1e0:face:b00c:0:6e2e, port: 5222, ex: folly::AsyncSocketException: AsyncSocketException: connect timed out after 9999ms, type = Timed out
+07-13 22:26:18.984 E/msys    (13800): E[N mccw.liger]onConnectError(588)=>connect/error - address: 2a03:2880:f275:1e0:face:b00c:0:6e2e, port: 443, ex: folly::AsyncSocketException: AsyncSocketException: connect timed out after 9999ms, type = Timed out
+07-13 22:26:18.998 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.004 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.005 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.005 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.005 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.006 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.006 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.006 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.006 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.016 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.016 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.024 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.052 E/SlowAppComponent(13800): 0ms: SystemJobService instantiating…
+07-13 22:26:19.053 E/SlowAppComponent(13800): Main thread was blocked for 30ms in the background starting with SystemJobService
+07-13 22:26:19.067 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMLifecycleEventHandler(2214)=>[INFO] connection/xmpp/lifecycle_event/did-connect, [1016.4700s]
+07-13 22:26:19.094 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMLifecycleEventHandler(2214)=>[INFO] connection/xmpp/lifecycle_event/did-send-initial-payload, [0.0261s]
+07-13 22:26:19.129 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMLifecycleEventHandler(2214)=>[INFO] connection/xmpp/lifecycle_event/will-handshake, [0.0356s]
+07-13 22:26:19.136 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMLifecycleEventHandler(2214)=>[INFO] connection/xmpp/lifecycle_event/did-handshake, [0.0068s]
+07-13 22:26:19.137 E/EmergencyPushPeriodicFetchWorker(13800): Skipping fetch since app is backgrounded
+07-13 22:26:19.141 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMReceiveHandler(2386)=>[INFO] connection/receive/login-success
+07-13 22:26:19.145 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMEmitStateChange(3230)=>[INFO] connection/new_state/connected [connection_id=241137855, wcc_source=1, wcc_reason=18]
+07-13 22:26:19.146 E/msys    (13800): E[C MEMConnectionManager]_MEMConnectionManagerStateChangeHandler(631)=>[Critical] MEMConnectionState updated to ID: 2 with connectionId: 241137855
+07-13 22:26:19.189 E/screenrecord( 3849): Failed to query component interface for required system resources: 6
+07-13 22:26:19.191 E/ECOSession( 1320): Failed to create ECOSession with w: 1080, h: 2400, isCameraRecording: 1
+07-13 22:26:19.191 E/ECOService( 1320): ECOService failed to create ECOSession w: 1080, h: 2400, isCameraRecording: 1
+07-13 22:26:19.191 E/ECOServiceStatsProvider( 1320): Failed to obtain an ECO session
+07-13 22:26:19.191 E/ExynosC2H264EncComponent( 1320): Failed to create stats provider
+07-13 22:26:19.193 E/libbinder.IPCThreadState( 1728): Binder transaction failure. id: 8681089, cmd: BR_DEAD_REPLY (29189), error: -22 (Invalid argument)
+07-13 22:26:19.206 E/SurfaceFlinger(  552): [ScreenRecorder] getUniqueId: Invalid operation on virtual display
+07-13 22:26:19.238 E/BpTransactionCompletedListener(  552): Failed to transact (-32)
+07-13 22:26:19.243 E/msys    (13800): E[N mns:DGWClient]_OnResolverSuccess(359)=>Cache refresh succeeded with system DNS resolver. IP count: 2
+07-13 22:26:19.329 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.563 E/msys    (13800): E[N mns:TigonMNS]_OnResolverSuccess(359)=>Cache refresh succeeded with Multinetwork resolver. IP count: 2
+07-13 22:26:19.793 E/libc    ( 3950): SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+07-13 22:26:19.841 W/chromium( 3912): [WARNING:net/dns/dns_config_service_android.cc:69] Failed to read DnsConfig.
+07-13 22:26:19.850 W/chromium( 3912): [WARNING:android_webview/browser/network_service/net_helpers.cc:137] HTTP Cache size is: 20971520
+07-13 22:26:19.894 D/Capacitor( 3912): Starting BridgeActivity
+07-13 22:26:19.919 W/chromium( 3950): [WARNING:content/app/android/content_main_android.cc:82] android_setCpu already initialized
+07-13 22:26:19.944 W/chromium( 3950): [WARNING:content/child/runtime_features.cc:546] Fenced frames cannot be enabled in this configuration. Use --enable-features=FencedFrames instead.
+07-13 22:26:19.944 W/chromium( 3950): [WARNING:content/child/runtime_features.cc:571] Topics cannot be enabled in this configuration. Use --enable-features=BrowsingTopics in addition.
+07-13 22:26:19.944 W/chromium( 3950): [WARNING:content/child/runtime_features.cc:592] SharedStorage cannot be enabled in this configuration. Use --enable-features=SharedStorageAPI in addition.
+07-13 22:26:20.064 E/ashmem  ( 3950): readlink(/proc/self/fd/123) failed: Operation not permitted
+07-13 22:26:20.065 E/ashmem  ( 3950): readlink(/proc/self/fd/124) failed: Operation not permitted
+07-13 22:26:20.065 E/ashmem  ( 3950): readlink(/proc/self/fd/126) failed: Operation not permitted
+07-13 22:26:20.065 E/ashmem  ( 3950): readlink(/proc/self/fd/125) failed: Operation not permitted
+07-13 22:26:20.066 E/ashmem  ( 3950): readlink(/proc/self/fd/127) failed: Operation not permitted
+07-13 22:26:20.066 E/ashmem  ( 3950): readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 22:26:20.229 E/ashmem  ( 3950): readlink(/proc/self/fd/99) failed: Operation not permitted
+07-13 22:26:20.234 E/ashmem  ( 3950): readlink(/proc/self/fd/128) failed: Operation not permitted
+07-13 22:26:20.235 E/ashmem  ( 3950): readlink(/proc/self/fd/112) failed: Operation not permitted
+07-13 22:26:20.237 E/ashmem  ( 3950): readlink(/proc/self/fd/112) failed: Operation not permitted
+07-13 22:26:20.767 E/PickerDbFacade( 4081): Could not get first date taken millis for media id: 1000000718
+07-13 22:26:20.804 E/AuthPII (13259): [RequestTokenManager] getToken() -> BAD_AUTHENTICATION. App: com.android.vending, Service: oauth2:https://www.googleapis.com/auth/googleplay
+07-13 22:26:20.804 E/AuthPII (13259): bkfz: Long live credential not available.
+07-13 22:26:20.804 E/AuthPII (13259): 	at aiho.a(:com.google.android.gms@262434035@26.24.34 (260400-938041327):1347)
+07-13 22:26:20.804 E/AuthPII (13259): 	at aihv.b(:com.google.android.gms@262434035@26.24.34 (260400-938041327):26)
+07-13 22:26:20.804 E/AuthPII (13259): 	at aiht.a(:com.google.android.gms@262434035@26.24.34 (260400-938041327):745)
+07-13 22:26:20.804 E/AuthPII (13259): 	at aihs.b(:com.google.android.gms@262434035@26.24.34 (260400-938041327):151)
+07-13 22:26:20.804 E/AuthPII (13259): 	at abbt.d(:com.google.android.gms@262434035@26.24.34 (260400-938041327):829)
+07-13 22:26:20.804 E/AuthPII (13259): 	at aibf.getAuthToken(:com.google.android.gms@262434035@26.24.34 (260400-938041327):411)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.accounts.AbstractAccountAuthenticator$Transport.getAuthToken(AbstractAccountAuthenticator.java:248)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.accounts.IAccountAuthenticator$Stub.onTransact(IAccountAuthenticator.java:254)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.os.Binder.transact(Binder.java:1318)
+07-13 22:26:20.804 E/AuthPII (13259): 	at csax.onTransact(:com.google.android.gms@262434035@26.24.34 (260400-938041327):12)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.os.Binder.transact(Binder.java:1318)
+07-13 22:26:20.804 E/AuthPII (13259): 	at cdnj.onTransact(:com.google.android.gms@262434035@26.24.34 (260400-938041327):169)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.os.Binder.execTransactInternal(Binder.java:1471)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.os.Binder.execTransact(Binder.java:1411)
+07-13 22:26:20.804 E/AuthPII (13259): Message is Long live credential not available.
+07-13 22:26:20.804 E/AuthPII (13259): bkfz: Long live credential not available.
+07-13 22:26:20.804 E/AuthPII (13259): 	at aiho.a(:com.google.android.gms@262434035@26.24.34 (260400-938041327):1347)
+07-13 22:26:20.804 E/AuthPII (13259): 	at aihv.b(:com.google.android.gms@262434035@26.24.34 (260400-938041327):26)
+07-13 22:26:20.804 E/AuthPII (13259): 	at aiht.a(:com.google.android.gms@262434035@26.24.34 (260400-938041327):745)
+07-13 22:26:20.804 E/AuthPII (13259): 	at aihs.b(:com.google.android.gms@262434035@26.24.34 (260400-938041327):151)
+07-13 22:26:20.804 E/AuthPII (13259): 	at abbt.d(:com.google.android.gms@262434035@26.24.34 (260400-938041327):829)
+07-13 22:26:20.804 E/AuthPII (13259): 	at aibf.getAuthToken(:com.google.android.gms@262434035@26.24.34 (260400-938041327):411)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.accounts.AbstractAccountAuthenticator$Transport.getAuthToken(AbstractAccountAuthenticator.java:248)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.accounts.IAccountAuthenticator$Stub.onTransact(IAccountAuthenticator.java:254)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.os.Binder.transact(Binder.java:1318)
+07-13 22:26:20.804 E/AuthPII (13259): 	at csax.onTransact(:com.google.android.gms@262434035@26.24.34 (260400-938041327):12)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.os.Binder.transact(Binder.java:1318)
+07-13 22:26:20.804 E/AuthPII (13259): 	at cdnj.onTransact(:com.google.android.gms@262434035@26.24.34 (260400-938041327):169)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.os.Binder.execTransactInternal(Binder.java:1471)
+07-13 22:26:20.804 E/AuthPII (13259): 	at android.os.Binder.execTransact(Binder.java:1411)
+07-13 22:26:22.039 E/MetadataRetrieverClient( 1470): offset (0) bigger than file size (0)
+07-13 22:26:24.220 E/msys    (13800): E[N mccw.liger]onReadError(701)=>read/error - ex: AsyncSocketException: recv() failed (peer=[2a03:2880:f275:1e0:face:b00c:0:6e2e]:80), type = Internal error, errno = 103 (Software caused connection abort), errno: 103
+07-13 22:26:24.224 E/msys    (13800): E[N WA]_WCCXMPPStreamDisconnectHandler(344)=>xmpp/disconnect - WCIStreamStateErrorCode: 2, domain: WCIStreamState, subdomain: MCCWLigerStream: Error Domain=WCIStreamState Code=2 UserInfo=0xb400007874585520 {MCFErrorDirectUnderlyingErrorKey=0xb40000795410b390 "Error Domain=MCCWLigerStream Code=2 UserInfo=0xb4000078740636a0 {MCFErrorDirectLocalizedFailureReasonKey=AsyncSocketException: recv() failed (peer=[2a03:2880:f275:1e0:face:b00c:0:6e2e]:80), type = Internal error, errno = 103 (Software caused connection abort)}"}
+07-13 22:26:24.224 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMLifecycleEventHandler(2214)=>[INFO] connection/xmpp/lifecycle_event/not-connected, [5.0876s]
+07-13 22:26:24.224 E/msys    (13800): E[N WA]_WCCXMPPStreamDoDisconnect(1319)=>xmpp/disconnect - flags: 256
+07-13 22:26:24.225 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMDisconnectHandler(2325)=>connection/disconnected, peer reset
+07-13 22:26:24.225 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMEmitStateChange(3230)=>[INFO] connection/new_state/not-connected [connection_id=241137855, wcc_source=1, wcc_reason=18]
+07-13 22:26:24.227 E/msys    (13800): E[C MEMConnectionManager]_MEMConnectionManagerStateChangeHandler(631)=>[Critical] MEMConnectionState updated to ID: 0 with connectionId: 241137855
+07-13 22:26:24.239 E/msys    (13800): E[C 1]_MCCLogErrorInternal(331)=>8/374/3970/65536
+07-13 22:26:24.240 E/msys    (13800): E[C 1]_MCCLogErrorInternal(331)=>8/374/3972/18
+07-13 22:26:24.241 E/msys    (13800): E[C mem.context]_LogConnectFailure(4887)=>Establishing connection failure reason and flags: disconnect/Doze/-1/reason/18/flags/65536/[-, -, -, -, -, -, -, -, -, peer_reset, -, -, -, -]
+07-13 22:26:24.241 E/msys    (13800): E[C mem.context]_LogConnectFailure(4919)=>[Happy Eyeball] Connect failed with source=1, winner stream ip=2a03:2880:f275:1e0:face:b00c:0:6e2e, port=80, dnsResolutionMethod=1, combined_ip_addresses=2a03:2880:f275:1e0:face:b00c:0:6e2e, 57.144.174.36
+07-13 22:26:24.244 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMEmitStateChange(3230)=>[INFO] connection/new_state/connecting [connection_id=241137856, wcc_source=1, wcc_reason=18]
+07-13 22:26:24.245 E/msys    (13800): E[C MEMConnectionManager]_MEMConnectionManagerStateChangeHandler(631)=>[Critical] MEMConnectionState updated to ID: 1 with connectionId: 241137856
+07-13 22:26:24.300 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMDoConnectWithAuthKeys(1576)=>[INFO] connection/connect/start/[host=z-p42-chat-e2ee-ig.facebook.com port=5222]/[57.144.174.36:5222]/socketAddressCount=2
+07-13 22:26:24.301 E/msys    (13800): E[N WCCConnectionMEM]_WCCConnectionMEMLifecycleEventHandler(2206)=>[INFO] connection/xmpp/lifecycle_event/will-connect
+07-13 22:26:24.301 E/msys    (13800): E[A WA]WCCHandshakeCreate(191)=>handshake/create, pq mode:0

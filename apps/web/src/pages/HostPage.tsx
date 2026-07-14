@@ -256,6 +256,9 @@ export default function HostPage() {
               >
                 Start Countdown
               </button>
+              <button className="btn-secondary btn-large" onClick={endRoom} type="button">
+                End Room
+              </button>
             </div>
           </div>
         </>

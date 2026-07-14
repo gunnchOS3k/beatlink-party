@@ -33,6 +33,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- Internal RC / adb acceptance helper: navigate Capacitor WebView to /join or /play -->
+        <receiver
+            android:name=".AcceptNavReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.gunnchos.beatlinkparty.ACCEPT_NAV" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <!-- Permissions -->
