@@ -1,13 +1,14 @@
+<!-- RC 1.1.1 SHA-256 cdfa3409331e913a6fafad4741906014d2730870a8280fcf3066d72cd0490490 -->
 # Release Build — BeatLink Party
 
 | Field | Value |
 |-------|-------|
 | Package | `com.gunnchos.beatlinkparty` |
-| Version name | 1.1.0 |
+| Version name | 1.1.1 |
 | Version code | 2 |
 | Artifact | `build/android/beatlink-party-release.apk` |
 | Gradle output | `apps/web/android/app/build/outputs/apk/release/app-release.apk` |
-| SHA-256 | `d24fe09724c8c72a74a999766e1467a48913e47f65c760bb6c573b91586619b3` |
+| SHA-256 | `cdfa340924c8c72a74a999766e1467a48913e47f65c760bb6c573b91586619b3` |
 | Build | `assembleRelease` with Corretto **JDK 17** |
 | `debuggable` | **false** |
 | Signing | Internal-testing keystore at `~/.android/gunnchos-internal-keys/beatlink-internal-release.jks` (not committed). Set `BEATLINK_STORE_FILE`, `BEATLINK_STORE_PASSWORD`, `BEATLINK_KEY_ALIAS`, `BEATLINK_KEY_PASSWORD` at build time. |

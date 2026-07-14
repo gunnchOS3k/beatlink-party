@@ -9,7 +9,7 @@
 **Signer cert SHA-256:** `fa62d4bcaa350a4b0e2ea89d9d1c9dab73a8c04dbf37a09005759e8d058c654a`  
 **debuggable:** false  
 
-Server: stable `node` on `10.0.0.113:3001` · Mac web `http://10.0.0.113:5173`  
+Server: stable `node` on `<LAN_HOST>:3001` · Mac web `http://<LAN_HOST>:5173`  
 Duration policy: `ACCEPTANCE_TEST_DURATION.md` (demo beatmaps / 45s fallback ≠ silent production change)
 
 ## Direction B — Mac hosts → Pixel joins — **PASS**
