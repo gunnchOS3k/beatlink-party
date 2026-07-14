@@ -1,0 +1,12 @@
+path=/Users/gunnchos/Documents/Codex/2026-07-09/github-plugin-github-openai-curated-remote/work/repos/beatlink-party/build/android/beatlink-party-release.apk
+mtime=2026-07-13T23:00:22-0500
+d24fe09724c8c72a74a999766e1467a48913e47f65c760bb6c573b91586619b3  /Users/gunnchos/Documents/Codex/2026-07-09/github-plugin-github-openai-curated-remote/work/repos/beatlink-party/build/android/beatlink-party-release.apk
+package: name='com.gunnchos.beatlinkparty' versionCode='2' versionName='1.1.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'
+sdkVersion:'22'
+targetSdkVersion:'34'
+debuggable=false (default)
+Verifies
+Number of signers: 1
+Signer #1 certificate DN: CN=BeatLink Internal RC, OU=GunnchOS, O=GunnchOS, L=Local, ST=NA, C=US
+Signer #1 certificate SHA-256 digest: fa62d4bcaa350a4b0e2ea89d9d1c9dab73a8c04dbf37a09005759e8d058c654a
+Signer #1 public key SHA-256 digest: 4332fc8eff36deba8827fddc57a05fa7ce9c9a002c7100f8f52455eae84652eb

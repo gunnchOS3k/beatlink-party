@@ -1,6 +1,7 @@
 package com.gunnchos.beatlinkparty;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 import com.getcapacitor.Bridge;
 import com.getcapacitor.BridgeActivity;
@@ -37,5 +38,23 @@ public class MainActivity extends BridgeActivity {
             bridge
                 .getWebView()
                 .evaluateJavascript("window.location.assign('" + safe + "');", null));
+  }
+
+  /** Internal RC: evaluate JS in the Capacitor WebView (AcceptNav `action=js`). */
+  public static void evalJs(String js) {
+    if (instance == null || js == null || js.isEmpty()) {
+      return;
+    }
+    final Bridge bridge = instance.getBridge();
+    if (bridge == null || bridge.getWebView() == null) {
+      return;
+    }
+    instance.runOnUiThread(
+        () ->
+            bridge
+                .getWebView()
+                .evaluateJavascript(
+                    js,
+                    (value) -> Log.i("BeatLinkAccept", "JS_RESULT:" + value)));
   }
 }

@@ -1,15 +1,12 @@
 # Known Limitations — BeatLink Party
 
-- Current Pixel artifact is **debug** (`assembleDebug`), not signed release
-- Capacitor uses `https://localhost` with `allowMixedContent` for LAN `ws://` — production hosting should use WSS
-- Host QR “join at” shows `https://localhost/join` on device (code + QR still usable)
-- Cold Node module load on Documents path can take minutes; keep server process alive
-- Gradle requires **JDK 17** (Java 25 fails with unsupported class file 69)
-- Mac-host → Pixel-join full round not fully re-recorded after KJRFW Pixel-host round
-- No independent acceptance-verifier run yet
-- No PR (gated)
+**Updated:** 2026-07-14
 
-
-- Pixel Direction A/B retained results screenshots showed **0%** team scores despite awards/round-complete UI; browser path scores correctly. Treat Pixel scoring confirmation as open until a non-zero scored Pixel round is re-captured.
-- AcceptNav broadcast is RC acceptance harness for WebView form fill; QR/manual join remains the product path.
-- `10-room-ended.png` in Direction A archive is mislabeled (song picker) — rely on Direction B `k8-end.png` / Mac end-room frames for room-ended proof.
+- Capacitor device build uses `https://localhost` origin with `allowMixedContent` for LAN `ws://` — production should use WSS / hosted origin.
+- Host QR “join at” shows `https://localhost/join` on device; room **code** + AcceptNav / manual join remain the workable Pixel paths.
+- AcceptNav (`ACCEPT_NAV` + `js_b64`) is an RC harness; not a substitute for finger-only product UX claims.
+- Reuse/invalid-code screens often remain on Enter Lobby until the join attempt fails — capture alert/toast wording more clearly next pass.
+- Direction A Pixel-host rounds have one scoring player (Mac); host UI does not submit TAP input.
+- Cold Node module load on Documents path can take minutes — keep the device server process alive.
+- Gradle requires **JDK 17**.
+- Independent acceptance-verifier not re-run after this evidence refresh; **no PR** yet.

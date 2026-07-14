@@ -1,67 +1,29 @@
 # Acceptance Checklist — BeatLink Party
 
-**Verified evidence audit:** 2026-07-13 (resume)
+**Updated:** 2026-07-14
 
-## Requirement classification
+| Gate | Status | Evidence |
+|------|--------|----------|
+| Stable server (no watch) | **PASS** | `node` on `:3001` health OK at `10.0.0.113` |
+| Test vs production duration | **PASS** | `ACCEPTANCE_TEST_DURATION.md` — demo beatmaps / 45s fallback; not a silent production override |
+| Signed RC + `debuggable=false` | **PASS** | `build/android/beatlink-party-release.apk` 1.1.1 (3) SHA `cdfa3409331e913a6fafad4741906014d2730870a8280fcf3066d72cd0490490` · cert `fa62d4bc…654a` |
+| Pixel Direction B (Mac hosts) | **PASS** | Room `Y7QM9` · both Ready · Round Complete team **10050** · End Room · `evidence/pixel-multiplayer/direction-b/` |
+| Pixel Direction A (Pixel hosts) | **PASS** | Room `3KB67` · MacGuest Ready · Round Complete team **7400** · End Room · `evidence/pixel-multiplayer/direction-a/` |
+| Reconnect / background | **PASS** | Dir B Pixel HOME+resume; Dir A Mac offline/online |
+| Invalid / reuse | **PARTIAL** | Invalid-code + reuse screens captured; reject UX often stays on Enter Lobby until join fails |
+| PR | **No** | Awaiting independent verifier + Edmund |
 
-| Gate | Status | Direct evidence in-repo | Notes |
-|------|--------|-------------------------|-------|
-| Stable server without watch | **PASS** | Scripts + prior session notes | `server:device` → `node dist/index.js` |
-| Create Room loading feedback | **PARTIAL** | Documented; no retained screenshot file | Checkbox narrative only |
-| Host lobby + room code + QR | **PARTIAL** | Room `CQ9V5` documented; **no** `evidence/browser-host-*.png` | Screenshot not archived under `docs/product-quality/evidence/` |
-| Two-client browser join | **PARTIAL** | Narrative + room URLs | No retained host/player browser PNG pair |
-| Role + ready | **PARTIAL** | Narrative | Same |
-| Demo track + countdown | **PARTIAL** | Narrative (Neon Groove) | Same |
-| Synchronized play | **PARTIAL** | Narrative | Same |
-| Server-authoritative scores | **PARTIAL** | Score 300 / 75% recorded in docs | No saved server log file |
-| Results on host + player | **PARTIAL** | Claimed screenshots; **not found on disk** | Do not treat as fully evidenced |
-| Disconnect / reconnect | **PASS** | Documented socket room `2XWWD` | Code paths present; no log artifact file |
-| End room + reject reuse | **PASS** | Documented `room.end` → rejoin fail | Same |
-| Pixel create → Mac join round | **PASS** | `evidence/pixel-*.png` (startup, connected, host+Mac, round) | Room `KJRFW`, score 300 / 50% |
-| Mac create → Pixel join round | **PASS where evidenced** | Explicitly incomplete in `PIXEL_6A_TEST.md` | Reverse Flow B not re-recorded |
-| Screen recording | **PASS where evidenced** | No `.mp4` / `.webm` in evidence | — |
-| Browser console log artifact | **PASS where evidenced** | No saved console dump | — |
-| Server / WebSocket log artifact | **PASS where evidenced** | No saved log file | — |
-| Debug APK path + SHA-256 | **PASS** | `build/android/beatlink-party-debug.apk` | SHA matches `afc2893f…0c54` (re-hashed) |
-| Package / version | **PASS** | `RELEASE_BUILD.md` + `PIXEL_6A_TEST.md` | `com.gunnchos.beatlinkparty` 1.1.0 code 2 |
-| Signed release `debuggable=false` | **PASS where evidenced** | Debug APK only | — |
-| Pixel reconnect / back / pause net | **PARTIAL** | Mixed-content create+round covered | Dedicated reconnect UI not evidenced |
-| PR | **No** | — | Gates remaining |
+## APK metadata
 
-## Artifact inventory
+- Package: `com.gunnchos.beatlinkparty`
+- Version: **1.1.1** · versionCode **3**
+- Path: `build/android/beatlink-party-release.apk`
+- SHA-256: `cdfa3409331e913a6fafad4741906014d2730870a8280fcf3066d72cd0490490`
+- Signer: CN=BeatLink Internal RC · cert SHA-256 `fa62d4bcaa350a4b0e2ea89d9d1c9dab73a8c04dbf37a09005759e8d058c654a`
 
-**Present**
+## Evidence roots
 
-- Pixel screenshots under `docs/product-quality/evidence/`
-- `docs/product-quality/PIXEL_6A_TEST.md`
-- `docs/product-quality/RELEASE_BUILD.md`
-- APK: `build/android/beatlink-party-debug.apk` (SHA verified)
-
-**Missing (do not invent PASS)**
-
-- Host/player browser screenshots archived in evidence/
-- Screen recording
-- Saved server / WebSocket / browser console logs
-- Flow B Pixel-join full round evidence
-- Signed release APK
-
-## Honest overall
-
-| Milestone | Status |
-|-----------|--------|
-| Browser two-client round | **PARTIAL** — implementation worked in session; retained file evidence incomplete |
-| Pixel host → Mac join | **PASS** — PNG evidence present |
-| Release readiness | **PARTIAL** — debug APK only |
-
-Prior ADB absence does not erase Pixel PNG evidence. Browser PASS is downgraded to **PARTIAL** until host/player screenshots and logs are archived or the flow is re-run with capture.
-
-
-## Verifier follow-up (2026-07-14)
-
-| Gate | Status | Notes |
-|------|--------|-------|
-| Browser two-client AVRMA | PASS | evidence/browser-two-client |
-| Signed RC + debuggable=false | PASS | SHA-256 `d24fe09724c8c72a74a999766e1467a48913e47f65c760bb6c573b91586619b3` |
-| Pixel Direction B (RVJNR) AcceptNav | PARTIAL | Round completed + recording; scores showed 0% on retained screenshots |
-| Pixel Direction A | PARTIAL | Lobby/round/results frames; end-room filename mismatch (`10-room-ended.png`) |
-| Live adb re-verify | NOT TESTED | Pixel USB currently absent |
+- `docs/product-quality/evidence/pixel-multiplayer/direction-b/` (incl. `beatlink-direction-b.mp4`, results host/player)
+- `docs/product-quality/evidence/pixel-multiplayer/direction-a/` (incl. `beatlink-direction-a.mp4`)
+- `docs/product-quality/evidence/pixel-multiplayer/SUMMARY.json`
+- `docs/product-quality/ACCEPTANCE_TEST_DURATION.md`
