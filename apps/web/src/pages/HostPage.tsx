@@ -50,7 +50,9 @@ function LinkPreview({ result }: { result: LinkResolveResult }) {
           <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>{result.message}</p>
         </div>
       </div>
-      {result.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM' && result.sourceId ? (
+      {result.sourceId &&
+      (result.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM' ||
+        result.playbackStatus === 'METADATA_ONLY') ? (
         <ProviderEmbed result={result} />
       ) : null}
     </div>
@@ -59,10 +61,15 @@ function LinkPreview({ result }: { result: LinkResolveResult }) {
 
 function ProviderEmbed({ result }: { result: LinkResolveResult }) {
   if (!result.sourceId) return null;
+  const isAuthorized = result.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM';
   if (result.platform === 'youtube') {
     return (
       <div style={{ marginTop: '0.75rem' }}>
-        <p className="label">Official YouTube embed stub</p>
+        <p className="label">
+          {isAuthorized
+            ? 'Official YouTube embed (authorized platform path)'
+            : 'Official YouTube embed preview (no API key required)'}
+        </p>
         <iframe
           title="YouTube preview"
           width="100%"
@@ -72,6 +79,10 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
           allowFullScreen
           style={{ border: 0, borderRadius: 12 }}
         />
+        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+          Host hearing uses the official embed. Multiplayer scoring still follows catalog metronome /
+          calibration unless a future SDK auth path unlocks platform-synced rounds.
+        </p>
       </div>
     );
   }
@@ -79,7 +90,11 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
     const id = result.sourceId.slice('track:'.length);
     return (
       <div style={{ marginTop: '0.75rem' }}>
-        <p className="label">Official Spotify embed stub</p>
+        <p className="label">
+          {isAuthorized
+            ? 'Official Spotify embed (authorized platform path)'
+            : 'Official Spotify embed preview (no client secret required for iframe)'}
+        </p>
         <iframe
           title="Spotify preview"
           style={{ borderRadius: 12, border: 0 }}
@@ -89,6 +104,37 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"
         />
+        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+          User-initiated Spotify iframe playback is shown here. Synchronized controller rounds still
+          require catalog match or Spotify Web Playback SDK + user OAuth.
+        </p>
+      </div>
+    );
+  }
+  if (result.platform === 'apple_music') {
+    const deepLink = result.sourceId
+      ? `https://music.apple.com/song/${encodeURIComponent(result.sourceId)}`
+      : null;
+    return (
+      <div style={{ marginTop: '0.75rem' }}>
+        <p className="label">Apple Music — legal deep-link / MusicKit boundary</p>
+        {deepLink ? (
+          <a
+            href={deepLink}
+            target="_blank"
+            rel="noreferrer"
+            className="btn"
+            style={{ display: 'inline-block', marginTop: '0.35rem' }}
+          >
+            Open in Apple Music
+          </a>
+        ) : (
+          <p style={{ fontSize: '0.9rem' }}>Paste a song URL with a recognizable Apple Music song id.</p>
+        )}
+        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+          MusicKit JS playback needs a signed developer token from a secure server endpoint. BeatLink
+          does not embed private keys or mint tokens in the client.
+        </p>
       </div>
     );
   }
@@ -265,6 +311,8 @@ export default function HostPage() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [songsError, setSongsError] = useState<string | null>(null);
   const [beatmapBpm, setBeatmapBpm] = useState(120);
+  const [difficulty, setDifficulty] = useState<'beginner' | 'casual' | 'pro' | 'nightmare'>('casual');
+  const [playMode, setPlayMode] = useState<'party' | 'competitive'>('party');
   const metronomeRef = useRef<{ stop: () => void } | null>(null);
 
   useEffect(() => {
@@ -570,6 +618,38 @@ export default function HostPage() {
                   Shared with peers: {room.pastedLinkUrl}
                 </p>
               )}
+
+              <div className="row" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
+                <label style={{ flex: 1, minWidth: 140 }}>
+                  <span className="label">Difficulty</span>
+                  <select
+                    value={difficulty}
+                    onChange={(e) =>
+                      setDifficulty(e.target.value as 'beginner' | 'casual' | 'pro' | 'nightmare')
+                    }
+                    style={{ width: '100%' }}
+                  >
+                    <option value="beginner">Beginner</option>
+                    <option value="casual">Casual</option>
+                    <option value="pro">Pro</option>
+                    <option value="nightmare">Nightmare</option>
+                  </select>
+                </label>
+                <label style={{ flex: 1, minWidth: 140 }}>
+                  <span className="label">Mode</span>
+                  <select
+                    value={playMode}
+                    onChange={(e) => setPlayMode(e.target.value as 'party' | 'competitive')}
+                    style={{ width: '100%' }}
+                  >
+                    <option value="party">Party</option>
+                    <option value="competitive">Competitive</option>
+                  </select>
+                </label>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
+                Selected for this room: {difficulty} · {playMode}
+              </p>
 
               <button
                 className="btn-primary btn-large"

@@ -1,0 +1,13 @@
+# BeatLink APK inspection — 1.1.2 / versionCode 4
+
+**Built:** 2026-07-15 from branch `cursor/character-life-and-final-product-pass`  
+**Path:** `build/android/beatlink-party-release.apk`  
+**SHA-256:** `a59d1e68f779d09085d3c471fe923130dbbdc70d6871c2290e2606134040c753`  
+**Package:** `com.gunnchos.beatlinkparty`  
+**Includes current UI markers:** `Official YouTube embed preview`, `Start Calibration`
+
+## Notes
+
+- Finder `* 2` / spaced resource duplicates must be cleared before `assembleRelease`.
+- Pixel install of this APK: **BLOCKED** (no device attached this session).
+- Defining platform-synced audio still requires provider credentials / SDK user auth; see `PROVIDER_CREDENTIALS.md`.

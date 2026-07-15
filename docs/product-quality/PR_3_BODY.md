@@ -1,22 +1,29 @@
 ## Summary
-- Song-link resolve (YouTube/Spotify oEmbed), calibration phase, host metronome for catalog tracks, room link persistence (branch tip `f88f3d7`).
-- Defining paste → official auth/playback → calibrate → round → results is **not** complete for Spotify/Apple SDK; YouTube is best-effort embed.
+- Credential-free provider host flow improved: official YouTube/Spotify iframe previews without secrets; Apple deep-link/MusicKit boundary CTA.
+- Difficulty + mode selectors on Host page.
+- Exact credential matrix: `docs/product-quality/PROVIDER_CREDENTIALS.md`.
+- Rebuilt signed RC **1.1.2 / versionCode 4** from this branch (new UI confirmed in APK).
 
 ## Final defining flow (target)
-Paste link → metadata → official playback/auth → beat calibration → difficulty/mode → create room → lobby persistence → Pixel controller → countdown → synchronized round → results → Play Again / Another Song.
+Paste → metadata → official playback/auth → calibrate → difficulty/mode → room → controller → round → results.
+
+## Current APK
+- Path: `build/android/beatlink-party-release.apk`
+- Package: `com.gunnchos.beatlinkparty`
+- Version: `1.1.2` / `4`
+- SHA-256: `a59d1e68f779d09085d3c471fe923130dbbdc70d6871c2290e2606134040c753`
+- Bundle includes `Official YouTube embed preview` + `Start Calibration`
 
 ## Pixel tests
-Not freshly verified on this branch for defining paste-link path. Prior catalog multiplayer Pixel evidence must not be treated as defining-gate PASS.
+**Blocked** — no device; install of 1.1.2 not performed this session.
 
-## APK metadata
-Release APK on disk may predate this branch UI — rebuild required before claiming ship.
+## Provider credential blockers
+See `PROVIDER_CREDENTIALS.md`. Synchronized platform-audio multiplayer still needs provider SDK/user auth beyond iframe preview + catalog metronome.
 
-## Remaining limitations
-- Official OAuth SDK playback incomplete
-- Apple Music best-effort metadata only
-- No copyrighted audio download/extraction (by design)
+## Tests
+`pnpm test` → 25/25 passed.
 
-## Independent-verifier result
-**NOT APPROVED FOR PR** — defining gate FAIL/BLOCKED (official playback, APK freshness, Pixel).
+## Independent-verifier expectation
+Keep **NOT APPROVED** / Draft — defining platform-sync gate incomplete; Pixel unverified.
 
 Awaiting Edmund’s final approval. Do not merge automatically.
