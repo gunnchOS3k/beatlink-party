@@ -29,3 +29,9 @@ export async function resolveLink(url: string) {
   if (!res.ok) throw new Error('Failed to resolve link');
   return res.json() as Promise<import('@beatlink/shared').LinkResolveResult>;
 }
+
+export async function fetchProviderStatus() {
+  const res = await fetch(`${API_URL}/providers/status`);
+  if (!res.ok) throw new Error('Failed to load provider status');
+  return res.json() as Promise<{ providers: import('@beatlink/shared').ProviderAuthStatus }>;
+}

@@ -3,7 +3,7 @@ import cors from 'cors';
 import { createServer } from 'node:http';
 import { setupRealtime } from './realtime/socket.js';
 import { loadCatalog, getBeatmapForSong } from './beatmaps/store.js';
-import { resolveLink } from './music/linkResolver.js';
+import { getProviderAuthStatus, resolveLink } from './music/linkResolver.js';
 import { roomManager } from './rooms/RoomManager.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
@@ -38,11 +38,21 @@ app.get('/beatmaps/:songId', (req, res) => {
   res.json({ beatmap });
 });
 
-app.post('/songs/resolve-link', (req, res) => {
+app.get('/providers/status', (_req, res) => {
+  res.json({ providers: getProviderAuthStatus() });
+});
+
+app.post('/songs/resolve-link', async (req, res) => {
   const { url } = req.body as { url?: string };
   if (!url) return res.status(400).json({ error: 'url is required' });
-  const result = resolveLink(url);
-  res.json(result);
+  try {
+    const result = await resolveLink(url);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({
+      error: err instanceof Error ? err.message : 'Failed to resolve link',
+    });
+  }
 });
 
 const httpServer = createServer(app);

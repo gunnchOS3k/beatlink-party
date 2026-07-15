@@ -50,6 +50,12 @@ export interface RoomState {
   hostId: string | null;
   players: Player[];
   selectedSongId: string | null;
+  /** Host-pasted music URL (metadata / catalog match only — never downloaded audio). */
+  pastedLinkUrl: string | null;
+  /** Last successful link resolve snapshot, broadcast to peers. */
+  linkResolveResult: LinkResolveResult | null;
+  /** Host-measured input latency offset applied to the beatmap. */
+  calibrationOffsetMs: number;
   countdown: number | null;
   gameStartTime: number | null;
   gameDurationMs: number;
@@ -57,6 +63,13 @@ export interface RoomState {
   crowdMeter: number;
   createdAt: number;
   expiresAt: number;
+}
+
+/** Which official providers have env credentials configured on the server. */
+export interface ProviderAuthStatus {
+  spotify: boolean;
+  youtube: boolean;
+  apple_music: boolean;
 }
 
 export interface SongCatalogEntry {

@@ -185,11 +185,39 @@ export default function PlayerPage() {
     );
   }
 
+  if (room?.phase === 'calibrating') {
+    return (
+      <div className="page">
+        <div className="card stack" style={{ textAlign: 'center' }}>
+          <h2>Host is calibrating</h2>
+          <p style={{ color: 'var(--muted)' }}>
+            Latency offset: {room.calibrationOffsetMs ?? 0} ms. Get ready — countdown starts next.
+          </p>
+          {room.linkResolveResult?.title ? (
+            <p>
+              Song: <strong>{room.linkResolveResult.title}</strong>
+              {room.linkResolveResult.artist ? ` — ${room.linkResolveResult.artist}` : ''}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   if (room?.phase === 'lobby' || room?.phase === 'song_select') {
     return (
       <div className="page">
         <div className="card stack">
           <h2>Welcome, {player?.name}!</h2>
+          {room.linkResolveResult ? (
+            <div className="compliance-banner">
+              <span className="status-badge status-metadata">{room.linkResolveResult.playbackStatus}</span>
+              <p style={{ marginTop: '0.5rem' }}>
+                {room.linkResolveResult.title ?? 'Linked track'}
+                {room.linkResolveResult.artist ? ` — ${room.linkResolveResult.artist}` : ''}
+              </p>
+            </div>
+          ) : null}
           <p style={{ color: 'var(--muted)' }}>Choose your role</p>
           <div className="role-grid">
             {ROLES.map((r) => (
