@@ -1,0 +1,4 @@
+sha=dfef9137dea8b78e7422a9b3262e56ac982de7f6d9da0d3d0da8fbb9a9694595
+mtime=2026-07-14T15:14:04-0500
+package: name='com.gunnchos.beatlinkparty' versionCode='3' versionName='1.1.1' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'
+sdkVersion:'22'

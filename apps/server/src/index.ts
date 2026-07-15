@@ -7,7 +7,7 @@ import { resolveLink } from './music/linkResolver.js';
 import { roomManager } from './rooms/RoomManager.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
-const CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '*';
 
 const app = express();
 app.use(cors({ origin: CORS_ORIGIN }));
@@ -48,6 +48,6 @@ app.post('/songs/resolve-link', (req, res) => {
 const httpServer = createServer(app);
 setupRealtime(httpServer, CORS_ORIGIN);
 
-httpServer.listen(PORT, () => {
-  console.log(`BeatLink Party server running on http://localhost:${PORT}`);
+httpServer.listen(PORT, '0.0.0.0', () => {
+  console.log(`BeatLink Party server running on http://0.0.0.0:${PORT}`);
 });

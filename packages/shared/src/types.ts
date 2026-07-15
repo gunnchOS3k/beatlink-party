@@ -6,7 +6,8 @@ export type RoomPhase =
   | 'calibrating'
   | 'countdown'
   | 'playing'
-  | 'results';
+  | 'results'
+  | 'closed';
 
 export type TimingGrade = 'perfect' | 'great' | 'good' | 'miss';
 

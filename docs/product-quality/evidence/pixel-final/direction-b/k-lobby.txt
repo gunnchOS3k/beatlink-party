@@ -1,0 +1,25 @@
+← Home
+HOST MODE
+
+ROOM CODE — SHARE WITH PLAYERS
+
+RVJNR
+
+Players join at: http://127.0.0.1:5173/join
+
+Connection: ✓ Room server connected
+
+Players (1/6)
+PixelPlayer
+Hype Captain · ✓ Ready
+Select Song
+Neon Groove
+BeatLink Demo Ensemble · 45s · 120 BPM
+Crowd Anthem
+BeatLink Demo Ensemble · 40s · 128 BPM
+Midnight Pulse
+BeatLink Demo Ensemble · 50s · 110 BPM
+PASTE MUSIC LINK (METADATA ONLY)
+Resolve
+Start Countdown
+End Room

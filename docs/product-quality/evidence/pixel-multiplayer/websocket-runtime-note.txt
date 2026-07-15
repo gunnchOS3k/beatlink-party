@@ -1,0 +1,4 @@
+
+  VITE v6.4.3  ready in 230 ms
+
+  ➜  Network: http://<LAN_HOST>:5173/

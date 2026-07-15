@@ -1,0 +1,27 @@
+{
+  "roomCode": "AVRMA",
+  "demoTitle": "Neon Groove",
+  "health": {
+    "status": "ok",
+    "service": "beatlink-party"
+  },
+  "screenshots": [
+    "01-host-startup.png",
+    "02-host-lobby.png",
+    "03-host-lobby-with-player.png",
+    "04-player-lobby.png",
+    "05-ready-state-host.png",
+    "05-ready-state-player.png",
+    "06-countdown-host.png",
+    "06-countdown-player.png",
+    "07-round-host.png",
+    "07-round-player.png",
+    "08-results-host.png",
+    "08-results-player.png",
+    "09-reconnect-player.png",
+    "09-reconnect-host.png",
+    "10-room-close-host.png",
+    "11-room-reuse-rejected.png"
+  ],
+  "completedAt": "2026-07-14T02:00:23.925Z"
+}

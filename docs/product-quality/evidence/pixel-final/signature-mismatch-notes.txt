@@ -1,0 +1,12 @@
+=== before uninstall ===
+62:    versionCode=2 minSdk=22 targetSdk=34
+64:    versionName=1.1.0
+69:    flags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP KILL_AFTER_RESTORE ]
+84:    signatures=PackageSignatures{f35fb9f version:2, signatures:[4c1db0e8], past signatures:[]}
+86:    pkgFlags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP KILL_AFTER_RESTORE ]
+Success
+Reinstall erased local BeatLink test state on Pixel.
+=== after install RC ===
+62:    versionCode=2 minSdk=22 targetSdk=34
+64:    versionName=1.1.0
+86:    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP KILL_AFTER_RESTORE ]

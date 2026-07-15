@@ -34,7 +34,9 @@ describe('RoomManager', () => {
 
   it('transitions through countdown to playing', () => {
     const room = manager.createRoom('host-1');
-    manager.joinRoom(room.code, 'p1', 'Alice');
+    const { player } = manager.joinRoom(room.code, 'p1', 'Alice')!;
+    manager.setRole(room.code, player.id, 'beat_tapper');
+    manager.setReady(room.code, player.id, true);
     manager.selectSong(room.code, 'demo-neon-groove');
     const countdown = manager.startCountdown(room.code);
     expect(countdown?.phase).toBe('countdown');
@@ -50,6 +52,7 @@ describe('RoomManager', () => {
     const room = manager.createRoom('host-1');
     const { player } = manager.joinRoom(room.code, 'p1', 'Alice')!;
     manager.setRole(room.code, player.id, 'beat_tapper');
+    manager.setReady(room.code, player.id, true);
     manager.selectSong(room.code, 'demo-neon-groove');
     manager.startCountdown(room.code);
     manager.tickCountdown(room.code);

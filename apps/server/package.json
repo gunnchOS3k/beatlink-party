@@ -4,9 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch --ignore 'dist/**' --ignore '**/*.log' src/index.ts",
+    "dev:device": "node --import tsx src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
+    "start:prod": "NODE_ENV=production node dist/index.js",
+    "health": "node -e \"fetch(process.env.BEATLINK_HEALTH_URL||'http://127.0.0.1:3001/health').then(r=>r.json()).then(j=>{console.log(JSON.stringify(j));process.exit(j.status==='ok'?0:1)}).catch(e=>{console.error(e);process.exit(1)})\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

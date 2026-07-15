@@ -10,3 +10,6 @@ coverage/
 .DS_Store
 *.tsbuildinfo
 .vite/
+
+apps/web/.env.production.local
+.env.production.local

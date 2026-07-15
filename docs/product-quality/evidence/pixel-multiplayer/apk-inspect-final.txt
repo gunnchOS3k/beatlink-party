@@ -1,0 +1,6 @@
+sha=cdfa3409331e913a6fafad4741906014d2730870a8280fcf3066d72cd0490490
+package: name='com.gunnchos.beatlinkparty' versionCode='3' versionName='1.1.1' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'
+Verifies
+Signer #1 certificate DN: CN=BeatLink Internal RC, OU=GunnchOS, O=GunnchOS, L=Local, ST=NA, C=US
+Signer #1 certificate SHA-256 digest: fa62d4bcaa350a4b0e2ea89d9d1c9dab73a8c04dbf37a09005759e8d058c654a
+Signer #1 public key SHA-256 digest: 4332fc8eff36deba8827fddc57a05fa7ce9c9a002c7100f8f52455eae84652eb

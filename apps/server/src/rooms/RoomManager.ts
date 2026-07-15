@@ -29,6 +29,9 @@ const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
 interface InternalRoom extends RoomState {
   beatmap: Beatmap | null;
   hypeCooldowns: Map<string, number>;
+  hostToken: string;
+  playerTokens: Map<string, string>;
+  scoredTargets: Set<string>;
 }
 
 export class RoomManager {
@@ -57,6 +60,9 @@ export class RoomManager {
       expiresAt: now + ROOM_TTL_MS,
       beatmap: null,
       hypeCooldowns: new Map(),
+      hostToken: randomUUID(),
+      playerTokens: new Map(),
+      scoredTargets: new Set(),
     };
     this.rooms.set(code, room);
     return this.stripInternal(room);
@@ -73,13 +79,46 @@ export class RoomManager {
   }
 
   stripInternal(room: InternalRoom): RoomState {
-    const { beatmap: _beatmap, hypeCooldowns: _hypeCooldowns, ...state } = room;
+    const {
+      beatmap: _beatmap,
+      hypeCooldowns: _hypeCooldowns,
+      hostToken: _hostToken,
+      playerTokens: _playerTokens,
+      scoredTargets: _scoredTargets,
+      ...state
+    } = room;
     void _beatmap;
     void _hypeCooldowns;
+    void _hostToken;
+    void _playerTokens;
+    void _scoredTargets;
     return state;
   }
 
-  joinRoom(code: string, socketId: string, name: string): { room: RoomState; player: Player } | null {
+  getHostToken(code: string, socketId: string): string | null {
+    const room = this.getRoom(code);
+    return room?.hostId === socketId ? room.hostToken : null;
+  }
+
+  authorizeHost(code: string, socketId: string, hostToken: string | undefined): boolean {
+    const room = this.getRoom(code);
+    if (!room || !hostToken || room.hostToken !== hostToken) return false;
+    room.hostId = socketId;
+    return true;
+  }
+
+  ownsPlayer(code: string, socketId: string, playerId: string): boolean {
+    return (
+      this.socketToPlayer.get(socketId) === playerId &&
+      this.playerToRoom.get(playerId) === code.toUpperCase()
+    );
+  }
+
+  joinRoom(
+    code: string,
+    socketId: string,
+    name: string,
+  ): { room: RoomState; player: Player; playerToken: string } | null {
     const room = this.getRoom(code);
     if (!room) return null;
     if (room.phase !== 'lobby' && room.phase !== 'song_select') return null;
@@ -89,7 +128,11 @@ export class RoomManager {
       const player = room.players.find((p) => p.id === existingPlayerId);
       if (player) {
         player.connected = true;
-        return { room: this.stripInternal(room), player };
+        return {
+          room: this.stripInternal(room),
+          player,
+          playerToken: room.playerTokens.get(player.id)!,
+        };
       }
     }
 
@@ -108,14 +151,22 @@ export class RoomManager {
       color: PLAYER_COLORS[room.players.length % PLAYER_COLORS.length],
     };
     room.players.push(player);
+    const playerToken = randomUUID();
+    room.playerTokens.set(player.id, playerToken);
     this.playerToRoom.set(player.id, room.code);
     this.socketToPlayer.set(socketId, player.id);
-    return { room: this.stripInternal(room), player };
+    return { room: this.stripInternal(room), player, playerToken };
   }
 
-  reconnectPlayer(code: string, playerId: string, socketId: string): Player | null {
+  reconnectPlayer(
+    code: string,
+    playerId: string,
+    playerToken: string,
+    socketId: string,
+  ): Player | null {
     const room = this.getRoom(code);
     if (!room) return null;
+    if (room.playerTokens.get(playerId) !== playerToken) return null;
     const player = room.players.find((p) => p.id === playerId);
     if (!player) return null;
     player.connected = true;
@@ -137,9 +188,27 @@ export class RoomManager {
     return this.stripInternal(room);
   }
 
-  setRole(code: string, playerId: string, role: Player['role']): RoomState | null {
+  endRoom(code: string, hostSocketId: string): RoomState | null {
     const room = this.getRoom(code);
     if (!room) return null;
+    if (room.hostId !== hostSocketId) return null;
+    for (const player of room.players) {
+      this.playerToRoom.delete(player.id);
+      room.playerTokens.delete(player.id);
+    }
+    for (const [socketId, playerId] of [...this.socketToPlayer.entries()]) {
+      if (room.players.some((p) => p.id === playerId)) {
+        this.socketToPlayer.delete(socketId);
+      }
+    }
+    this.rooms.delete(code.toUpperCase());
+    return this.stripInternal({ ...room, phase: 'closed' as RoomState['phase'], players: [] });
+  }
+
+  setRole(code: string, playerId: string, role: Player['role']): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;
+    if (!role || !['beat_tapper', 'vocalist', 'hype_captain'].includes(role)) return null;
     const player = room.players.find((p) => p.id === playerId);
     if (!player) return null;
     player.role = role;
@@ -148,7 +217,7 @@ export class RoomManager {
 
   setReady(code: string, playerId: string, ready: boolean): RoomState | null {
     const room = this.getRoom(code);
-    if (!room) return null;
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;
     const player = room.players.find((p) => p.id === playerId);
     if (!player) return null;
     player.ready = ready;
@@ -157,9 +226,11 @@ export class RoomManager {
 
   selectSong(code: string, songId: string): RoomState | null {
     const room = this.getRoom(code);
-    if (!room) return null;
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;
+    const beatmap = getBeatmapForSong(songId);
+    if (!beatmap) return null;
     room.selectedSongId = songId;
-    room.beatmap = getBeatmapForSong(songId);
+    room.beatmap = beatmap;
     room.gameDurationMs = room.beatmap?.durationMs ?? 45000;
     room.phase = 'song_select';
     return this.stripInternal(room);
@@ -167,7 +238,15 @@ export class RoomManager {
 
   startCountdown(code: string): RoomState | null {
     const room = this.getRoom(code);
-    if (!room || !room.selectedSongId || !room.beatmap) return null;
+    if (
+      !room ||
+      !room.selectedSongId ||
+      !room.beatmap ||
+      !assertCanStart(room) ||
+      (room.phase !== 'lobby' && room.phase !== 'song_select')
+    ) {
+      return null;
+    }
     assertTransition(room.phase, 'countdown');
     room.phase = 'countdown';
     room.countdown = 3;
@@ -180,6 +259,7 @@ export class RoomManager {
     room.teamScore = 0;
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
+    room.scoredTargets.clear();
     return this.stripInternal(room);
   }
 
@@ -213,9 +293,18 @@ export class RoomManager {
 
     if (player.role === 'beat_tapper' && input.type === 'tap') {
       const note = room.beatmap.notes.find(
-        (n) => n.id === input.noteId || Math.abs(n.timeMs - gameTimeMs) < 150,
+        (n) =>
+          n.role === 'beat_tapper' &&
+          (input.noteId ? n.id === input.noteId : Math.abs(n.timeMs - gameTimeMs) < 150),
       );
-      if (note) {
+      const targetKey = note ? `${player.id}:note:${note.id}` : null;
+      if (
+        note &&
+        targetKey &&
+        !room.scoredTargets.has(targetKey) &&
+        Math.abs(note.timeMs - gameTimeMs) < 200
+      ) {
+        room.scoredTargets.add(targetKey);
         const result = scoreBeatTap(input, note.timeMs, gameTimeMs, player.streak);
         Object.assign(player, updatePlayerStats(player, result));
         room.teamScore += result.points;
@@ -230,9 +319,14 @@ export class RoomManager {
       }
     } else if (player.role === 'vocalist' && input.type === 'vocal_phrase') {
       const prompt = room.beatmap.vocalPrompts.find(
-        (v) => v.id === input.promptId || Math.abs(v.timeMs - gameTimeMs) < 500,
+        (v) =>
+          (input.promptId ? v.id === input.promptId : Math.abs(v.timeMs - gameTimeMs) < 500) &&
+          gameTimeMs >= v.timeMs - 200 &&
+          gameTimeMs <= v.timeMs + v.durationMs + 200,
       );
-      if (prompt) {
+      const targetKey = prompt ? `${player.id}:vocal:${prompt.id}` : null;
+      if (prompt && targetKey && !room.scoredTargets.has(targetKey)) {
+        room.scoredTargets.add(targetKey);
         const result = scoreVocalPhrase(
           input,
           prompt.timeMs,
@@ -314,6 +408,8 @@ export class RoomManager {
     }
     room.teamScore = 0;
     room.crowdMeter = 50;
+    room.hypeCooldowns.clear();
+    room.scoredTargets.clear();
     return this.stripInternal(room);
   }
 
@@ -332,6 +428,14 @@ export class RoomManager {
     room.phase = phase;
     return this.stripInternal(room);
   }
+}
+
+function assertCanStart(room: InternalRoom): boolean {
+  const connectedPlayers = room.players.filter((player) => player.connected);
+  return (
+    connectedPlayers.length > 0 &&
+    connectedPlayers.every((player) => player.ready && player.role !== null)
+  );
 }
 
 export const roomManager = new RoomManager();
