@@ -32,12 +32,18 @@ describe('RoomManager', () => {
     expect(seventh).toBeNull();
   });
 
-  it('transitions through countdown to playing', () => {
+  it('transitions song_select → calibrating → countdown → playing', () => {
     const room = manager.createRoom('host-1');
+    expect(room.pastedLinkUrl).toBeNull();
+    expect(room.calibrationOffsetMs).toBe(0);
     const { player } = manager.joinRoom(room.code, 'p1', 'Alice')!;
     manager.setRole(room.code, player.id, 'beat_tapper');
     manager.setReady(room.code, player.id, true);
     manager.selectSong(room.code, 'demo-neon-groove');
+    const calibrating = manager.startCalibration(room.code);
+    expect(calibrating?.phase).toBe('calibrating');
+    const calibrated = manager.submitCalibration(room.code, 42);
+    expect(calibrated?.calibrationOffsetMs).toBe(42);
     const countdown = manager.startCountdown(room.code);
     expect(countdown?.phase).toBe('countdown');
     expect(countdown?.countdown).toBe(3);
@@ -48,12 +54,46 @@ describe('RoomManager', () => {
     expect(playing?.gameStartTime).not.toBeNull();
   });
 
+  it('persists resolved link snapshot on room state', () => {
+    const room = manager.createRoom('host-1');
+    const result = manager.setResolvedLink(room.code, 'https://open.spotify.com/track/abc', {
+      platform: 'spotify',
+      sourceId: 'track:abc',
+      title: 'Neon Groove Extra',
+      artist: 'BeatLink Demo Ensemble',
+      album: null,
+      artworkUrl: null,
+      durationMs: 45000,
+      playbackStatus: 'PLAYABLE_APPROVED',
+      analysisEligible: true,
+      lyricsEligible: false,
+      matchedCatalogId: 'demo-neon-groove',
+      message: 'Matched',
+      fallbackOptions: [],
+    });
+    expect(result?.pastedLinkUrl).toContain('spotify');
+    expect(result?.linkResolveResult?.playbackStatus).toBe('PLAYABLE_APPROVED');
+    expect(result?.selectedSongId).toBe('demo-neon-groove');
+    expect(result?.phase).toBe('song_select');
+  });
+
+  it('rejects countdown before calibration', () => {
+    const room = manager.createRoom('host-1');
+    const { player } = manager.joinRoom(room.code, 'p1', 'Alice')!;
+    manager.setRole(room.code, player.id, 'beat_tapper');
+    manager.setReady(room.code, player.id, true);
+    manager.selectSong(room.code, 'demo-neon-groove');
+    expect(manager.startCountdown(room.code)).toBeNull();
+  });
+
   it('scores beat tapper input during gameplay', () => {
     const room = manager.createRoom('host-1');
     const { player } = manager.joinRoom(room.code, 'p1', 'Alice')!;
     manager.setRole(room.code, player.id, 'beat_tapper');
     manager.setReady(room.code, player.id, true);
     manager.selectSong(room.code, 'demo-neon-groove');
+    manager.startCalibration(room.code);
+    manager.submitCalibration(room.code, 0);
     manager.startCountdown(room.code);
     manager.tickCountdown(room.code);
     manager.tickCountdown(room.code);

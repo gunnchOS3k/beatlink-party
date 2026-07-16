@@ -1,7 +1,8 @@
 import { Server as SocketServer } from 'socket.io';
 import type { Server } from 'http';
-import type { PlayerInputEvent } from '@beatlink/shared';
+import type { LinkResolveResult, PlayerInputEvent } from '@beatlink/shared';
 import { roomManager } from '../rooms/RoomManager.js';
+import { resolveLink } from '../music/linkResolver.js';
 
 export function setupRealtime(httpServer: Server, corsOrigin: string) {
   const io = new SocketServer(httpServer, {
@@ -75,6 +76,45 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
 
     socket.on('room.select_song', (data: { code: string; songId: string }) => {
       const room = roomManager.selectSong(data.code, data.songId);
+      if (room) io.to(data.code).emit('room.state', room);
+    });
+
+    socket.on(
+      'room.resolve_link',
+      async (
+        data: { code: string; url: string },
+        cb?: (result: { ok: boolean; error?: string; room?: unknown; resolve?: LinkResolveResult }) => void,
+      ) => {
+        try {
+          const resolve = await resolveLink(data.url);
+          const room = roomManager.setResolvedLink(data.code, data.url, resolve);
+          if (!room) {
+            cb?.({ ok: false, error: 'Unable to store link on room' });
+            return;
+          }
+          io.to(data.code).emit('room.state', room);
+          cb?.({ ok: true, room, resolve });
+        } catch (err) {
+          cb?.({
+            ok: false,
+            error: err instanceof Error ? err.message : 'Link resolve failed',
+          });
+        }
+      },
+    );
+
+    socket.on('room.set_resolved_link', (data: { code: string; url: string; result: LinkResolveResult }) => {
+      const room = roomManager.setResolvedLink(data.code, data.url, data.result);
+      if (room) io.to(data.code).emit('room.state', room);
+    });
+
+    socket.on('game.start_calibration', (data: { code: string }) => {
+      const room = roomManager.startCalibration(data.code);
+      if (room) io.to(data.code).emit('room.state', room);
+    });
+
+    socket.on('game.submit_calibration', (data: { code: string; offsetMs: number }) => {
+      const room = roomManager.submitCalibration(data.code, data.offsetMs);
       if (room) io.to(data.code).emit('room.state', room);
     });
 

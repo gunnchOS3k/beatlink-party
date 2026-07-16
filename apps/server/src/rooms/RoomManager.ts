@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type {
   Beatmap,
   GameResults,
+  LinkResolveResult,
   Player,
   PlayerInputEvent,
   RoomPhase,
@@ -51,6 +52,9 @@ export class RoomManager {
       hostId: hostSocketId,
       players: [],
       selectedSongId: null,
+      pastedLinkUrl: null,
+      linkResolveResult: null,
+      calibrationOffsetMs: 0,
       countdown: null,
       gameStartTime: null,
       gameDurationMs: 45000,
@@ -230,9 +234,67 @@ export class RoomManager {
     const beatmap = getBeatmapForSong(songId);
     if (!beatmap) return null;
     room.selectedSongId = songId;
-    room.beatmap = beatmap;
+    room.beatmap = {
+      ...beatmap,
+      offsetMs: room.calibrationOffsetMs,
+    };
     room.gameDurationMs = room.beatmap?.durationMs ?? 45000;
     room.phase = 'song_select';
+    return this.stripInternal(room);
+  }
+
+  /** Persist pasted link + resolve snapshot so peers can see preview/eligibility. */
+  setResolvedLink(code: string, url: string, result: LinkResolveResult): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;
+    room.pastedLinkUrl = url;
+    room.linkResolveResult = result;
+    if (result.matchedCatalogId && result.playbackStatus === 'PLAYABLE_APPROVED') {
+      const beatmap = getBeatmapForSong(result.matchedCatalogId);
+      if (beatmap) {
+        room.selectedSongId = result.matchedCatalogId;
+        room.beatmap = {
+          ...beatmap,
+          offsetMs: room.calibrationOffsetMs,
+        };
+        room.gameDurationMs = beatmap.durationMs;
+        room.phase = 'song_select';
+      }
+    }
+    return this.stripInternal(room);
+  }
+
+  startCalibration(code: string): RoomState | null {
+    const room = this.getRoom(code);
+    if (
+      !room ||
+      !room.selectedSongId ||
+      !room.beatmap ||
+      !assertCanStart(room) ||
+      (room.phase !== 'lobby' && room.phase !== 'song_select')
+    ) {
+      return null;
+    }
+    if (room.phase === 'lobby') {
+      assertTransition('lobby', 'song_select');
+      room.phase = 'song_select';
+    }
+    assertTransition(room.phase, 'calibrating');
+    room.phase = 'calibrating';
+    return this.stripInternal(room);
+  }
+
+  submitCalibration(code: string, offsetMs: number): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || room.phase !== 'calibrating') return null;
+    const clamped = Math.max(-500, Math.min(500, Math.round(offsetMs)));
+    room.calibrationOffsetMs = clamped;
+    if (room.beatmap) {
+      room.beatmap = {
+        ...room.beatmap,
+        offsetMs: clamped,
+      };
+    }
     return this.stripInternal(room);
   }
 
@@ -243,7 +305,7 @@ export class RoomManager {
       !room.selectedSongId ||
       !room.beatmap ||
       !assertCanStart(room) ||
-      (room.phase !== 'lobby' && room.phase !== 'song_select')
+      room.phase !== 'calibrating'
     ) {
       return null;
     }
@@ -288,7 +350,9 @@ export class RoomManager {
     const player = room.players.find((p) => p.id === input.playerId);
     if (!player) return null;
 
-    const gameTimeMs = this.getGameTimeMs(code);
+    const rawGameTimeMs = this.getGameTimeMs(code);
+    // Positive calibrationOffsetMs = host/players tap late; subtract so windows align.
+    const gameTimeMs = rawGameTimeMs - (room.calibrationOffsetMs || 0);
     let scoreEvent: ScoreEvent | null = null;
 
     if (player.role === 'beat_tapper' && input.type === 'tap') {
@@ -366,7 +430,7 @@ export class RoomManager {
       };
     }
 
-    if (gameTimeMs >= room.gameDurationMs) {
+    if (rawGameTimeMs >= room.gameDurationMs) {
       room.phase = 'results';
     }
 
@@ -399,6 +463,11 @@ export class RoomManager {
     room.phase = 'lobby';
     room.countdown = null;
     room.gameStartTime = null;
+    room.pastedLinkUrl = null;
+    room.linkResolveResult = null;
+    room.calibrationOffsetMs = 0;
+    room.selectedSongId = null;
+    room.beatmap = null;
     for (const p of room.players) {
       p.score = 0;
       p.streak = 0;

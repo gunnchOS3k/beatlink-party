@@ -329,6 +329,11 @@ input:focus {
   font-size: 0.9rem;
 }
 
+.link-preview {
+  background: rgba(78, 205, 196, 0.08);
+  border-color: rgba(78, 205, 196, 0.45);
+}
+
 .label {
   display: block;
   margin-bottom: 0.5rem;
