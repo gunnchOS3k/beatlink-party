@@ -1,0 +1,8 @@
+{
+  "game": "beatlink-party",
+  "evidence_type": "performance_sample",
+  "timestamp": "2026-08-06T20:13:09.915Z",
+  "sample_ms": 0.717875,
+  "hook": "node_cpu_microbench",
+  "samples": 1.9395054106807037
+}
