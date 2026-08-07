@@ -59,17 +59,6 @@ async function shot(page, name) {
   console.log('screenshot', name);
 }
 
-async function waitPhase(page, phase, timeout = 30000) {
-  await page.waitForFunction(
-    (p) => {
-      const el = document.body?.innerText || '';
-      return el.toLowerCase().includes(p.toLowerCase()) || document.querySelector(`[data-phase="${p}"]`);
-    },
-    phase,
-    { timeout },
-  ).catch(() => {});
-}
-
 async function main() {
   writeFileSync(path.join(out, 'websocket-transitions.log'), '');
   writeFileSync(path.join(out, 'room-state-transitions.log'), '');

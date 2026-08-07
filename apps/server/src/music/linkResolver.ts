@@ -231,7 +231,7 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
   let title = parseTitleFromUrl(trimmed);
   let artist: string | null = null;
   let artworkUrl: string | null = null;
-  let album: string | null = null;
+  const album: string | null = null;
   let durationMs: number | null = null;
   let appleMessage: string | undefined;
 

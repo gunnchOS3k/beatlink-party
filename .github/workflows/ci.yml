@@ -49,7 +49,11 @@ jobs:
         run: pnpm lint
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: |
+          # Package exports resolve via dist types; build workspace libs first.
+          pnpm --filter @beatlink/shared build
+          pnpm --filter @beatlink/game-engine build
+          pnpm typecheck
 
       - name: Test (includes Gate1 core-loop)
         run: pnpm test

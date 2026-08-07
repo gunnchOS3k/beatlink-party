@@ -1,12 +1,13 @@
 import type { RoomPhase } from '@beatlink/shared';
 
 const VALID_TRANSITIONS: Record<RoomPhase, RoomPhase[]> = {
-  lobby: ['song_select', 'lobby'],
-  song_select: ['calibrating', 'countdown', 'lobby'],
-  calibrating: ['countdown', 'lobby'],
-  countdown: ['playing', 'lobby'],
-  playing: ['results', 'lobby'],
-  results: ['lobby', 'song_select', 'countdown'],
+  lobby: ['song_select', 'lobby', 'closed'],
+  song_select: ['calibrating', 'countdown', 'lobby', 'closed'],
+  calibrating: ['countdown', 'lobby', 'closed'],
+  countdown: ['playing', 'lobby', 'closed'],
+  playing: ['results', 'lobby', 'closed'],
+  results: ['lobby', 'song_select', 'countdown', 'closed'],
+  closed: [],
 };
 
 export function canTransition(from: RoomPhase, to: RoomPhase): boolean {
