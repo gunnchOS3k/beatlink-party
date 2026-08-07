@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateRoom, useSocket } from '../lib/socket';
 import { isBackendConfigured } from '../lib/api';
+import {
+  AccessibilityPanel,
+  DeviceRolePicker,
+  useAccessibility,
+  useDeviceRole,
+} from '../lib/deviceSettings';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -10,6 +16,8 @@ export default function LandingPage() {
   const backendReady = isBackendConfigured();
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { role, setRole, roles, profile } = useDeviceRole(false);
+  const { settings, update } = useAccessibility();
 
   async function handleCreate() {
     if (!backendReady) {
@@ -21,7 +29,7 @@ export default function LandingPage() {
     setCreating(true);
     setError(null);
     try {
-      const code = await createRoom();
+      const { code } = await createRoom();
       navigate(`/host/${code}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create room');
@@ -35,7 +43,8 @@ export default function LandingPage() {
       <div className="hero">
         <h1>BeatLink Party</h1>
         <p>
-          Rhythm + karaoke party game. Host on the big screen, play from your phone.
+          Rhythm + karaoke party game. Host on the big screen, play from your phone — or spectate as
+          audience.
         </p>
         {!backendReady && (
           <div className="compliance-banner" style={{ marginBottom: '1rem' }}>
@@ -46,7 +55,10 @@ export default function LandingPage() {
           </div>
         )}
         {error && (
-          <div className="compliance-banner" style={{ marginBottom: '1rem', borderColor: 'var(--accent)' }}>
+          <div
+            className="compliance-banner"
+            style={{ marginBottom: '1rem', borderColor: 'var(--accent)' }}
+          >
             <strong>Could not create room.</strong> {error}
           </div>
         )}
@@ -66,21 +78,31 @@ export default function LandingPage() {
           <button className="btn-secondary btn-large" onClick={() => navigate('/join')}>
             Join with Code (Player)
           </button>
+          <button
+            className="btn-secondary btn-large"
+            onClick={() => navigate('/join?seat=audience')}
+          >
+            Watch as Audience
+          </button>
         </div>
       </div>
-      <div className="card" style={{ maxWidth: 700, margin: '2rem auto' }}>
-        <h3 style={{ marginBottom: '0.5rem' }}>How to play</h3>
+      <div className="card stack" style={{ maxWidth: 700, margin: '2rem auto' }}>
+        <h3>How to play</h3>
         <ol style={{ paddingLeft: '1.25rem', color: 'var(--muted)', lineHeight: 1.8 }}>
           <li>Host creates a room and displays the code on a TV or laptop.</li>
           <li>Players join at <strong>/join</strong> with the room code.</li>
+          <li>Audience can spectate and send moderated hype/votes (rate-limited).</li>
           <li>Pick a role: Beat Tapper, Vocalist, or Hype Captain.</li>
           <li>Host selects an approved demo song and starts the round.</li>
           <li>Perform from your phone — score awards at the end!</li>
         </ol>
-        <div className="compliance-banner" style={{ marginTop: '1rem' }}>
+        <div className="compliance-banner">
           Music compliance: pasted YouTube/Spotify/Apple links are metadata-only. No audio is
           downloaded. Use approved demo songs for gameplay.
         </div>
+        <DeviceRolePicker role={role} roles={roles} onChange={setRole} />
+        <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{profile.hints.join(' · ')}</p>
+        <AccessibilityPanel settings={settings} update={update} />
       </div>
     </div>
   );

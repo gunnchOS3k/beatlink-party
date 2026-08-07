@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@beatlink/shared": "workspace:*",
+    "@beatlink/device-ux": "workspace:*",
+    "@beatlink/game-engine": "workspace:*",
     "@capacitor/android": "6",
     "@capacitor/app": "6",
     "@capacitor/cli": "6",

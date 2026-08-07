@@ -403,3 +403,75 @@ input:focus {
     padding: 1rem;
   }
 }
+
+/* Accessibility */
+.a11y-reduce-motion *,
+.a11y-reduce-motion *::before,
+.a11y-reduce-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.a11y-high-contrast {
+  --bg: #000;
+  --bg-card: #111;
+  --text: #fff;
+  --muted: #ddd;
+  --accent: #ff0;
+  --accent2: #0ff;
+  --accent3: #0f0;
+}
+
+.a11y-large-targets button,
+.a11y-large-targets .tap-button,
+.a11y-large-targets .hype-btn,
+.a11y-large-targets .role-btn {
+  min-height: calc(48px * var(--hit-target-scale, 1.25));
+  padding: 1.15rem 1.75rem;
+}
+
+.a11y-large-targets .tap-button {
+  width: min(320px, 88vw);
+  height: min(320px, 88vw);
+}
+
+/* Device role layouts */
+.device-student-14-5 .page {
+  max-width: 1280px;
+}
+
+.device-handheld-hybrid .page {
+  max-width: 480px;
+  padding: 1rem;
+}
+
+.device-handheld-hybrid .tap-button {
+  width: min(240px, 70vw);
+  height: min(240px, 70vw);
+}
+
+.device-ds-xl-coder .page {
+  max-width: 1400px;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.device-edge-io-rings .page {
+  max-width: 360px;
+}
+
+.device-edge-io-rings .hero h1 {
+  font-size: 1.75rem;
+}
+
+.device-docked .page {
+  max-width: 1600px;
+}
+
+.device-docked .room-code {
+  font-size: clamp(4rem, 14vw, 7rem);
+}
+
+.device-ds-xl-coder .card {
+  border-style: dashed;
+}

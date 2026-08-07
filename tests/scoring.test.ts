@@ -38,6 +38,17 @@ describe('scoring engine', () => {
     );
     expect(result.points).toBeGreaterThan(0);
   });
+
+  it('exposes combo on score results', () => {
+    const result = scoreBeatTap(
+      { playerId: 'p1', type: 'tap', clientTimeMs: 2000 },
+      2000,
+      2000,
+      4,
+    );
+    expect(result.combo).toBe(2);
+    expect(result.streak).toBe(5);
+  });
 });
 
 describe('awards', () => {
@@ -53,6 +64,7 @@ describe('awards', () => {
         accuracy: 90,
         streak: 2,
         maxStreak: 5,
+        combo: 1,
         color: '#ff6b6b',
       },
       {
@@ -65,6 +77,7 @@ describe('awards', () => {
         accuracy: 80,
         streak: 1,
         maxStreak: 3,
+        combo: 1,
         color: '#4ecdc4',
       },
     ];

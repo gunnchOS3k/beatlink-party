@@ -1,5 +1,27 @@
 game_id: beatlink-party
-devices: [student_14_5, handheld_hybrid, ds_xl_coder, edge_io_rings]
 source: field-kit-g2-c6
 evidence_class: SOFTWARE
 physical_status: PHYSICAL_PENDING
+protected_asset_policy: no_copyrighted_music_or_anime_ip
+# Canonical TypeScript runtime: device_ux/src (package @beatlink/device-ux)
+devices:
+  student_14_5:
+    input: keyboard_trackpad
+    layout: landscape_classroom
+    audio: procedural_metronome
+  handheld_hybrid:
+    input: gamepad
+    layout: handheld
+    audio: procedural_metronome
+  ds_xl_coder:
+    input: keyboard
+    layout: dual_screen_debug
+    audio: muted_default
+  edge_io_rings:
+    input: ring_gesture
+    layout: peripheral_only
+    audio: none
+  docked:
+    input: touch_hybrid
+    layout: docked_tv
+    audio: host_speakers

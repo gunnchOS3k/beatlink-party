@@ -10,7 +10,14 @@ import type {
 import { ROLES } from '@beatlink/shared';
 import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
 import { startCalibrationClicks, startHostMetronome, resumeAudioContext } from '../lib/hostAudio';
-import { useCreateRoom, useRoomEvents, useSocket } from '../lib/socket';
+import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
+import {
+  AccessibilityPanel,
+  DeviceRolePicker,
+  useAccessibility,
+  useDeviceRole,
+} from '../lib/deviceSettings';
+import { resolveMediaDescriptor } from '@beatlink/game-engine';
 
 function statusBadgeClass(status: LinkResolveResult['playbackStatus']): string {
   if (status === 'PLAYABLE_APPROVED' || status === 'PLAYABLE_AUTHORIZED_PLATFORM') {
@@ -313,7 +320,10 @@ export default function HostPage() {
   const [beatmapBpm, setBeatmapBpm] = useState(120);
   const [difficulty, setDifficulty] = useState<'beginner' | 'casual' | 'pro' | 'nightmare'>('casual');
   const [playMode, setPlayMode] = useState<'party' | 'competitive'>('party');
+  const [hostToken, setHostToken] = useState<string>('');
   const metronomeRef = useRef<{ stop: () => void } | null>(null);
+  const { role, setRole, roles, profile } = useDeviceRole(true);
+  const { settings, update } = useAccessibility();
 
   useEffect(() => {
     fetchSongs()
@@ -331,12 +341,23 @@ export default function HostPage() {
 
   useEffect(() => {
     if (roomCode) {
-      setCode(roomCode.toUpperCase());
-      socket.emit('room.subscribe', { code: roomCode.toUpperCase() });
+      const upper = roomCode.toUpperCase();
+      setCode(upper);
+      const token = loadHostToken(upper);
+      if (token) {
+        setHostToken(token);
+        socket.emit('room.host_reconnect', { code: upper, hostToken: token }, () => {
+          socket.emit('room.subscribe', { code: upper, hostToken: token });
+        });
+      } else {
+        socket.emit('room.subscribe', { code: upper });
+      }
     } else if (!code) {
       createRoom()
-        .then((c) => {
+        .then(({ code: c, hostToken: token }) => {
           setCode(c);
+          setHostToken(token);
+          if (token) storeHostToken(c, token);
           setCreateError(null);
           window.history.replaceState(null, '', `/host/${c}`);
         })
@@ -427,7 +448,7 @@ export default function HostPage() {
     try {
       const result = await resolveLink(linkUrl);
       setLinkResult(result);
-      socket.emit('room.set_resolved_link', { code, url: linkUrl.trim(), result });
+      socket.emit('room.set_resolved_link', { code, url: linkUrl.trim(), result, hostToken });
       if (result.matchedCatalogId) {
         const song = songs.find((s) => s.id === result.matchedCatalogId);
         if (song) setBeatmapBpm(song.bpm);
@@ -440,26 +461,26 @@ export default function HostPage() {
   }
 
   function selectSong(songId: string) {
-    socket.emit('room.select_song', { code, songId });
+    socket.emit('room.select_song', { code, songId, hostToken });
     const song = songs.find((s) => s.id === songId);
     if (song) setBeatmapBpm(song.bpm);
   }
 
   function startCalibration() {
     void resumeAudioContext();
-    socket.emit('game.start_calibration', { code });
+    socket.emit('game.start_calibration', { code, hostToken });
   }
 
   function submitCalibration(offsetMs: number) {
-    socket.emit('game.submit_calibration', { code, offsetMs });
+    socket.emit('game.submit_calibration', { code, offsetMs, hostToken });
     // After save, host starts countdown
     window.setTimeout(() => {
-      socket.emit('game.start_countdown', { code });
+      socket.emit('game.start_countdown', { code, hostToken });
     }, 50);
   }
 
-  function replay() {
-    socket.emit('game.replay', { code });
+  function rematch() {
+    socket.emit('game.rematch', { code, hostToken });
     setResults(null);
     setGameTimeMs(0);
     setLinkResult(null);
@@ -467,7 +488,7 @@ export default function HostPage() {
   }
 
   function endRoom() {
-    socket.emit('room.end', { code }, (result?: { ok?: boolean; error?: string }) => {
+    socket.emit('room.end', { code, hostToken }, (result?: { ok?: boolean; error?: string }) => {
       if (result && result.ok === false) {
         setCreateError(result.error ?? 'Failed to end room');
         return;
@@ -477,6 +498,14 @@ export default function HostPage() {
   }
 
   const displayResult = linkResult ?? room?.linkResolveResult ?? null;
+  const mediaDescriptor = useMemo(() => {
+    const song = songs.find((s) => s.id === room?.selectedSongId) ?? null;
+    return resolveMediaDescriptor({
+      catalogEntry: song,
+      linkResult: displayResult,
+      fallbackBpm: beatmapBpm,
+    });
+  }, [songs, room?.selectedSongId, displayResult, beatmapBpm]);
   const canStartCalibration = useMemo(() => {
     if (!room?.selectedSongId || (room.players?.length ?? 0) < 1) return false;
     const ready = room.players.every((p) => p.ready && p.role);
@@ -567,6 +596,54 @@ export default function HostPage() {
               {(room?.players.length ?? 0) === 0 && (
                 <p style={{ color: 'var(--muted)' }}>Waiting for players to join...</p>
               )}
+              <h3 style={{ marginTop: '0.75rem' }}>
+                Audience ({room?.audience?.length ?? 0})
+              </h3>
+              {(room?.audience ?? []).map((a) => (
+                <div key={a.id} className="player-card" style={{ borderColor: a.color }}>
+                  <div className="player-dot" style={{ background: a.color }} />
+                  <div style={{ flex: 1 }}>
+                    <strong>{a.name}</strong>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+                      Spectator · {a.muted ? 'Muted' : 'Live'}
+                      {a.sandboxed ? ' · Sandbox' : ''}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                    onClick={() =>
+                      socket.emit('audience.mute', {
+                        code,
+                        audienceId: a.id,
+                        muted: !a.muted,
+                        hostToken,
+                      })
+                    }
+                  >
+                    {a.muted ? 'Unmute' : 'Mute'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                    onClick={() =>
+                      socket.emit('audience.sandbox', {
+                        code,
+                        audienceId: a.id,
+                        sandboxed: !a.sandboxed,
+                        hostToken,
+                      })
+                    }
+                  >
+                    {a.sandboxed ? 'Unsandbox' : 'Sandbox'}
+                  </button>
+                </div>
+              ))}
+              <DeviceRolePicker role={role} roles={roles} onChange={setRole} />
+              <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{profile.hints[0]}</p>
+              <AccessibilityPanel settings={settings} update={update} />
             </div>
 
             <div className="card stack">
@@ -695,9 +772,7 @@ export default function HostPage() {
         <div className="stage">
           <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>LIVE</h2>
           <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '0.75rem' }}>
-            {displayResult?.playbackStatus === 'PLAYABLE_APPROVED' || room.selectedSongId
-              ? 'Host metronome (Web Audio) — no copyrighted audio files'
-              : 'Metadata / provider mode — no ripped audio'}
+            Media: {mediaDescriptor.kind} — {mediaDescriptor.message}
           </p>
           <div className="beat-lane">
             {Array.from({ length: 16 }).map((_, i) => (
@@ -730,7 +805,7 @@ export default function HostPage() {
                   <strong>{p.name}</strong>
                   <div style={{ fontSize: '0.85rem' }}>
                     {ROLES.find((r) => r.id === p.role)?.label} · Score: {p.score} · Streak:{' '}
-                    {p.streak}
+                    {p.streak} · Combo: {p.combo ?? 1}x
                   </div>
                 </div>
               </div>
@@ -746,7 +821,7 @@ export default function HostPage() {
             <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--accent3)' }}>
               {results.teamScore}
             </div>
-            <p>Team Score · Crowd {results.crowdMeter}%</p>
+            <p>Team Score · Crowd {results.crowdMeter}% · Round {(room?.rematchRound ?? 0) + 1}</p>
           </div>
 
           <div className="grid-2">
@@ -777,8 +852,8 @@ export default function HostPage() {
             </div>
           </div>
 
-          <button className="btn-primary btn-large" onClick={replay} type="button">
-            Replay / Next Song
+          <button className="btn-primary btn-large" onClick={rematch} type="button">
+            Rematch / Next Song
           </button>
           <button className="btn-secondary btn-large" onClick={endRoom} type="button">
             End Room
