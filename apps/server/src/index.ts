@@ -1,10 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'node:http';
+import { registerTelemetrySink } from '@beatlink/shared';
 import { setupRealtime } from './realtime/socket.js';
 import { loadCatalog, getBeatmapForSong } from './beatmaps/store.js';
 import { getProviderAuthStatus, resolveLink } from './music/linkResolver.js';
 import { roomManager } from './rooms/RoomManager.js';
+
+if (process.env.BEATLINK_TELEMETRY === '1') {
+  registerTelemetrySink((event) => {
+    console.log('[telemetry]', event.name, event.roomCodeHash, event.meta ?? {});
+  });
+}
 
 const PORT = Number(process.env.PORT ?? 3001);
 const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '*';

@@ -72,6 +72,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@beatlink/device-ux':
+        specifier: workspace:*
+        version: link:../../device_ux
+      '@beatlink/game-engine':
+        specifier: workspace:*
+        version: link:../../packages/game-engine
       '@beatlink/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -115,6 +121,16 @@ importers:
       vite:
         specifier: ^6.0.5
         version: 6.4.3(@types/node@22.20.0)(tsx@4.23.0)
+
+  device_ux:
+    dependencies:
+      '@beatlink/shared':
+        specifier: workspace:*
+        version: link:../packages/shared
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
 
   packages/game-engine:
     dependencies:

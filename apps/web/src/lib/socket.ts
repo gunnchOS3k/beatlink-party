@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import type { Beatmap, GameResults, RoomState, ScoreEvent } from '@beatlink/shared';
+import type {
+  AudienceInfluenceEvent,
+  AudienceMember,
+  Beatmap,
+  GameResults,
+  RoomState,
+  ScoreEvent,
+} from '@beatlink/shared';
 import { WS_URL } from './api';
+
+const HOST_TOKEN_KEY = 'beatlink_host';
 
 let sharedSocket: Socket | null = null;
 
@@ -10,6 +19,21 @@ function getSocket(): Socket {
     sharedSocket = io(WS_URL, { transports: ['websocket', 'polling'] });
   }
   return sharedSocket;
+}
+
+export function storeHostToken(roomCode: string, hostToken: string): void {
+  localStorage.setItem(HOST_TOKEN_KEY, JSON.stringify({ roomCode, hostToken }));
+}
+
+export function loadHostToken(roomCode: string): string | undefined {
+  try {
+    const raw = localStorage.getItem(HOST_TOKEN_KEY);
+    if (!raw) return undefined;
+    const parsed = JSON.parse(raw) as { roomCode?: string; hostToken?: string };
+    return parsed.roomCode === roomCode ? parsed.hostToken : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function useSocket(): { socket: Socket; connected: boolean } {
@@ -42,6 +66,8 @@ export function useRoomEvents(
     onEnded?: (room: RoomState, results: GameResults) => void;
     onPlayerJoined?: (room: RoomState) => void;
     onPlayerLeft?: (room: RoomState) => void;
+    onHostMigrated?: (room: RoomState, newHostPlayerId: string | null) => void;
+    onAudienceInfluence?: (room: RoomState, event: AudienceInfluenceEvent) => void;
   },
 ) {
   const { socket } = useSocket();
@@ -78,6 +104,20 @@ export function useRoomEvents(
     const onPlayerLeft = ({ room }: { room: RoomState }) =>
       handlersRef.current.onPlayerLeft?.(room);
     const onReady = ({ room }: { room: RoomState }) => handlersRef.current.onState?.(room);
+    const onHostMigrated = ({
+      room,
+      newHostPlayerId,
+    }: {
+      room: RoomState;
+      newHostPlayerId?: string | null;
+    }) => handlersRef.current.onHostMigrated?.(room, newHostPlayerId ?? null);
+    const onAudienceInfluence = ({
+      room,
+      event,
+    }: {
+      room: RoomState;
+      event: AudienceInfluenceEvent;
+    }) => handlersRef.current.onAudienceInfluence?.(room, event);
 
     socket.on('room.state', onState);
     socket.on('game.countdown', onCountdown);
@@ -87,6 +127,8 @@ export function useRoomEvents(
     socket.on('room.player_joined', onPlayerJoined);
     socket.on('room.player_left', onPlayerLeft);
     socket.on('room.ready_changed', onReady);
+    socket.on('room.host_migrated', onHostMigrated);
+    socket.on('audience.influence', onAudienceInfluence);
 
     return () => {
       socket.off('room.state', onState);
@@ -97,6 +139,8 @@ export function useRoomEvents(
       socket.off('room.player_joined', onPlayerJoined);
       socket.off('room.player_left', onPlayerLeft);
       socket.off('room.ready_changed', onReady);
+      socket.off('room.host_migrated', onHostMigrated);
+      socket.off('audience.influence', onAudienceInfluence);
     };
   }, [code, socket]);
 }
@@ -126,48 +170,90 @@ function waitForSocketConnection(socket: Socket, timeoutMs: number): Promise<voi
 
 export function useCreateRoom() {
   const { socket } = useSocket();
-  return useCallback(
-    async () => {
-      await waitForSocketConnection(socket, ROOM_CREATE_TIMEOUT_MS);
-      return new Promise<string>((resolve, reject) => {
-        const timer = window.setTimeout(() => {
-          reject(
-            new Error(
-              'BeatLink could not reach the room server. Confirm the host service is running and that this phone can reach it.',
-            ),
-          );
-        }, ROOM_CREATE_TIMEOUT_MS);
-        socket.emit('room.create', (data: { code?: string; error?: string }) => {
-          window.clearTimeout(timer);
-          if (data?.code) resolve(data.code);
-          else reject(new Error(data?.error ?? 'Failed to create room'));
-        });
+  return useCallback(async () => {
+    await waitForSocketConnection(socket, ROOM_CREATE_TIMEOUT_MS);
+    return new Promise<{ code: string; hostToken: string }>((resolve, reject) => {
+      const timer = window.setTimeout(() => {
+        reject(
+          new Error(
+            'BeatLink could not reach the room server. Confirm the host service is running and that this phone can reach it.',
+          ),
+        );
+      }, ROOM_CREATE_TIMEOUT_MS);
+      socket.emit('room.create', (data: { code?: string; hostToken?: string; error?: string }) => {
+        window.clearTimeout(timer);
+        if (data?.code && data.hostToken) {
+          storeHostToken(data.code, data.hostToken);
+          resolve({ code: data.code, hostToken: data.hostToken });
+        } else if (data?.code) {
+          resolve({ code: data.code, hostToken: '' });
+        } else {
+          reject(new Error(data?.error ?? 'Failed to create room'));
+        }
       });
-    },
-    [socket],
-  );
+    });
+  }, [socket]);
 }
 
 export function useJoinRoom() {
   const { socket } = useSocket();
   return useCallback(
     (code: string, name: string, playerId?: string, playerToken?: string) =>
-      new Promise<{ player: import('@beatlink/shared').Player; room: RoomState; playerToken?: string }>(
+      new Promise<{
+        player: import('@beatlink/shared').Player;
+        room: RoomState;
+        playerToken?: string;
+      }>((resolve, reject) => {
+        socket.emit(
+          'room.join',
+          { code, name, playerId, playerToken },
+          (result: {
+            ok: boolean;
+            error?: string;
+            player?: import('@beatlink/shared').Player;
+            room?: RoomState;
+            playerToken?: string;
+          }) => {
+            if (result.ok && result.player && result.room) {
+              resolve({
+                player: result.player,
+                room: result.room,
+                playerToken: result.playerToken,
+              });
+            } else {
+              reject(new Error(result.error ?? 'Join failed'));
+            }
+          },
+        );
+      }),
+    [socket],
+  );
+}
+
+export function useJoinAudience() {
+  const { socket } = useSocket();
+  return useCallback(
+    (code: string, name: string, audienceId?: string, audienceToken?: string) =>
+      new Promise<{ audience: AudienceMember; room: RoomState; audienceToken?: string }>(
         (resolve, reject) => {
           socket.emit(
-            'room.join',
-            { code, name, playerId, playerToken },
+            'room.join_audience',
+            { code, name, audienceId, audienceToken },
             (result: {
               ok: boolean;
               error?: string;
-              player?: import('@beatlink/shared').Player;
+              audience?: AudienceMember;
               room?: RoomState;
-              playerToken?: string;
+              audienceToken?: string;
             }) => {
-              if (result.ok && result.player && result.room) {
-                resolve({ player: result.player, room: result.room, playerToken: result.playerToken });
+              if (result.ok && result.audience && result.room) {
+                resolve({
+                  audience: result.audience,
+                  room: result.room,
+                  audienceToken: result.audienceToken,
+                });
               } else {
-                reject(new Error(result.error ?? 'Join failed'));
+                reject(new Error(result.error ?? 'Audience join failed'));
               }
             },
           );

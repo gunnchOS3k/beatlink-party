@@ -10,7 +10,20 @@ import type {
   VocalPrompt,
 } from '@beatlink/shared';
 import { ROLES } from '@beatlink/shared';
+import {
+  buildKaraokePromptState,
+  buildTimelineSync,
+  calibratedGameTimeMs,
+  canSubmitVocalPhrase,
+  describeCombo,
+} from '@beatlink/game-engine';
 import { useJoinRoom, useRoomEvents, useSocket } from '../lib/socket';
+import {
+  AccessibilityPanel,
+  DeviceRolePicker,
+  useAccessibility,
+  useDeviceRole,
+} from '../lib/deviceSettings';
 
 const PLAYER_STORAGE_KEY = 'beatlink_player';
 
@@ -29,14 +42,29 @@ export default function PlayerPage() {
   const [joined, setJoined] = useState(false);
   const [beatmap, setBeatmap] = useState<Beatmap | null>(null);
   const [gameStartTime, setGameStartTime] = useState(0);
-  const [gameTimeMs, setGameTimeMs] = useState(0);
+  const [rawElapsedMs, setRawElapsedMs] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [feedbackClass, setFeedbackClass] = useState('');
   const [results, setResults] = useState<GameResults | null>(null);
   const [currentPrompt, setCurrentPrompt] = useState<VocalPrompt | null>(null);
   const [hypeCooldown, setHypeCooldown] = useState(false);
+  const [hostOffer, setHostOffer] = useState(false);
   const playerIdRef = useRef<string | undefined>(undefined);
   playerIdRef.current = player?.id;
+  const { role: deviceRole, setRole: setDeviceRole, roles: deviceRoles } = useDeviceRole(false);
+  const { settings, update } = useAccessibility();
+
+  const calibrationOffsetMs = room?.calibrationOffsetMs ?? 0;
+  const gameTimeMs = calibratedGameTimeMs(rawElapsedMs, calibrationOffsetMs);
+  const timeline = useMemo(() => {
+    if (!beatmap) return null;
+    return buildTimelineSync(beatmap, rawElapsedMs, calibrationOffsetMs);
+  }, [beatmap, rawElapsedMs, calibrationOffsetMs]);
+
+  const karaokeState = useMemo(() => {
+    if (!beatmap) return null;
+    return buildKaraokePromptState(beatmap.vocalPrompts, gameTimeMs);
+  }, [beatmap, gameTimeMs]);
 
   const handlers = useMemo(
     () => ({
@@ -59,7 +87,8 @@ export default function PlayerPage() {
         const me = next.players.find((p) => p.id === playerIdRef.current);
         if (me) setPlayer(me);
         if (ev && ev.playerId === playerIdRef.current) {
-          setFeedback(ev.message);
+          const comboLabel = ev.combo > 1 ? ` ${describeCombo(ev.combo)}` : '';
+          setFeedback(`${ev.message}${comboLabel}`);
           setFeedbackClass(ev.grade);
           setTimeout(() => setFeedback(''), 800);
         }
@@ -70,6 +99,12 @@ export default function PlayerPage() {
       },
       onPlayerJoined: setRoom,
       onPlayerLeft: setRoom,
+      onHostMigrated: (next: RoomState, newHostPlayerId: string | null) => {
+        setRoom(next);
+        if (newHostPlayerId && newHostPlayerId === playerIdRef.current) {
+          setHostOffer(true);
+        }
+      },
     }),
     [],
   );
@@ -79,18 +114,35 @@ export default function PlayerPage() {
   useEffect(() => {
     if (!joined || room?.phase !== 'playing') return;
     const id = setInterval(() => {
-      if (gameStartTime) setGameTimeMs(Date.now() - gameStartTime);
+      if (gameStartTime) setRawElapsedMs(Date.now() - gameStartTime);
     }, 50);
     return () => clearInterval(id);
   }, [joined, room?.phase, gameStartTime]);
 
   useEffect(() => {
     if (!beatmap || !player) return;
-    const prompt = beatmap.vocalPrompts.find(
-      (v) => gameTimeMs >= v.timeMs - 500 && gameTimeMs <= v.timeMs + v.durationMs,
-    );
+    const prompt =
+      karaokeState?.prompt ??
+      beatmap.vocalPrompts.find(
+        (v) => gameTimeMs >= v.timeMs - 500 && gameTimeMs <= v.timeMs + v.durationMs,
+      );
     setCurrentPrompt(prompt ?? null);
-  }, [beatmap, gameTimeMs, player]);
+  }, [beatmap, gameTimeMs, player, karaokeState]);
+
+  function claimHost() {
+    if (!player) return;
+    const stored = localStorage.getItem(PLAYER_STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) : null;
+    const playerToken = parsed?.roomCode === code ? parsed.playerToken : undefined;
+    if (!playerToken) return;
+    socket.emit(
+      'room.claim_host',
+      { code, playerId: player.id, playerToken },
+      (result?: { ok?: boolean }) => {
+        if (result?.ok) setHostOffer(false);
+      },
+    );
+  }
 
   async function handleJoin() {
     if (!name.trim() || !code) return;
@@ -238,6 +290,13 @@ export default function PlayerPage() {
           >
             {player?.ready ? 'Not Ready' : 'Ready!'}
           </button>
+          {hostOffer && (
+            <button className="btn-secondary btn-large" onClick={claimHost}>
+              Claim Host (previous host disconnected)
+            </button>
+          )}
+          <DeviceRolePicker role={deviceRole} roles={deviceRoles} onChange={setDeviceRole} />
+          <AccessibilityPanel settings={settings} update={update} />
         </div>
       </div>
     );
@@ -257,8 +316,16 @@ export default function PlayerPage() {
         <div className="row" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
           <span>{ROLES.find((r) => r.id === player.role)?.label}</span>
           <span>Score: {player.score}</span>
-          <span>Streak: {player.streak}</span>
+          <span>
+            Streak: {player.streak} · {describeCombo(player.combo ?? 1)}
+          </span>
         </div>
+        {timeline && (
+          <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+            Beat {timeline.beatIndex + 1} · {Math.floor(timeline.calibratedMs / 1000)}s · offset{' '}
+            {calibrationOffsetMs}ms
+          </p>
+        )}
 
         <div className={`feedback ${feedbackClass}`}>{feedback}</div>
 
@@ -271,16 +338,33 @@ export default function PlayerPage() {
         {player.role === 'vocalist' && (
           <div className="stack" style={{ alignItems: 'center' }}>
             <div className="card" style={{ textAlign: 'center', width: '100%' }}>
-              <p className="label">Current Prompt</p>
-              <p style={{ fontSize: '1.5rem', fontWeight: 700 }}>
-                {currentPrompt?.text ?? 'Get ready...'}
+              <p className="label">
+                Karaoke · {karaokeState?.phase ?? 'idle'}
+                {karaokeState?.msUntilStart != null && karaokeState.phase === 'upcoming'
+                  ? ` · in ${Math.ceil(karaokeState.msUntilStart / 1000)}s`
+                  : ''}
               </p>
+              <p style={{ fontSize: '1.5rem', fontWeight: 700 }}>
+                {currentPrompt?.text ?? karaokeState?.prompt?.text ?? 'Get ready...'}
+              </p>
+              {karaokeState && karaokeState.phase !== 'idle' && (
+                <div className="meter" style={{ marginTop: '0.75rem' }}>
+                  <div
+                    className="meter-fill"
+                    style={{ width: `${Math.round(karaokeState.progress * 100)}%` }}
+                  />
+                </div>
+              )}
             </div>
-            <button className="btn-primary btn-large" onClick={handleVocal}>
+            <button
+              className="btn-primary btn-large"
+              onClick={handleVocal}
+              disabled={karaokeState ? !canSubmitVocalPhrase(karaokeState) : !currentPrompt}
+            >
               Perform Phrase
             </button>
             <p style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center' }}>
-              Mic optional for MVP — tap when prompted. No audio is stored.
+              Mic optional — tap when the prompt is active. No audio is stored.
             </p>
           </div>
         )}

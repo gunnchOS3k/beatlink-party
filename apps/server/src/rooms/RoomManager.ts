@@ -1,5 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import type {
+  AudienceInfluenceEvent,
+  AudienceInfluenceType,
+  AudienceMember,
   Beatmap,
   GameResults,
   LinkResolveResult,
@@ -11,13 +14,22 @@ import type {
 } from '@beatlink/shared';
 import {
   PLAYER_COLORS,
+  AUDIENCE_COLORS,
+  AUDIENCE_INFLUENCE_COOLDOWN_MS,
+  AUDIENCE_INFLUENCE_MAX_PER_ROUND,
   generateRoomCode,
   sanitizePlayerName,
   HYPE_COOLDOWN_MS,
+  comboFromStreak,
+  emitTelemetry,
 } from '@beatlink/shared';
 import {
   assertTransition,
+  calibratedGameTimeMs,
   computeAwards,
+  findActiveVocalPrompt,
+  findNearestHypeEvent,
+  findNearestNote,
   scoreBeatTap,
   scoreHypeAction,
   scoreVocalPhrase,
@@ -26,21 +38,27 @@ import {
 import { getBeatmapForSong } from '../beatmaps/store.js';
 
 const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
+const MAX_PLAYERS = 6;
+const MAX_AUDIENCE = 20;
 
 interface InternalRoom extends RoomState {
   beatmap: Beatmap | null;
   hypeCooldowns: Map<string, number>;
   hostToken: string;
   playerTokens: Map<string, string>;
+  audienceTokens: Map<string, string>;
   scoredTargets: Set<string>;
 }
 
 export class RoomManager {
   private rooms = new Map<string, InternalRoom>();
   private playerToRoom = new Map<string, string>();
+  private audienceToRoom = new Map<string, string>();
   private socketToPlayer = new Map<string, string>();
+  private socketToAudience = new Map<string, string>();
+  private socketToHostRoom = new Map<string, string>();
 
-  createRoom(hostSocketId: string): RoomState {
+  createRoom(hostSocketId: string): RoomState & { hostToken: string } {
     let code = generateRoomCode();
     while (this.rooms.has(code)) {
       code = generateRoomCode();
@@ -51,6 +69,7 @@ export class RoomManager {
       phase: 'lobby',
       hostId: hostSocketId,
       players: [],
+      audience: [],
       selectedSongId: null,
       pastedLinkUrl: null,
       linkResolveResult: null,
@@ -60,16 +79,20 @@ export class RoomManager {
       gameDurationMs: 45000,
       teamScore: 0,
       crowdMeter: 50,
+      rematchRound: 0,
       createdAt: now,
       expiresAt: now + ROOM_TTL_MS,
       beatmap: null,
       hypeCooldowns: new Map(),
       hostToken: randomUUID(),
       playerTokens: new Map(),
+      audienceTokens: new Map(),
       scoredTargets: new Set(),
     };
     this.rooms.set(code, room);
-    return this.stripInternal(room);
+    this.socketToHostRoom.set(hostSocketId, code);
+    emitTelemetry('room_created', code, { rematchRound: 0 });
+    return { ...this.stripInternal(room), hostToken: room.hostToken };
   }
 
   getRoom(code: string): InternalRoom | null {
@@ -88,6 +111,7 @@ export class RoomManager {
       hypeCooldowns: _hypeCooldowns,
       hostToken: _hostToken,
       playerTokens: _playerTokens,
+      audienceTokens: _audienceTokens,
       scoredTargets: _scoredTargets,
       ...state
     } = room;
@@ -95,6 +119,7 @@ export class RoomManager {
     void _hypeCooldowns;
     void _hostToken;
     void _playerTokens;
+    void _audienceTokens;
     void _scoredTargets;
     return state;
   }
@@ -104,10 +129,15 @@ export class RoomManager {
     return room?.hostId === socketId ? room.hostToken : null;
   }
 
+  /** Validate host token and re-bind host socket (reconnect / migration claim). */
   authorizeHost(code: string, socketId: string, hostToken: string | undefined): boolean {
     const room = this.getRoom(code);
     if (!room || !hostToken || room.hostToken !== hostToken) return false;
+    if (room.hostId && room.hostId !== socketId) {
+      this.socketToHostRoom.delete(room.hostId);
+    }
     room.hostId = socketId;
+    this.socketToHostRoom.set(socketId, room.code);
     return true;
   }
 
@@ -118,6 +148,13 @@ export class RoomManager {
     );
   }
 
+  ownsAudience(code: string, socketId: string, audienceId: string): boolean {
+    return (
+      this.socketToAudience.get(socketId) === audienceId &&
+      this.audienceToRoom.get(audienceId) === code.toUpperCase()
+    );
+  }
+
   joinRoom(
     code: string,
     socketId: string,
@@ -125,7 +162,9 @@ export class RoomManager {
   ): { room: RoomState; player: Player; playerToken: string } | null {
     const room = this.getRoom(code);
     if (!room) return null;
-    if (room.phase !== 'lobby' && room.phase !== 'song_select') return null;
+    if (room.phase !== 'lobby' && room.phase !== 'song_select' && room.phase !== 'results') {
+      return null;
+    }
 
     const existingPlayerId = this.socketToPlayer.get(socketId);
     if (existingPlayerId) {
@@ -140,7 +179,7 @@ export class RoomManager {
       }
     }
 
-    if (room.players.length >= 6) return null;
+    if (room.players.length >= MAX_PLAYERS) return null;
 
     const player: Player = {
       id: randomUUID(),
@@ -152,6 +191,7 @@ export class RoomManager {
       accuracy: 0,
       streak: 0,
       maxStreak: 0,
+      combo: 1,
       color: PLAYER_COLORS[room.players.length % PLAYER_COLORS.length],
     };
     room.players.push(player);
@@ -159,7 +199,50 @@ export class RoomManager {
     room.playerTokens.set(player.id, playerToken);
     this.playerToRoom.set(player.id, room.code);
     this.socketToPlayer.set(socketId, player.id);
+    emitTelemetry('player_join', room.code, { playerCount: room.players.length });
     return { room: this.stripInternal(room), player, playerToken };
+  }
+
+  joinAudience(
+    code: string,
+    socketId: string,
+    name: string,
+  ): { room: RoomState; audience: AudienceMember; audienceToken: string } | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+
+    const existingId = this.socketToAudience.get(socketId);
+    if (existingId) {
+      const member = room.audience.find((a) => a.id === existingId);
+      if (member) {
+        member.connected = true;
+        return {
+          room: this.stripInternal(room),
+          audience: member,
+          audienceToken: room.audienceTokens.get(member.id)!,
+        };
+      }
+    }
+
+    if (room.audience.length >= MAX_AUDIENCE) return null;
+
+    const audience: AudienceMember = {
+      id: randomUUID(),
+      name: sanitizePlayerName(name) || 'Spectator',
+      connected: true,
+      muted: false,
+      sandboxed: false,
+      influenceCount: 0,
+      lastInfluenceAt: null,
+      color: AUDIENCE_COLORS[room.audience.length % AUDIENCE_COLORS.length],
+    };
+    room.audience.push(audience);
+    const audienceToken = randomUUID();
+    room.audienceTokens.set(audience.id, audienceToken);
+    this.audienceToRoom.set(audience.id, room.code);
+    this.socketToAudience.set(socketId, audience.id);
+    emitTelemetry('audience_join', room.code, { audienceCount: room.audience.length });
+    return { room: this.stripInternal(room), audience, audienceToken };
   }
 
   reconnectPlayer(
@@ -179,7 +262,205 @@ export class RoomManager {
     return player;
   }
 
+  reconnectAudience(
+    code: string,
+    audienceId: string,
+    audienceToken: string,
+    socketId: string,
+  ): AudienceMember | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    if (room.audienceTokens.get(audienceId) !== audienceToken) return null;
+    const member = room.audience.find((a) => a.id === audienceId);
+    if (!member) return null;
+    member.connected = true;
+    this.socketToAudience.set(socketId, member.id);
+    this.audienceToRoom.set(member.id, room.code);
+    return member;
+  }
+
+  reconnectHost(code: string, hostToken: string, socketId: string): RoomState | null {
+    if (!this.authorizeHost(code, socketId, hostToken)) return null;
+    const room = this.getRoom(code);
+    return room ? this.stripInternal(room) : null;
+  }
+
+  /**
+   * When the host socket disconnects, migrate host seat to the first connected player
+   * (or keep hostId null until host reconnects with token). Returns new host player id if migrated.
+   */
+  migrateHostOnDisconnect(socketId: string): {
+    room: RoomState;
+    previousHostId: string | null;
+    newHostPlayerId: string | null;
+    hostToken: string;
+  } | null {
+    const code = this.socketToHostRoom.get(socketId);
+    if (!code) return null;
+    const room = this.getRoom(code);
+    if (!room || room.hostId !== socketId) {
+      this.socketToHostRoom.delete(socketId);
+      return null;
+    }
+
+    const previousHostId = room.hostId;
+    this.socketToHostRoom.delete(socketId);
+
+    const successor = room.players.find((p) => p.connected);
+    if (successor) {
+      // Temporary host claim for continuity — full auth still requires hostToken.
+      room.hostId = `player-host:${successor.id}`;
+      emitTelemetry('host_migrated', room.code, { rematchRound: room.rematchRound });
+      return {
+        room: this.stripInternal(room),
+        previousHostId,
+        newHostPlayerId: successor.id,
+        hostToken: room.hostToken,
+      };
+    }
+
+    room.hostId = null;
+    emitTelemetry('host_migrated', room.code, { rematchRound: room.rematchRound });
+    return {
+      room: this.stripInternal(room),
+      previousHostId,
+      newHostPlayerId: null,
+      hostToken: room.hostToken,
+    };
+  }
+
+  claimHostAsPlayer(
+    code: string,
+    playerId: string,
+    playerToken: string,
+    socketId: string,
+  ): { room: RoomState; hostToken: string } | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    if (room.playerTokens.get(playerId) !== playerToken) return null;
+    const player = room.players.find((p) => p.id === playerId);
+    if (!player || !player.connected) return null;
+    // Allow claim when host is missing or already migrated to this player.
+    if (
+      room.hostId !== null &&
+      room.hostId !== `player-host:${playerId}` &&
+      !room.hostId.startsWith('player-host:')
+    ) {
+      return null;
+    }
+    if (room.hostId?.startsWith('player-host:') && room.hostId !== `player-host:${playerId}`) {
+      return null;
+    }
+    room.hostId = socketId;
+    this.socketToHostRoom.set(socketId, room.code);
+    emitTelemetry('host_migrated', room.code, { claimed: true });
+    return { room: this.stripInternal(room), hostToken: room.hostToken };
+  }
+
+  setAudienceMuted(
+    code: string,
+    audienceId: string,
+    muted: boolean,
+  ): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    const member = room.audience.find((a) => a.id === audienceId);
+    if (!member) return null;
+    member.muted = muted;
+    return this.stripInternal(room);
+  }
+
+  setAudienceSandboxed(
+    code: string,
+    audienceId: string,
+    sandboxed: boolean,
+  ): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    const member = room.audience.find((a) => a.id === audienceId);
+    if (!member) return null;
+    member.sandboxed = sandboxed;
+    return this.stripInternal(room);
+  }
+
+  /**
+   * Moderated audience influence with anti-grief rate limits.
+   * Sandboxed members get accepted=false (no crowd effect).
+   */
+  processAudienceInfluence(
+    code: string,
+    audienceId: string,
+    type: AudienceInfluenceType,
+    choice?: string,
+  ): { room: RoomState; event: AudienceInfluenceEvent } | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    const member = room.audience.find((a) => a.id === audienceId);
+    if (!member || !member.connected) return null;
+
+    const now = Date.now();
+    let accepted = true;
+    let reason: string | undefined;
+    let crowdDelta = 0;
+
+    if (member.muted) {
+      accepted = false;
+      reason = 'muted';
+    } else if (member.sandboxed) {
+      accepted = false;
+      reason = 'sandboxed';
+    } else if (
+      member.lastInfluenceAt != null &&
+      now - member.lastInfluenceAt < AUDIENCE_INFLUENCE_COOLDOWN_MS
+    ) {
+      accepted = false;
+      reason = 'rate_limited';
+    } else if (member.influenceCount >= AUDIENCE_INFLUENCE_MAX_PER_ROUND) {
+      accepted = false;
+      reason = 'round_cap';
+    } else if (room.phase !== 'playing' && room.phase !== 'countdown' && room.phase !== 'results') {
+      accepted = false;
+      reason = 'phase_blocked';
+    }
+
+    if (accepted) {
+      member.lastInfluenceAt = now;
+      member.influenceCount += 1;
+      crowdDelta = type === 'hype' ? 2 : 1;
+      room.crowdMeter = Math.min(100, Math.max(0, room.crowdMeter + crowdDelta));
+    }
+
+    const event: AudienceInfluenceEvent = {
+      audienceId,
+      type,
+      choice: choice?.slice(0, 32),
+      accepted,
+      reason,
+      crowdDelta,
+      atMs: now,
+    };
+    emitTelemetry('audience_influence', room.code, {
+      accepted,
+      type,
+      reason: reason ?? null,
+    });
+    return { room: this.stripInternal(room), event };
+  }
+
   leaveRoom(socketId: string): RoomState | null {
+    const audienceId = this.socketToAudience.get(socketId);
+    if (audienceId) {
+      const code = this.audienceToRoom.get(audienceId);
+      this.socketToAudience.delete(socketId);
+      if (!code) return null;
+      const room = this.getRoom(code);
+      if (!room) return null;
+      const member = room.audience.find((a) => a.id === audienceId);
+      if (member) member.connected = false;
+      emitTelemetry('disconnect', room.code, { seat: 'audience' });
+      return this.stripInternal(room);
+    }
+
     const playerId = this.socketToPlayer.get(socketId);
     if (!playerId) return null;
     const code = this.playerToRoom.get(playerId);
@@ -189,6 +470,7 @@ export class RoomManager {
     const player = room.players.find((p) => p.id === playerId);
     if (player) player.connected = false;
     this.socketToPlayer.delete(socketId);
+    emitTelemetry('disconnect', room.code, { seat: 'player' });
     return this.stripInternal(room);
   }
 
@@ -200,13 +482,23 @@ export class RoomManager {
       this.playerToRoom.delete(player.id);
       room.playerTokens.delete(player.id);
     }
+    for (const member of room.audience) {
+      this.audienceToRoom.delete(member.id);
+      room.audienceTokens.delete(member.id);
+    }
     for (const [socketId, playerId] of [...this.socketToPlayer.entries()]) {
       if (room.players.some((p) => p.id === playerId)) {
         this.socketToPlayer.delete(socketId);
       }
     }
+    for (const [socketId, audienceId] of [...this.socketToAudience.entries()]) {
+      if (room.audience.some((a) => a.id === audienceId)) {
+        this.socketToAudience.delete(socketId);
+      }
+    }
+    this.socketToHostRoom.delete(hostSocketId);
     this.rooms.delete(code.toUpperCase());
-    return this.stripInternal({ ...room, phase: 'closed' as RoomState['phase'], players: [] });
+    return this.stripInternal({ ...room, phase: 'closed' as RoomState['phase'], players: [], audience: [] });
   }
 
   setRole(code: string, playerId: string, role: Player['role']): RoomState | null {
@@ -317,6 +609,11 @@ export class RoomManager {
       p.streak = 0;
       p.maxStreak = 0;
       p.accuracy = 0;
+      p.combo = 1;
+    }
+    for (const a of room.audience) {
+      a.influenceCount = 0;
+      a.lastInfluenceAt = null;
     }
     room.teamScore = 0;
     room.crowdMeter = 50;
@@ -344,6 +641,12 @@ export class RoomManager {
     return Date.now() - room.gameStartTime;
   }
 
+  getCalibratedGameTimeMs(code: string): number {
+    const room = this.getRoom(code);
+    if (!room) return 0;
+    return calibratedGameTimeMs(this.getGameTimeMs(code), room.calibrationOffsetMs || 0);
+  }
+
   processInput(code: string, input: PlayerInputEvent): { room: RoomState; scoreEvent: ScoreEvent | null } | null {
     const room = this.getRoom(code);
     if (!room || room.phase !== 'playing' || !room.beatmap) return null;
@@ -351,16 +654,15 @@ export class RoomManager {
     if (!player) return null;
 
     const rawGameTimeMs = this.getGameTimeMs(code);
-    // Positive calibrationOffsetMs = host/players tap late; subtract so windows align.
-    const gameTimeMs = rawGameTimeMs - (room.calibrationOffsetMs || 0);
+    const gameTimeMs = calibratedGameTimeMs(rawGameTimeMs, room.calibrationOffsetMs || 0);
     let scoreEvent: ScoreEvent | null = null;
 
     if (player.role === 'beat_tapper' && input.type === 'tap') {
-      const note = room.beatmap.notes.find(
-        (n) =>
-          n.role === 'beat_tapper' &&
-          (input.noteId ? n.id === input.noteId : Math.abs(n.timeMs - gameTimeMs) < 150),
-      );
+      const note =
+        (input.noteId
+          ? room.beatmap.notes.find((n) => n.id === input.noteId)
+          : null) ??
+        findNearestNote(room.beatmap.notes, gameTimeMs, 150, 'beat_tapper');
       const targetKey = note ? `${player.id}:note:${note.id}` : null;
       if (
         note &&
@@ -378,18 +680,23 @@ export class RoomManager {
           grade: result.grade,
           points: result.points,
           streak: result.streak,
+          combo: result.combo,
           message: result.message,
         };
       }
     } else if (player.role === 'vocalist' && input.type === 'vocal_phrase') {
-      const prompt = room.beatmap.vocalPrompts.find(
-        (v) =>
-          (input.promptId ? v.id === input.promptId : Math.abs(v.timeMs - gameTimeMs) < 500) &&
-          gameTimeMs >= v.timeMs - 200 &&
-          gameTimeMs <= v.timeMs + v.durationMs + 200,
-      );
+      const prompt =
+        (input.promptId
+          ? room.beatmap.vocalPrompts.find((v) => v.id === input.promptId)
+          : null) ?? findActiveVocalPrompt(room.beatmap.vocalPrompts, gameTimeMs, 500);
       const targetKey = prompt ? `${player.id}:vocal:${prompt.id}` : null;
-      if (prompt && targetKey && !room.scoredTargets.has(targetKey)) {
+      if (
+        prompt &&
+        targetKey &&
+        !room.scoredTargets.has(targetKey) &&
+        gameTimeMs >= prompt.timeMs - 200 &&
+        gameTimeMs <= prompt.timeMs + prompt.durationMs + 200
+      ) {
         room.scoredTargets.add(targetKey);
         const result = scoreVocalPhrase(
           input,
@@ -406,6 +713,7 @@ export class RoomManager {
           grade: result.grade,
           points: result.points,
           streak: result.streak,
+          combo: result.combo,
           message: result.message,
         };
       }
@@ -414,7 +722,7 @@ export class RoomManager {
       if (Date.now() - lastHype < HYPE_COOLDOWN_MS) {
         return { room: this.stripInternal(room), scoreEvent: null };
       }
-      const event = room.beatmap.hypeEvents.find((e) => Math.abs(e.timeMs - gameTimeMs) < 300);
+      const event = findNearestHypeEvent(room.beatmap.hypeEvents, gameTimeMs, 300);
       const targetTime = event?.timeMs ?? gameTimeMs;
       const result = scoreHypeAction(gameTimeMs, targetTime, player.streak);
       Object.assign(player, updatePlayerStats(player, result));
@@ -426,8 +734,17 @@ export class RoomManager {
         grade: result.grade,
         points: result.points,
         streak: result.streak,
+        combo: result.combo,
         message: result.message,
       };
+    }
+
+    if (scoreEvent) {
+      emitTelemetry('score', room.code, {
+        grade: scoreEvent.grade,
+        points: scoreEvent.points,
+        combo: scoreEvent.combo,
+      });
     }
 
     if (rawGameTimeMs >= room.gameDurationMs) {
@@ -457,9 +774,11 @@ export class RoomManager {
     };
   }
 
-  replay(code: string): RoomState | null {
+  /** Rematch: keep seats/tokens, clear scores, return to lobby for next song. */
+  rematch(code: string): RoomState | null {
     const room = this.getRoom(code);
-    if (!room) return null;
+    if (!room || (room.phase !== 'results' && room.phase !== 'lobby')) return null;
+    room.rematchRound += 1;
     room.phase = 'lobby';
     room.countdown = null;
     room.gameStartTime = null;
@@ -473,13 +792,24 @@ export class RoomManager {
       p.streak = 0;
       p.maxStreak = 0;
       p.accuracy = 0;
+      p.combo = 1;
       p.ready = false;
+    }
+    for (const a of room.audience) {
+      a.influenceCount = 0;
+      a.lastInfluenceAt = null;
     }
     room.teamScore = 0;
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
+    emitTelemetry('rematch', room.code, { rematchRound: room.rematchRound });
     return this.stripInternal(room);
+  }
+
+  /** @deprecated Prefer rematch() — keeps seats; still supported for host UI. */
+  replay(code: string): RoomState | null {
+    return this.rematch(code);
   }
 
   getBeatmap(code: string): Beatmap | null {
@@ -489,6 +819,10 @@ export class RoomManager {
 
   getPlayerIdForSocket(socketId: string): string | undefined {
     return this.socketToPlayer.get(socketId);
+  }
+
+  getAudienceIdForSocket(socketId: string): string | undefined {
+    return this.socketToAudience.get(socketId);
   }
 
   resetToLobby(code: string, phase: RoomPhase = 'lobby'): RoomState | null {
@@ -508,3 +842,6 @@ function assertCanStart(room: InternalRoom): boolean {
 }
 
 export const roomManager = new RoomManager();
+
+// Re-export for tests that assert combo helper wiring
+export { comboFromStreak };
