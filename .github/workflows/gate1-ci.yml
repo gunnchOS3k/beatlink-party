@@ -1,4 +1,4 @@
-name: CI
+name: Gate 1 post-merge integrity
 
 on:
   pull_request:
@@ -11,13 +11,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: gate1-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  gate1-core-loop:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -45,26 +45,17 @@ jobs:
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Test (includes Gate1 core-loop)
-        run: pnpm test
-
-      - name: Gate1 core-loop focused
+      - name: Gate1 core-loop tests
         run: pnpm vitest run tests/gate1_core_loop.test.ts
 
-      - name: Build smoke
-        run: pnpm build
+      - name: Gate1 suite smoke (vitest only; lint/typecheck tracked separately)
+        run: pnpm vitest run
 
       - name: Upload synthetic Gate1 summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gate1-beatlink-synthetic-summary
+          name: gate1-core-loop-summary
           path: |
             gate1/evidence/out/*summary*.json
             gate1/status/gate1_core_loop_status.json

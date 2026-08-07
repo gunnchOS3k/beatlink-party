@@ -13,3 +13,9 @@ coverage/
 
 apps/web/.env.production.local
 .env.production.local
+
+# Gate 1 runtime evidence outputs
+gate1/evidence/out/**
+!gate1/evidence/out/**/.gitkeep
+gate1/status/*
+!gate1/status/.gitkeep
