@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import type { AudienceMember, AudienceInfluenceEvent, RoomState } from '@beatlink/shared';
 import { useJoinAudience, useRoomEvents, useSocket } from '../lib/socket';

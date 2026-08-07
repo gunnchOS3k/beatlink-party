@@ -10,7 +10,13 @@ import type {
   VocalPrompt,
 } from '@beatlink/shared';
 import { ROLES } from '@beatlink/shared';
-import { buildKaraokePromptState, canSubmitVocalPhrase, describeCombo } from '@beatlink/game-engine';
+import {
+  buildKaraokePromptState,
+  buildTimelineSync,
+  calibratedGameTimeMs,
+  canSubmitVocalPhrase,
+  describeCombo,
+} from '@beatlink/game-engine';
 import { useJoinRoom, useRoomEvents, useSocket } from '../lib/socket';
 import {
   AccessibilityPanel,
@@ -36,7 +42,7 @@ export default function PlayerPage() {
   const [joined, setJoined] = useState(false);
   const [beatmap, setBeatmap] = useState<Beatmap | null>(null);
   const [gameStartTime, setGameStartTime] = useState(0);
-  const [gameTimeMs, setGameTimeMs] = useState(0);
+  const [rawElapsedMs, setRawElapsedMs] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [feedbackClass, setFeedbackClass] = useState('');
   const [results, setResults] = useState<GameResults | null>(null);
@@ -47,6 +53,13 @@ export default function PlayerPage() {
   playerIdRef.current = player?.id;
   const { role: deviceRole, setRole: setDeviceRole, roles: deviceRoles } = useDeviceRole(false);
   const { settings, update } = useAccessibility();
+
+  const calibrationOffsetMs = room?.calibrationOffsetMs ?? 0;
+  const gameTimeMs = calibratedGameTimeMs(rawElapsedMs, calibrationOffsetMs);
+  const timeline = useMemo(() => {
+    if (!beatmap) return null;
+    return buildTimelineSync(beatmap, rawElapsedMs, calibrationOffsetMs);
+  }, [beatmap, rawElapsedMs, calibrationOffsetMs]);
 
   const karaokeState = useMemo(() => {
     if (!beatmap) return null;
@@ -101,7 +114,7 @@ export default function PlayerPage() {
   useEffect(() => {
     if (!joined || room?.phase !== 'playing') return;
     const id = setInterval(() => {
-      if (gameStartTime) setGameTimeMs(Date.now() - gameStartTime);
+      if (gameStartTime) setRawElapsedMs(Date.now() - gameStartTime);
     }, 50);
     return () => clearInterval(id);
   }, [joined, room?.phase, gameStartTime]);
@@ -307,6 +320,12 @@ export default function PlayerPage() {
             Streak: {player.streak} · {describeCombo(player.combo ?? 1)}
           </span>
         </div>
+        {timeline && (
+          <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+            Beat {timeline.beatIndex + 1} · {Math.floor(timeline.calibratedMs / 1000)}s · offset{' '}
+            {calibrationOffsetMs}ms
+          </p>
+        )}
 
         <div className={`feedback ${feedbackClass}`}>{feedback}</div>
 

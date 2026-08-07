@@ -434,7 +434,13 @@ export default function HostPage() {
     const id = setInterval(() => {
       socket.emit('game.tick', { code });
     }, 100);
-    const onTick = ({ gameTimeMs: t }: { gameTimeMs: number }) => setGameTimeMs(t);
+    const onTick = ({
+      calibratedMs,
+      gameTimeMs: t,
+    }: {
+      calibratedMs?: number;
+      gameTimeMs: number;
+    }) => setGameTimeMs(calibratedMs ?? t);
     socket.on('game.tick', onTick);
     return () => {
       clearInterval(id);
