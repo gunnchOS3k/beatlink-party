@@ -173,6 +173,8 @@ function buildResult(partial: {
     NEEDS_LICENSE: 'This track requires a commercial license before gameplay.',
     UNSUPPORTED: 'Unsupported link format. Try YouTube, YouTube Music, Spotify, or Apple Music URLs.',
     BLOCKED_BY_POLICY: 'This link is blocked by platform policy. Use approved catalog instead.',
+    TAKEN_DOWN: 'This track was taken down and cannot be used for playback.',
+    RIGHTS_EXPIRED: 'Rights attestation expired — renew attestation or pick an approved catalog track.',
   };
 
   return {

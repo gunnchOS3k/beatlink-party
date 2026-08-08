@@ -58,7 +58,7 @@ export function createDemoBeatmap(
   songId: string,
   bpm: number,
   durationMs: number,
-  difficulty: 'beginner' | 'casual' | 'pro' | 'nightmare' = 'casual',
+  difficulty: import('@beatlink/shared').DifficultyId = 'casual',
 ) {
   const beatInterval = difficulty === 'beginner' ? 2 : difficulty === 'pro' ? 0.5 : 1;
   return {
