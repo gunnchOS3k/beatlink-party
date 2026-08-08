@@ -215,8 +215,7 @@ export async function runCrossProcessNetworkLoad(options: {
   const baseUrl = `http://127.0.0.1:${port}`;
   const { spawn } = await import('node:child_process');
   const serverEntry = resolve(process.cwd(), 'apps/server/src/index.ts');
-  // Prefer `node --import tsx` (reliable under pnpm CI shims); fall back to tsx bin.
-  const tsxBin = resolveTsxBin();
+  // `node --import tsx` is reliable under pnpm CI (avoids .bin shim issues).
   const child = spawn(process.execPath, ['--import', 'tsx', serverEntry], {
     cwd: process.cwd(),
     env: {
@@ -228,7 +227,6 @@ export async function runCrossProcessNetworkLoad(options: {
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
-  void tsxBin;
   let stderrBuf = '';
   child.stderr?.on('data', (chunk: Buffer) => {
     stderrBuf += chunk.toString();
