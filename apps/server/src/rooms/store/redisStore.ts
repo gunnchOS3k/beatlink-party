@@ -91,8 +91,9 @@ export class RedisRoomStore implements RoomStore {
     this.pending.clear();
   }
 
-  async close(): Promise<void> {
+  async close(options: { quit?: boolean } = {}): Promise<void> {
     await this.flush();
+    if (options.quit === false) return;
     await this.redis.quit();
   }
 }
