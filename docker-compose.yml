@@ -1,0 +1,31 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Optional: run API against durable Redis rooms
+  #   REDIS_URL=redis://redis:6379 pnpm --filter @beatlink/server start
+  server:
+    profiles: ["app"]
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      PORT: "3001"
+      REDIS_URL: redis://redis:6379
+      BEATLINK_ROOM_STORE: redis
+      CORS_ORIGIN: "*"
+    ports:
+      - "3001:3001"
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["sh", "-c", "corepack enable && pnpm install --frozen-lockfile && pnpm --filter @beatlink/shared build && pnpm --filter @beatlink/game-engine build && pnpm --filter @beatlink/server start"]

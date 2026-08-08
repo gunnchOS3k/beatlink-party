@@ -140,10 +140,22 @@ export class BrowserMicPermissionAdapter implements MicPermissionAdapter {
 
   async request(): Promise<MicPermissionState> {
     if (this.noRecording) return 'no_recording';
-    // Intentionally do not call getUserMedia here — recording is out of scope for alpha.
-    // Hosts that enable live ephemeral capture must opt in via a future adapter.
-    this.cached = 'prompt';
-    return this.cached;
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      this.cached = 'unavailable';
+      return this.cached;
+    }
+    try {
+      // Ephemeral permission probe — tracks stopped immediately; no MediaRecorder.
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      for (const track of stream.getTracks()) track.stop();
+      this.cached = 'granted';
+      return this.cached;
+    } catch (err) {
+      const name = err instanceof Error ? err.name : '';
+      this.cached =
+        name === 'NotAllowedError' || name === 'PermissionDeniedError' ? 'denied' : 'unavailable';
+      return this.cached;
+    }
   }
 }
 

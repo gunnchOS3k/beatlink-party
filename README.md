@@ -54,8 +54,12 @@ pnpm install
 | `pnpm dev:server` | API + WebSocket server (port 3001) |
 | `pnpm build` | Build all packages |
 | `pnpm test` | Run Vitest test suite |
+| `pnpm test:network-load` | Real Socket.IO localhost load (8×25/50/100/300) |
+| `pnpm compose:redis` | Start Redis via docker compose (durable rooms) |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | TypeScript check all packages |
+
+Set `REDIS_URL=redis://127.0.0.1:6379` (and optionally `BEATLINK_ROOM_STORE=redis`) for durable room snapshots. Unit tests keep the in-memory store.
 
 ## How to Run Host + Player
 

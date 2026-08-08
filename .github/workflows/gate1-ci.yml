@@ -45,11 +45,18 @@ jobs:
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
+      # Package exports point at dist/; cross-process network load spawns the real server
+      # via tsx and needs built @beatlink/shared + @beatlink/game-engine (same as primary CI typecheck).
+      - name: Build workspace packages for server spawn
+        run: pnpm --filter @beatlink/shared build && pnpm --filter @beatlink/game-engine build
+
       - name: Gate1 core-loop tests
         run: pnpm vitest run tests/gate1_core_loop.test.ts
 
       - name: Gate1 suite smoke (vitest only; lint/typecheck tracked separately)
         run: pnpm vitest run
+        env:
+          BEATLINK_ROOM_STORE: memory
 
       - name: Upload synthetic Gate1 summary
         if: always()

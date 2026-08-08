@@ -61,6 +61,12 @@ import {
   type CalibrationSample,
 } from '@beatlink/game-engine';
 import { getBeatmapForSong } from '../beatmaps/store.js';
+import {
+  InMemoryRoomStore,
+  deserializeRoom,
+  serializeRoom,
+  type RoomStore,
+} from './store/index.js';
 
 const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
 const MAX_PLAYERS = MAX_PERFORMERS;
@@ -78,12 +84,56 @@ interface InternalRoom extends RoomState {
 }
 
 export class RoomManager {
+  /** Live in-process room objects (Maps/Sets). Snapshots sync to `store`. */
   private rooms = new Map<string, InternalRoom>();
+  private store: RoomStore;
   private playerToRoom = new Map<string, string>();
   private audienceToRoom = new Map<string, string>();
   private socketToPlayer = new Map<string, string>();
   private socketToAudience = new Map<string, string>();
   private socketToHostRoom = new Map<string, string>();
+
+  constructor(store: RoomStore = new InMemoryRoomStore()) {
+    this.store = store;
+    for (const [code, snapshot] of this.store.entries()) {
+      this.rooms.set(code.toUpperCase(), deserializeRoom(snapshot) as InternalRoom);
+    }
+  }
+
+  getStoreBackend(): RoomStore['backend'] {
+    return this.store.backend;
+  }
+
+  /** Swap durable backend (e.g. Redis hydrate at process boot). Keeps live socket maps. */
+  replaceStore(store: RoomStore): void {
+    this.store = store;
+    for (const [code, snapshot] of this.store.entries()) {
+      const key = code.toUpperCase();
+      if (!this.rooms.has(key)) {
+        this.rooms.set(key, deserializeRoom(snapshot) as InternalRoom);
+      } else {
+        // Refresh durable snapshot from the live object already in memory.
+        this.commit(this.rooms.get(key)!);
+      }
+    }
+  }
+
+  /** Persist durable snapshot after in-place mutation. */
+  private commit(room: InternalRoom): void {
+    this.rooms.set(room.code.toUpperCase(), room);
+    this.store.set(room.code, serializeRoom(room as unknown as import('./store/serialize.js').InternalRoomLive));
+  }
+
+  private publish(room: InternalRoom): RoomState {
+    this.commit(room);
+    return this.stripInternal(room);
+  }
+
+  private dropRoom(code: string): void {
+    const key = code.toUpperCase();
+    this.rooms.delete(key);
+    this.store.delete(key);
+  }
 
   createRoom(
     hostSocketId: string,
@@ -138,7 +188,7 @@ export class RoomManager {
       publicOrigin,
       calibrationSamples: [],
     };
-    this.rooms.set(code, room);
+    this.commit(room);
     this.socketToHostRoom.set(hostSocketId, code);
     emitTelemetry('room_created', code, {
       rematchRound: 0,
@@ -149,10 +199,18 @@ export class RoomManager {
   }
 
   getRoom(code: string): InternalRoom | null {
-    const room = this.rooms.get(code.toUpperCase());
+    const key = code.toUpperCase();
+    let room = this.rooms.get(key);
+    if (!room) {
+      const snapshot = this.store.get(key);
+      if (snapshot) {
+        room = deserializeRoom(snapshot) as InternalRoom;
+        this.rooms.set(key, room);
+      }
+    }
     if (!room) return null;
     if (Date.now() > room.expiresAt) {
-      this.rooms.delete(code.toUpperCase());
+      this.dropRoom(key);
       return null;
     }
     return room;
@@ -199,6 +257,7 @@ export class RoomManager {
     }
     room.hostId = socketId;
     this.socketToHostRoom.set(socketId, room.code);
+    this.commit(room);
     return true;
   }
 
@@ -233,7 +292,7 @@ export class RoomManager {
       if (player) {
         player.connected = true;
         return {
-          room: this.stripInternal(room),
+          room: this.publish(room),
           player,
           playerToken: room.playerTokens.get(player.id)!,
         };
@@ -262,7 +321,7 @@ export class RoomManager {
     this.playerToRoom.set(player.id, room.code);
     this.socketToPlayer.set(socketId, player.id);
     emitTelemetry('player_join', room.code, { playerCount: room.players.length });
-    return { room: this.stripInternal(room), player, playerToken };
+    return { room: this.publish(room), player, playerToken };
   }
 
   joinAudience(
@@ -279,7 +338,7 @@ export class RoomManager {
       if (member) {
         member.connected = true;
         return {
-          room: this.stripInternal(room),
+          room: this.publish(room),
           audience: member,
           audienceToken: room.audienceTokens.get(member.id)!,
         };
@@ -304,7 +363,7 @@ export class RoomManager {
     this.audienceToRoom.set(audience.id, room.code);
     this.socketToAudience.set(socketId, audience.id);
     emitTelemetry('audience_join', room.code, { audienceCount: room.audience.length });
-    return { room: this.stripInternal(room), audience, audienceToken };
+    return { room: this.publish(room), audience, audienceToken };
   }
 
   reconnectPlayer(
@@ -344,7 +403,7 @@ export class RoomManager {
   reconnectHost(code: string, hostToken: string, socketId: string): RoomState | null {
     if (!this.authorizeHost(code, socketId, hostToken)) return null;
     const room = this.getRoom(code);
-    return room ? this.stripInternal(room) : null;
+    return room ? this.publish(room) : null;
   }
 
   /**
@@ -374,7 +433,7 @@ export class RoomManager {
       room.hostId = `player-host:${successor.id}`;
       emitTelemetry('host_migrated', room.code, { rematchRound: room.rematchRound });
       return {
-        room: this.stripInternal(room),
+        room: this.publish(room),
         previousHostId,
         newHostPlayerId: successor.id,
         hostToken: room.hostToken,
@@ -384,7 +443,7 @@ export class RoomManager {
     room.hostId = null;
     emitTelemetry('host_migrated', room.code, { rematchRound: room.rematchRound });
     return {
-      room: this.stripInternal(room),
+      room: this.publish(room),
       previousHostId,
       newHostPlayerId: null,
       hostToken: room.hostToken,
@@ -416,7 +475,7 @@ export class RoomManager {
     room.hostId = socketId;
     this.socketToHostRoom.set(socketId, room.code);
     emitTelemetry('host_migrated', room.code, { claimed: true });
-    return { room: this.stripInternal(room), hostToken: room.hostToken };
+    return { room: this.publish(room), hostToken: room.hostToken };
   }
 
   setAudienceMuted(
@@ -430,7 +489,7 @@ export class RoomManager {
     if (!member) return null;
     member.muted = muted;
     emitTelemetry('moderation_action', room.code, { action: 'mute', muted });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   setAudienceSandboxed(
@@ -444,7 +503,7 @@ export class RoomManager {
     if (!member) return null;
     member.sandboxed = sandboxed;
     emitTelemetry('moderation_action', room.code, { action: 'sandbox', sandboxed });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   /** Assign player to team A / B / solo (lobby / results / song_select). */
@@ -459,7 +518,7 @@ export class RoomManager {
     player.teamId = teamId;
     room.teamScores = recomputeTeamScores(room.players);
     emitTelemetry('team_assigned', room.code, { teamId });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   /** Auto-split connected players into A/B. */
@@ -473,7 +532,7 @@ export class RoomManager {
     });
     room.teamScores = recomputeTeamScores(room.players);
     emitTelemetry('team_assigned', room.code, { auto: true });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   updatePrivacy(
@@ -497,7 +556,7 @@ export class RoomManager {
       redactDisplayNames: room.privacy.redactDisplayNames,
       telemetryEnabled: room.privacy.telemetryEnabled,
     });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   /** Test / harness hook — force phase without full transition checks. */
@@ -505,7 +564,7 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     room.phase = phase;
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   /**
@@ -578,7 +637,7 @@ export class RoomManager {
       type,
       reason: reason ?? null,
     });
-    return { room: this.stripInternal(room), event };
+    return { room: this.publish(room), event };
   }
 
   leaveRoom(socketId: string): RoomState | null {
@@ -592,7 +651,7 @@ export class RoomManager {
       const member = room.audience.find((a) => a.id === audienceId);
       if (member) member.connected = false;
       emitTelemetry('disconnect', room.code, { seat: 'audience' });
-      return this.stripInternal(room);
+      return this.publish(room);
     }
 
     const playerId = this.socketToPlayer.get(socketId);
@@ -605,7 +664,7 @@ export class RoomManager {
     if (player) player.connected = false;
     this.socketToPlayer.delete(socketId);
     emitTelemetry('disconnect', room.code, { seat: 'player' });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   endRoom(code: string, hostSocketId: string): RoomState | null {
@@ -655,7 +714,7 @@ export class RoomManager {
     if (room.hostId) this.socketToHostRoom.delete(room.hostId);
     room.phase = 'closed';
     const closed = this.stripInternal({ ...room, players: [], audience: [] });
-    this.rooms.delete(code.toUpperCase());
+    this.dropRoom(code);
     emitTelemetry('room_shutdown', code, { reason: options.reason ?? 'shutdown' });
     return closed;
   }
@@ -683,7 +742,7 @@ export class RoomManager {
       origin: room.publicOrigin,
       expiresAt: room.expiresAt,
     });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   setGameMode(code: string, gameMode: GameModeId | string): RoomState | null {
@@ -694,7 +753,7 @@ export class RoomManager {
     if (!isGameModeId(gameMode)) return null;
     room.gameMode = gameMode;
     emitTelemetry('mode_selected', room.code, { gameMode });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   setDifficulty(code: string, difficulty: DifficultyId): RoomState | null {
@@ -704,7 +763,7 @@ export class RoomManager {
     }
     if (!['beginner', 'casual', 'pro', 'nightmare'].includes(difficulty)) return null;
     room.difficulty = difficulty;
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   setRole(code: string, playerId: string, role: Player['role']): RoomState | null {
@@ -714,7 +773,7 @@ export class RoomManager {
     const player = room.players.find((p) => p.id === playerId);
     if (!player) return null;
     player.role = role;
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   setReady(code: string, playerId: string, ready: boolean): RoomState | null {
@@ -723,7 +782,7 @@ export class RoomManager {
     const player = room.players.find((p) => p.id === playerId);
     if (!player) return null;
     player.ready = ready;
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   selectSong(code: string, songId: string): RoomState | null {
@@ -738,7 +797,7 @@ export class RoomManager {
     };
     room.gameDurationMs = room.beatmap?.durationMs ?? 45000;
     room.phase = 'song_select';
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   /** Persist pasted link + resolve snapshot so peers can see preview/eligibility. */
@@ -759,7 +818,7 @@ export class RoomManager {
         room.phase = 'song_select';
       }
     }
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   startCalibration(code: string): RoomState | null {
@@ -780,7 +839,7 @@ export class RoomManager {
     assertTransition(room.phase, 'calibrating');
     room.phase = 'calibrating';
     room.calibrationSamples = [];
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   /** Record a single calibration tap sample (expected vs tapped). */
@@ -791,7 +850,7 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room || room.phase !== 'calibrating') return null;
     room.calibrationSamples.push(sample);
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   submitCalibration(code: string, offsetMs?: number): RoomState | null {
@@ -837,7 +896,7 @@ export class RoomManager {
         offsetMs: clamped,
       };
     }
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   startCountdown(code: string): RoomState | null {
@@ -870,7 +929,7 @@ export class RoomManager {
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   tickCountdown(code: string): RoomState | null {
@@ -883,7 +942,7 @@ export class RoomManager {
       room.countdown = null;
       room.gameStartTime = Date.now();
     }
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   getGameTimeMs(code: string): number {
@@ -1005,7 +1064,7 @@ export class RoomManager {
     } else if (player.role === 'hype_captain' && input.type.startsWith('hype_')) {
       const lastHype = room.hypeCooldowns.get(player.id) ?? 0;
       if (Date.now() - lastHype < HYPE_COOLDOWN_MS) {
-        return { room: this.stripInternal(room), scoreEvent: null };
+        return { room: this.publish(room), scoreEvent: null };
       }
       const event = findNearestHypeEvent(room.beatmap.hypeEvents, gameTimeMs, 300);
       const targetTime = event?.timeMs ?? gameTimeMs;
@@ -1037,7 +1096,7 @@ export class RoomManager {
       room.phase = 'results';
     }
 
-    return { room: this.stripInternal(room), scoreEvent };
+    return { room: this.publish(room), scoreEvent };
   }
 
   endGame(code: string): GameResults | null {
@@ -1046,6 +1105,7 @@ export class RoomManager {
     room.phase = 'results';
     room.teamScores = recomputeTeamScores(room.players);
     const awards = computeAwards(room.players);
+    this.commit(room);
     return {
       teamScore: room.teamScore,
       crowdMeter: room.crowdMeter,
@@ -1104,7 +1164,7 @@ export class RoomManager {
       rematchRound: room.rematchRound,
       gameMode: room.gameMode,
     });
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 
   /** Alias for rematch — host "Next song" control. */
@@ -1134,7 +1194,7 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     room.phase = phase;
-    return this.stripInternal(room);
+    return this.publish(room);
   }
 }
 

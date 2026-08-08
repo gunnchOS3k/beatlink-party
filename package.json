@@ -15,9 +15,11 @@
     "device:test:android": "node scripts/device-test-android.mjs",
     "build": "pnpm -r build",
     "test": "vitest run",
+    "test:network-load": "vitest run tests/network_load.test.ts",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "test:watch": "vitest",
     "emit:digital-rc": "vitest run scripts/emit-digital-rc.test.ts",
+    "compose:redis": "docker compose up -d redis",
     "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
     "typecheck": "pnpm --filter @beatlink/shared build && pnpm --filter @beatlink/game-engine build && pnpm --filter @beatlink/device-ux build && pnpm -r typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,json,md,css}\""
@@ -30,6 +32,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "playwright": "1.49.1",
     "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
     "vitest": "^2.1.8"

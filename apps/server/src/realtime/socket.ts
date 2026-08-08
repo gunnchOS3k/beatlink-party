@@ -22,14 +22,25 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
   });
 
   io.on('connection', (socket) => {
-    socket.on('room.create', (cb?: (room: { code: string; hostToken?: string }) => void) => {
-      const room = roomManager.createRoom(socket.id);
-      socket.join(room.code);
-      cb?.({ code: room.code, hostToken: room.hostToken });
-      socket.emit('room.state', roomManager.stripInternal(roomManager.getRoom(room.code)!));
-      socket.emit('room.host_token', { code: room.code, hostToken: room.hostToken });
-    });
-
+    socket.on(
+      'room.create',
+      (
+        dataOrCb?:
+          | { capacityProfile?: 'party' | 'event_sim' }
+          | ((room: { code: string; hostToken?: string }) => void),
+        cb?: (room: { code: string; hostToken?: string }) => void,
+      ) => {
+        const data = typeof dataOrCb === 'function' ? undefined : dataOrCb;
+        const callback = typeof dataOrCb === 'function' ? dataOrCb : cb;
+        const room = roomManager.createRoom(socket.id, {
+          capacityProfile: data?.capacityProfile,
+        });
+        socket.join(room.code);
+        callback?.({ code: room.code, hostToken: room.hostToken });
+        socket.emit('room.state', roomManager.stripInternal(roomManager.getRoom(room.code)!));
+        socket.emit('room.host_token', { code: room.code, hostToken: room.hostToken });
+      },
+    );
     socket.on(
       'room.host_reconnect',
       (
