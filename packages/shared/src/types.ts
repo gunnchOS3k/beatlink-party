@@ -189,7 +189,44 @@ export type CatalogLicense =
   | 'public_domain'
   | 'demo_generated'
   | 'synthetic_original'
-  | 'licensed_pack';
+  | 'licensed_pack'
+  /** Creative Commons (e.g. CC0 / CC-BY) — attribution in rights.attribution. */
+  | 'creative_commons'
+  /** Creator-owned original — offline launch path with attestation metadata. */
+  | 'creator_owned';
+
+/** Offline karaoke metadata — placeholder prompts only; never copyrighted lyrics. */
+export interface CatalogKaraokeMeta {
+  prompts: string[];
+  /** Always true for digital offline launch — no mic recording retained. */
+  noRecording: true;
+  pitchHintHz?: number | null;
+  language?: string;
+}
+
+export interface CatalogChartMeta {
+  beatmapId: string;
+  difficulties: DifficultyId[];
+  noteRoles: PlayerRole[];
+}
+
+export interface CatalogRightsMeta {
+  license: CatalogLicense;
+  attribution: string;
+  ripForbidden: true;
+  drmBypassForbidden: true;
+  sourceKind:
+    | 'public_domain'
+    | 'original'
+    | 'creative_commons'
+    | 'creator_owned'
+    | 'royalty_free'
+    | 'synthetic'
+    | 'licensed_pack'
+    | 'demo';
+  /** Optional CC deed URL (never a download/rip endpoint). */
+  ccDeedUrl?: string | null;
+}
 
 export interface SongCatalogEntry {
   id: string;
@@ -200,6 +237,16 @@ export interface SongCatalogEntry {
   beatmapId: string;
   license: CatalogLicense;
   description: string;
+  /** Modes this track is charted/eligible for (offline launch catalog). */
+  modes?: GameModeId[];
+  /** Difficulty lanes present for charts. */
+  difficulties?: DifficultyId[];
+  karaokeMeta?: CatalogKaraokeMeta;
+  chart?: CatalogChartMeta;
+  rights?: CatalogRightsMeta;
+  analysisEligible?: boolean;
+  /** Marks track as part of the offline legal launch set. */
+  launchEligible?: boolean;
 }
 
 export interface RightsAttestation {
@@ -489,6 +536,8 @@ export type ContentPathKind =
   | 'synthetic_original'
   | 'demo_generated'
   | 'licensed_pack'
+  | 'creative_commons'
+  | 'creator_owned'
   | 'creator_upload_attested'
   | 'link_catalog_match'
   | 'blocked_rip_attempt';

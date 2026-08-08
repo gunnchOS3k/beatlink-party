@@ -1,31 +1,29 @@
-# Beat Link — Beta Event Platform + Digital RC (CONTINUATION IV) + V revalidation
+# Beat Link — Beta Event Platform + Digital RC (CONTINUATION VI re-earn)
 
 **Date:** 2026-08-08  
-**Branch (V):** `cursor/full-product-continuation-v-beatlink-closure`  
-**Base:** `origin/main` (`dd9f32dbc550e28138d7764813ad07256bfffd6b`) — #12 merged
+**Branch:** `cursor/full-product-continuation-vi-beta-rc`  
+**Base:** `origin/main` (`c8a2de8c51929d776eea7b219f6015e787e0f174`) — #13
 
-## Tokens (Continuation V revalidation)
+## Tokens
 
 | Token | Status | Notes |
 |-------|--------|-------|
-| `BEATLINK_BETA_CONTENT_COMPLETE_DIGITAL` | Earned (IV) | Retained |
-| `BEATLINK_DIGITAL_RC_READY` | Earned (IV, digital DEV only) | Retained — not store/HSM |
-| `BEATLINK_REDIS_DURABLE_ROOMS_PASS` | **EARNED (V)** | Redis + compose; InMemory for unit tests |
-| `BEATLINK_NETWORK_LOAD_PASS` | **EARNED (V)** | Real WS load 8×25/50/100/300 localhost |
-| `BEATLINK_LIVE_MIC_PIPELINE_PASS` | **EARNED (V)** | getUserMedia + synthetic-stream privacy tests |
-| `BEATLINK_PROVIDER_INTERFACE_PASS` | **EARNED (V)** | Mock + PD; commercial EXTERNAL |
-| `BETA` / `RC` | **REVOKED / not earned** | Premature — commercial EXTERNAL; digital ≠ physical RC |
+| `BEATLINK_BETA_CONTENT_COMPLETE_DIGITAL` | **RE-EARNED (VI)** | Offline PD/original/CC/creator-owned catalog for all five modes |
+| `BEATLINK_DIGITAL_RC_READY` | **RE-EARNED (VI)** | Clean criteria: package/SBOM/rights/update/rollback/reconnect/crash/privacy + SLOs |
+| `BEATLINK_REDIS_DURABLE_ROOMS_PASS` | Earned | Real Redis in CI; memory degraded without Redis |
+| `BEATLINK_NETWORK_LOAD_PASS` | Earned | Explicit digital SLOs; repeated trials |
+| `BETA` / `RC` | **NOT earned** | Premature — commercial EXTERNAL; digital ≠ physical RC |
 | `FULL_PRODUCT_FEATURE_COMPLETE` | **NOT claimed** | Remains open |
 | Launch | **NOT claimed** | Out of scope |
 
-See `docs/continuation-v/` for V evidence and load metrics.
+See `docs/release/beta_gap_audit.json` and `docs/continuation-vi/`.
 
 ## Remaining gaps
 
 1. Commercial lyrics/music providers remain EXTERNAL
 2. Digital RC signing is DEV digest only — not HSM/store
 3. Network load is localhost DEV — not live pilot / venue Wi-Fi
-4. Localization catalogs still architecture + seed strings
+4. Product BETA/RC remain false by design until commercial + physical criteria exist
 
 ## Do not merge as launch-ready
 

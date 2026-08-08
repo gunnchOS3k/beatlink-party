@@ -107,33 +107,48 @@ export async function createRedisClientFromEnv(): Promise<RedisLike | null> {
       status: string;
       on(event: string, cb: (...args: unknown[]) => void): void;
       off(event: string, cb: (...args: unknown[]) => void): void;
+      disconnect(): void;
     };
   };
   const client = new mod.default(url, {
     maxRetriesPerRequest: 2,
     enableReadyCheck: true,
     lazyConnect: true,
+    retryStrategy: () => null,
   });
-  await client.connect();
-  if (client.status !== 'ready') {
-    await new Promise<void>((resolve, reject) => {
-      const onReady = () => {
-        cleanup();
-        resolve();
-      };
-      const onError = (err: unknown) => {
-        cleanup();
-        reject(err);
-      };
-      const cleanup = () => {
-        client.off('ready', onReady);
-        client.off('error', onError);
-      };
-      client.on('ready', onReady);
-      client.on('error', onError);
-    });
+  // Prevent unhandled 'error' crash when daemon is down during probes.
+  client.on('error', () => {
+    /* swallowed — callers handle connect failures */
+  });
+  try {
+    await client.connect();
+    if (client.status !== 'ready') {
+      await new Promise<void>((resolve, reject) => {
+        const onReady = () => {
+          cleanup();
+          resolve();
+        };
+        const onError = (err: unknown) => {
+          cleanup();
+          reject(err);
+        };
+        const cleanup = () => {
+          client.off('ready', onReady);
+          client.off('error', onError);
+        };
+        client.on('ready', onReady);
+        client.on('error', onError);
+      });
+    }
+    return client;
+  } catch (err) {
+    try {
+      client.disconnect();
+    } catch {
+      // ignore
+    }
+    throw err;
   }
-  return client;
 }
 
 /** In-process fake Redis for unit tests of the Redis adapter (no daemon). */

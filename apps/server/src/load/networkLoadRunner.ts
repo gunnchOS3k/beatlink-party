@@ -91,17 +91,37 @@ function emitAck<T>(socket: Socket, event: string, payload?: unknown): Promise<T
   });
 }
 
+/** Connect sockets in bounded parallel batches to cut wall time under load SLOs. */
+async function connectClientsBatched(
+  baseUrl: string,
+  count: number,
+  batchSize = 32,
+): Promise<Socket[]> {
+  const out: Socket[] = [];
+  for (let i = 0; i < count; i += batchSize) {
+    const n = Math.min(batchSize, count - i);
+    const batch = await Promise.all(
+      Array.from({ length: n }, () => connectClient(baseUrl)),
+    );
+    out.push(...batch);
+  }
+  return out;
+}
+
 export async function runNetworkLoadAgainstServer(
   baseUrl: string,
   options: {
     performers?: number;
     tiers?: EventAudienceTier[];
     mode?: NetworkLoadReport['mode'];
+    /** Influence samples capped for stable p99 without thrashing CI (default 24). */
+    influenceSampleCap?: number;
   } = {},
 ): Promise<NetworkLoadReport> {
   const performers = options.performers ?? MAX_PERFORMERS;
   const tiers = options.tiers ?? [...EVENT_AUDIENCE_TIERS];
   const mode = options.mode ?? 'cross_process';
+    const influenceSampleCap = options.influenceSampleCap ?? 16;
   const metrics: NetworkLoadTierMetrics[] = [];
 
   for (const tier of tiers) {
@@ -111,6 +131,7 @@ export async function runNetworkLoadAgainstServer(
     const joinRtts: number[] = [];
     const influenceRtts: number[] = [];
     let ok = true;
+    let eventLoss = 0;
 
     try {
       const host = await connectClient(baseUrl);
@@ -122,9 +143,10 @@ export async function runNetworkLoadAgainstServer(
       const code = created.code;
 
       let performersJoined = 0;
-      for (let i = 0; i < performers; i++) {
-        const sock = await connectClient(baseUrl);
-        sockets.push(sock);
+      const performerSocks = await connectClientsBatched(baseUrl, performers, 8);
+      sockets.push(...performerSocks);
+      for (let i = 0; i < performerSocks.length; i++) {
+        const sock = performerSocks[i]!;
         const j0 = Date.now();
         const joined = await emitAck<{ ok: boolean }>(sock, 'room.join', {
           code,
@@ -132,14 +154,18 @@ export async function runNetworkLoadAgainstServer(
         });
         joinRtts.push(Date.now() - j0);
         if (joined?.ok) performersJoined += 1;
-        else ok = false;
+        else {
+          ok = false;
+          eventLoss += 1;
+        }
       }
 
       let audienceJoined = 0;
       const audience: Array<{ sock: Socket; id: string }> = [];
-      for (let i = 0; i < tier; i++) {
-        const sock = await connectClient(baseUrl);
-        sockets.push(sock);
+      const audienceSocks = await connectClientsBatched(baseUrl, tier, 32);
+      sockets.push(...audienceSocks);
+      for (let i = 0; i < audienceSocks.length; i++) {
+        const sock = audienceSocks[i]!;
         const j0 = Date.now();
         const joined = await emitAck<{
           ok: boolean;
@@ -151,20 +177,28 @@ export async function runNetworkLoadAgainstServer(
           audience.push({ sock, id: joined.audience.id });
         } else {
           ok = false;
+          eventLoss += 1;
         }
       }
 
-      // Force playing so influence path can accept (optional — RTT measured either way).
+      // Prefer in-process singleton force when available (cross-process uses phase_blocked RTT).
       defaultRoomManager.forcePhase?.(code, 'playing');
 
-      for (const a of audience.slice(0, Math.min(40, audience.length))) {
+      const influenceTargets = audience.slice(0, Math.min(influenceSampleCap, audience.length));
+      for (const a of influenceTargets) {
         const i0 = Date.now();
-        await emitAck(a.sock, 'audience.influence', {
-          code,
-          audienceId: a.id,
-          type: 'hype',
-        }).catch(() => null);
-        influenceRtts.push(Date.now() - i0);
+        try {
+          await emitAck(a.sock, 'audience.influence', {
+            code,
+            audienceId: a.id,
+            type: 'hype',
+          });
+          influenceRtts.push(Date.now() - i0);
+        } catch {
+          eventLoss += 1;
+          ok = false;
+          influenceRtts.push(Date.now() - i0);
+        }
       }
 
       if (performersJoined !== performers || audienceJoined !== tier) {
@@ -173,8 +207,10 @@ export async function runNetworkLoadAgainstServer(
           `join_mismatch performers=${performersJoined}/${performers} audience=${audienceJoined}/${tier}`,
         );
       }
+      notes.push(`event_loss=${eventLoss}`);
     } catch (err) {
       ok = false;
+      eventLoss += 1;
       notes.push(err instanceof Error ? err.message : String(err));
     } finally {
       for (const s of sockets) {
@@ -193,8 +229,9 @@ export async function runNetworkLoadAgainstServer(
       joinRttMs: summarizeLatencies(joinRtts),
       influenceRttMs: summarizeLatencies(influenceRtts),
       wallMs: Date.now() - t0,
-      ok,
+      ok: ok && eventLoss === 0,
       notes,
+      eventLoss,
     });
   }
 

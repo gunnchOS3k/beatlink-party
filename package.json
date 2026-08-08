@@ -16,6 +16,8 @@
     "build": "pnpm -r build",
     "test": "vitest run",
     "test:network-load": "vitest run tests/network_load.test.ts",
+    "test:redis-ci": "vitest run tests/redis_ci.test.ts",
+    "test:continuation-vi": "vitest run tests/continuation_vi.test.ts",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "test:watch": "vitest",
     "emit:digital-rc": "vitest run scripts/emit-digital-rc.test.ts",

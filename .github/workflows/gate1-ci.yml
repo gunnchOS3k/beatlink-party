@@ -17,7 +17,17 @@ concurrency:
 jobs:
   gate1-core-loop:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
@@ -56,6 +66,8 @@ jobs:
       - name: Gate1 suite smoke (vitest only; lint/typecheck tracked separately)
         run: pnpm vitest run
         env:
+          REDIS_URL: redis://127.0.0.1:6379
+          BEATLINK_REDIS_CI: "1"
           BEATLINK_ROOM_STORE: memory
 
       - name: Upload synthetic Gate1 summary
@@ -66,5 +78,7 @@ jobs:
           path: |
             gate1/evidence/out/*summary*.json
             gate1/status/gate1_core_loop_status.json
+            docs/continuation-vi/**
+            docs/release/beta_gap_audit.json
           if-no-files-found: ignore
           retention-days: 14

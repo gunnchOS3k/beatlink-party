@@ -17,7 +17,17 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
@@ -54,10 +64,25 @@ jobs:
           # shared, game-engine, and device-ux before recursive tsc.
           pnpm typecheck
 
-      - name: Test (includes Gate1 core-loop + Continuation V network load)
+      - name: Test (Redis CI + Continuation VI SLOs + Gate1)
         run: pnpm test
         env:
-          # Network load uses real Socket.IO; keep store memory unless Redis service attached.
+          REDIS_URL: redis://127.0.0.1:6379
+          BEATLINK_REDIS_CI: "1"
+          # Default room store for non-Redis unit paths remains memory unless a test opts in.
+          BEATLINK_ROOM_STORE: memory
+
+      - name: Redis durable rooms focused
+        run: pnpm vitest run tests/redis_ci.test.ts
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
+          BEATLINK_REDIS_CI: "1"
+
+      - name: Continuation VI focused
+        run: pnpm vitest run tests/continuation_vi.test.ts
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
+          BEATLINK_REDIS_CI: "1"
           BEATLINK_ROOM_STORE: memory
 
       - name: Gate1 core-loop focused
@@ -66,7 +91,7 @@ jobs:
       - name: Build smoke
         run: pnpm build
 
-      - name: Upload synthetic Gate1 summary
+      - name: Upload synthetic Gate1 + Continuation VI summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -76,5 +101,8 @@ jobs:
             gate1/status/gate1_core_loop_status.json
             docs/continuation-v/network-load*.json
             docs/continuation-v/CONTINUATION_V_TOKENS.json
+            docs/continuation-vi/**
+            docs/release/beta_gap_audit.json
+            docs/BETA_RC_TOKENS.json
           if-no-files-found: ignore
           retention-days: 14

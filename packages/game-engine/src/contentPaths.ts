@@ -38,6 +38,8 @@ const ANALYSIS_OK_LICENSES: CatalogLicense[] = [
   'synthetic_original',
   'demo_generated',
   'licensed_pack',
+  'creative_commons',
+  'creator_owned',
 ];
 
 export function contentPathFromLicense(license: CatalogLicense): ContentPathKind {
@@ -52,6 +54,10 @@ export function contentPathFromLicense(license: CatalogLicense): ContentPathKind
       return 'demo_generated';
     case 'licensed_pack':
       return 'licensed_pack';
+    case 'creative_commons':
+      return 'creative_commons';
+    case 'creator_owned':
+      return 'creator_owned';
     default:
       return 'blocked_rip_attempt';
   }

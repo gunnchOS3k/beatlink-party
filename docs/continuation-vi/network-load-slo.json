@@ -1,0 +1,39 @@
+{
+  "disclaimer": "Digital localhost SLOs only — not a live pilot, venue Wi-Fi, or commercial SLA claim.",
+  "trialsMin": 3,
+  "eventLossMax": 0,
+  "rssMbMax": 768,
+  "heapUsedMbMax": 512,
+  "cpuUserMsPerTrialMax": 180000,
+  "gcPauseMsP99Max": 500,
+  "tiers": [
+    {
+      "tier": 25,
+      "joinP95MsMax": 120,
+      "joinP99MsMax": 200,
+      "influenceP95MsMax": 150,
+      "influenceP99MsMax": 250
+    },
+    {
+      "tier": 50,
+      "joinP95MsMax": 200,
+      "joinP99MsMax": 350,
+      "influenceP95MsMax": 300,
+      "influenceP99MsMax": 500
+    },
+    {
+      "tier": 100,
+      "joinP95MsMax": 350,
+      "joinP99MsMax": 550,
+      "influenceP95MsMax": 500,
+      "influenceP99MsMax": 800
+    },
+    {
+      "tier": 300,
+      "joinP95MsMax": 800,
+      "joinP99MsMax": 1200,
+      "influenceP95MsMax": 1500,
+      "influenceP99MsMax": 2500
+    }
+  ]
+}
