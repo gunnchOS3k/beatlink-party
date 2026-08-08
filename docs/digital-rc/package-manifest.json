@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.0.0",
+  "product": "beatlink-party",
+  "channel": "digital-rc",
+  "versionName": "0.2.0-digital-rc",
+  "versionCode": 3,
+  "builtAtUtc": "2026-08-08T19:00:00.000Z",
+  "disclaimer": "Digital RC packaging only — not store submission, production HSM, or physical device RC.",
+  "signing": {
+    "mode": "DEV",
+    "algorithm": "SHA-256",
+    "packageDigestSha256": "c8ee65adc138828c298c9c3b39c70aff869b2d4772c510ed321c50bb9678843d",
+    "keyAlias": "beatlink-digital-rc-dev",
+    "productionHsm": false,
+    "storeSubmission": false
+  },
+  "sbom": {
+    "format": "beatlink-sbom-lite",
+    "components": [
+      {
+        "name": "beatlink-party",
+        "version": "0.1.0",
+        "type": "application"
+      },
+      {
+        "name": "@beatlink/shared",
+        "version": "0.1.0",
+        "type": "workspace"
+      },
+      {
+        "name": "@beatlink/game-engine",
+        "version": "0.1.0",
+        "type": "workspace"
+      },
+      {
+        "name": "@beatlink/web",
+        "version": "0.1.0",
+        "type": "workspace"
+      },
+      {
+        "name": "@beatlink/server",
+        "version": "0.1.0",
+        "type": "workspace"
+      },
+      {
+        "name": "@beatlink/device-ux",
+        "version": "0.1.0",
+        "type": "workspace"
+      }
+    ],
+    "digestSha256": "cc1f94668c7995ecd80561fad7b57442b6f2ce5d4efb0884ffd13874ca1e7e2d"
+  },
+  "update": {
+    "fromVersion": "0.1.0-alpha-exit",
+    "toVersion": "0.2.0-digital-rc",
+    "strategy": "replace_digital_bundle",
+    "requiresOnline": false,
+    "notes": [
+      "Digital bundle replace only — no forced cloud sync.",
+      "In-memory rooms are ephemeral across update."
+    ]
+  },
+  "rollback": {
+    "targetVersion": "0.1.0-alpha-exit",
+    "strategy": "restore_prior_digital_bundle",
+    "dataLossRisk": "session_ephemeral_ok",
+    "notes": [
+      "Rollback restores prior digital bundle digest.",
+      "Active socket sessions are not migrated."
+    ]
+  },
+  "offline": {
+    "includesApprovedCatalog": true,
+    "includesSyntheticAnalysisAssets": true,
+    "includesMicRecording": false,
+    "includesPlatformSdks": false,
+    "joinQrWorksOffline": true,
+    "notes": [
+      "Join QR encodes locally — no third-party QR network call.",
+      "Catalog + synthetic analysis assets ship in-repo."
+    ]
+  },
+  "privacy": {
+    "telemetryDefault": "session_local_no_pii",
+    "micRecordingDefault": "off",
+    "displayNameRedaction": "opt_in",
+    "retentionMsDefault": 900000,
+    "notes": [
+      "Telemetry sinks must redact names/tokens/URLs.",
+      "Karaoke default is no-recording."
+    ]
+  }
+}

@@ -151,9 +151,13 @@ describe('catalog floor', () => {
     const songs = loadCatalog();
     expect(songs.length).toBeGreaterThanOrEqual(12);
     for (const song of songs) {
-      expect(['demo_generated', 'synthetic_original', 'public_domain', 'royalty_free']).toContain(
-        song.license,
-      );
+      expect([
+        'demo_generated',
+        'synthetic_original',
+        'public_domain',
+        'royalty_free',
+        'licensed_pack',
+      ]).toContain(song.license);
     }
   });
 });

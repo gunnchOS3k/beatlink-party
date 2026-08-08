@@ -129,6 +129,16 @@
       "beatmapId": "synth-predict-130",
       "license": "synthetic_original",
       "description": "Section-change synthetic pulse for Prediction Trivia mode."
+    },
+    {
+      "id": "licensed-pack-aurora",
+      "title": "Aurora Pack Demo",
+      "artist": "BeatLink Licensed Desk",
+      "durationMs": 36000,
+      "bpm": 122,
+      "beatmapId": "licensed-aurora-122",
+      "license": "licensed_pack",
+      "description": "Stub licensed-pack demo entry for Beta rights path tests (not a commercial label deal)."
     }
   ]
 }

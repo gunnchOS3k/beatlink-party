@@ -15,6 +15,9 @@ export type GameModeId =
 
 export type DifficultyId = 'beginner' | 'casual' | 'pro' | 'nightmare';
 
+/** Room capacity profile — party default vs event-sim soft ceiling. */
+export type CapacityProfile = 'party' | 'event_sim';
+
 export type RoomPhase =
   | 'lobby'
   | 'song_select'
@@ -138,6 +141,11 @@ export interface RoomState {
   privacy: RoomPrivacySettings;
   /** Team scoreboard when players are assigned to A/B. */
   teamScores: TeamScoreboard;
+  /**
+   * Capacity profile — `event_sim` raises soft audience ceiling for Beta
+   * digital event-scale simulation only (not a live venue claim).
+   */
+  capacityProfile: CapacityProfile;
   createdAt: number;
   expiresAt: number;
 }
@@ -176,6 +184,13 @@ export interface ProviderAuthStatus {
   apple_music: boolean;
 }
 
+export type CatalogLicense =
+  | 'royalty_free'
+  | 'public_domain'
+  | 'demo_generated'
+  | 'synthetic_original'
+  | 'licensed_pack';
+
 export interface SongCatalogEntry {
   id: string;
   title: string;
@@ -183,7 +198,7 @@ export interface SongCatalogEntry {
   durationMs: number;
   bpm: number;
   beatmapId: string;
-  license: 'royalty_free' | 'public_domain' | 'demo_generated' | 'synthetic_original';
+  license: CatalogLicense;
   description: string;
 }
 
@@ -307,7 +322,16 @@ export type TelemetryEventName =
   | 'privacy_updated'
   | 'calibration_submitted'
   | 'moderation_action'
-  | 'load_harness';
+  | 'load_harness'
+  | 'mode_tutorial'
+  | 'mode_replay'
+  | 'mode_results'
+  | 'event_lifecycle'
+  | 'event_scale_sim'
+  | 'content_path'
+  | 'rc_packaging'
+  | 'rc_update'
+  | 'rc_rollback';
 
 /** Session telemetry — no PII (no names, tokens, or raw URLs). */
 export interface TelemetryEvent {
@@ -440,7 +464,34 @@ export const EMPTY_TEAM_SCORES: TeamScoreboard = { A: 0, B: 0, solo: 0 };
 /** ADR-GAME-BL-001 performer floor/ceiling for Alpha digital party loop. */
 export const MIN_PERFORMERS = 2;
 export const MAX_PERFORMERS = 8;
+/** Party soft ceiling — Alpha/Beta digital default. */
 export const MAX_AUDIENCE_SEATS = 50;
+/**
+ * Event-sim soft ceiling for in-process Beta event-scale simulation.
+ * Simulation ≠ live event capacity or SLA.
+ */
+export const MAX_AUDIENCE_SEATS_EVENT = 300;
+
+export const DEFAULT_CAPACITY_PROFILE: CapacityProfile = 'party';
+
+/** Audience tiers exercised by Beta event-scale simulation (honest: in-process). */
+export const EVENT_AUDIENCE_TIERS = [25, 50, 100, 300] as const;
+export type EventAudienceTier = (typeof EVENT_AUDIENCE_TIERS)[number];
+
+export function maxAudienceForProfile(profile: CapacityProfile): number {
+  return profile === 'event_sim' ? MAX_AUDIENCE_SEATS_EVENT : MAX_AUDIENCE_SEATS;
+}
+
+/** Legal content path kinds — never implies platform rip / DRM bypass. */
+export type ContentPathKind =
+  | 'royalty_free'
+  | 'public_domain'
+  | 'synthetic_original'
+  | 'demo_generated'
+  | 'licensed_pack'
+  | 'creator_upload_attested'
+  | 'link_catalog_match'
+  | 'blocked_rip_attempt';
 
 /** Combo multiplier steps from streak length. */
 export function comboFromStreak(streak: number): number {

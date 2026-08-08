@@ -27,8 +27,13 @@ describe('Wave G first-class game modes', () => {
   it('exposes tutorial + difficulty hooks for every mode', () => {
     for (const id of GAME_MODE_IDS) {
       const mode = getGameMode(id);
-      expect(mode.tutorial.length).toBeGreaterThanOrEqual(2);
+      expect(mode.tutorial.length).toBeGreaterThanOrEqual(5);
       expect(getModeTutorial(id)[0]?.title).toBeTruthy();
+      expect(mode.tutorial.every((s) => Boolean(s.caption))).toBe(true);
+      expect(mode.a11y.captionsRequired).toBe(true);
+      expect(mode.teams.supportsTeams).toBe(true);
+      expect(mode.replay.supported).toBe(true);
+      expect(mode.replay.includesMicAudio).toBe(false);
       for (const difficulty of ['beginner', 'casual', 'pro', 'nightmare'] as const) {
         const hooks = getModeDifficultyHooks(id, difficulty);
         expect(hooks.scoreMultiplier).toBeGreaterThan(0);

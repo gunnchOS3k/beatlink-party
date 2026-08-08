@@ -1,0 +1,9 @@
+{
+  "targetVersion": "0.1.0-alpha-exit",
+  "strategy": "restore_prior_digital_bundle",
+  "dataLossRisk": "session_ephemeral_ok",
+  "notes": [
+    "Rollback restores prior digital bundle digest.",
+    "Active socket sessions are not migrated."
+  ]
+}

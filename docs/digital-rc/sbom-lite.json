@@ -1,0 +1,36 @@
+{
+  "format": "beatlink-sbom-lite",
+  "components": [
+    {
+      "name": "beatlink-party",
+      "version": "0.1.0",
+      "type": "application"
+    },
+    {
+      "name": "@beatlink/shared",
+      "version": "0.1.0",
+      "type": "workspace"
+    },
+    {
+      "name": "@beatlink/game-engine",
+      "version": "0.1.0",
+      "type": "workspace"
+    },
+    {
+      "name": "@beatlink/web",
+      "version": "0.1.0",
+      "type": "workspace"
+    },
+    {
+      "name": "@beatlink/server",
+      "version": "0.1.0",
+      "type": "workspace"
+    },
+    {
+      "name": "@beatlink/device-ux",
+      "version": "0.1.0",
+      "type": "workspace"
+    }
+  ],
+  "digestSha256": "cc1f94668c7995ecd80561fad7b57442b6f2ce5d4efb0884ffd13874ca1e7e2d"
+}

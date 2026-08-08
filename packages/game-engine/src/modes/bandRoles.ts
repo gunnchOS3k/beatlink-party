@@ -1,5 +1,11 @@
 import type { DifficultyId, PlayerRole } from '@beatlink/shared';
-import type { GameModeDefinition, ModeDifficultyHooks, ModeScoreContext, ModeScoreResult } from './types.js';
+import type {
+  GameModeDefinition,
+  ModeDifficultyHooks,
+  ModeScoreContext,
+  ModeScoreResult,
+} from './types.js';
+import { defaultModeA11y } from './types.js';
 
 const HOOKS: Record<DifficultyId, ModeDifficultyHooks> = {
   beginner: { scoreMultiplier: 0.85, timingWindowScale: 1.3, chartDensity: 0.7 },
@@ -25,17 +31,32 @@ export const bandRolesMode: GameModeDefinition = {
       id: 'br-1',
       title: 'Pick your seat',
       body: 'Each player chooses Beat Tapper, Vocalist, or Hype Captain before ready-up.',
+      caption: 'Choose Beat Tapper, Vocalist, or Hype.',
     },
     {
       id: 'br-2',
       title: 'Stay in your lane',
       body: 'Only role-matched inputs score. Cross-role spam is ignored.',
       roleHint: 'beat_tapper',
+      caption: 'Only your role inputs score.',
     },
     {
       id: 'br-3',
       title: 'Team meter',
       body: 'Role bonuses stack into the team score — cover all three roles for max energy.',
+      caption: 'Cover all three roles for max energy.',
+    },
+    {
+      id: 'br-4',
+      title: 'A/B versus',
+      body: 'Host can assign Team A/B. Band coverage bonuses still apply within each team.',
+      caption: 'Teams A and B can compete.',
+    },
+    {
+      id: 'br-5',
+      title: 'Accessibility lanes',
+      body: 'Captions label role prompts; color-blind safe grades avoid red/green-only cues.',
+      caption: 'Role prompts are captioned.',
     },
   ],
   difficultyHooks: HOOKS,
@@ -49,6 +70,25 @@ export const bandRolesMode: GameModeDefinition = {
       points,
       message: covered ? `Band locked · ${role}` : `Band hit · ${role}`,
       crowdBoost: covered ? 7 : ctx.grade === 'miss' ? -1 : 3,
+    };
+  },
+  a11y: defaultModeA11y({ colorBlindSafeGrades: true, highContrastJudgment: true }),
+  teams: {
+    supportsTeams: true,
+    defaultTeamSplit: 'role_lanes',
+    teamMeterCounts: true,
+  },
+  replay: { supported: true, includesMicAudio: false, maxFrames: 2500 },
+  telemetryKeys: ['tutorial', 'score', 'results', 'replay', 'band_coverage'],
+  buildResults(input) {
+    return {
+      modeId: 'BandRoles',
+      difficulty: input.difficulty,
+      teamScore: input.teamScore,
+      crowdMeter: input.crowdMeter,
+      winningTeam: input.winningTeam,
+      rows: input.rows,
+      headline: 'Band Roles results',
     };
   },
 };

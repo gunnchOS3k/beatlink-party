@@ -16,3 +16,7 @@ export * from './chartEditor.js';
 export * from './calibration.js';
 export * from './loadHarness.js';
 export * from './teams.js';
+export * from './eventScaleSim.js';
+export * from './eventLifecycle.js';
+export * from './contentPaths.js';
+export * from './digitalRc.js';

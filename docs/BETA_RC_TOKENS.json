@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at_utc": "2026-08-08T19:45:00Z",
+  "branch": "cursor/full-product-beatlink-beta-rc",
+  "base_sha": "d2ef8d45bbe55790b21024b6307735c7c09979c8",
+  "tokens": {
+    "BEATLINK_ALPHA_EXIT_DIGITAL_PASS": true,
+    "BEATLINK_LOAD_HARNESS_SCAFFOLD_PASS": true,
+    "BEATLINK_BETA_CONTENT_COMPLETE_DIGITAL": true,
+    "BEATLINK_EVENT_LIFECYCLE_STRESS_PASS": true,
+    "BEATLINK_EVENT_SCALE_SIM_PASS": true,
+    "BEATLINK_DIGITAL_RC_READY": true,
+    "FULL_PRODUCT_CONTENT_COMPLETE": false,
+    "FULL_PRODUCT_FEATURE_COMPLETE": false,
+    "BETA": false,
+    "RC": false,
+    "LAUNCH": false
+  },
+  "local_ci": {
+    "typecheck": "pass",
+    "test": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "tests_passed": 87
+  },
+  "event_scale_simulation": {
+    "disclaimer": "In-process event-scale simulation only — not a live event, cloud soak, or SLA claim.",
+    "performers": 8,
+    "tiers": [25, 50, 100, 300],
+    "artifact": "docs/digital-rc/event-scale-metrics.json",
+    "live_event": false
+  },
+  "digital_rc": {
+    "disclaimer": "Digital RC packaging only — not store submission, production HSM, or physical device RC.",
+    "version_name": "0.2.0-digital-rc",
+    "version_code": 3,
+    "signing_mode": "DEV",
+    "package_digest_sha256": "c8ee65adc138828c298c9c3b39c70aff869b2d4772c510ed321c50bb9678843d",
+    "artifacts": "docs/digital-rc/"
+  },
+  "gaps_remaining": [
+    "in_memory_rooms_no_redis",
+    "no_live_getUserMedia_pitch",
+    "no_licensed_lyrics_or_platform_sdks",
+    "i18n_seed_catalogs_not_full_ui",
+    "event_scale_simulation_not_live_event",
+    "digital_rc_dev_signing_not_hsm_or_store"
+  ]
+}

@@ -1,5 +1,11 @@
 import type { DifficultyId } from '@beatlink/shared';
-import type { GameModeDefinition, ModeDifficultyHooks, ModeScoreContext, ModeScoreResult } from './types.js';
+import type {
+  GameModeDefinition,
+  ModeDifficultyHooks,
+  ModeScoreContext,
+  ModeScoreResult,
+} from './types.js';
+import { defaultModeA11y } from './types.js';
 
 const HOOKS: Record<DifficultyId, ModeDifficultyHooks> = {
   beginner: { scoreMultiplier: 0.9, timingWindowScale: 1.5, chartDensity: 0.5 },
@@ -20,16 +26,31 @@ export const callAndResponseMode: GameModeDefinition = {
       title: 'Listen for the call',
       body: 'A call phrase appears first. Wait for the response window before acting.',
       roleHint: 'vocalist',
+      caption: 'Wait for the response window.',
     },
     {
       id: 'cr-2',
       title: 'Echo on the response',
       body: 'Tap or phrase-submit during the response marker — not during the call.',
+      caption: 'Respond on the marker, not the call.',
     },
     {
       id: 'cr-3',
       title: 'Match the pattern',
       body: 'Harder difficulties shrink the response window and add more call pairs.',
+      caption: 'Harder = shorter response windows.',
+    },
+    {
+      id: 'cr-4',
+      title: 'Accessibility',
+      body: 'Captions mirror call/response markers so hearing-impaired players can play.',
+      caption: 'Captions show call and response.',
+    },
+    {
+      id: 'cr-5',
+      title: 'Replay',
+      body: 'Replay stores timing frames only — optional mic path is never recorded.',
+      caption: 'Replay is timing-only.',
     },
   ],
   difficultyHooks: HOOKS,
@@ -42,6 +63,25 @@ export const callAndResponseMode: GameModeDefinition = {
       points,
       message: matched ? 'Response locked!' : ctx.grade === 'miss' ? 'Missed response' : 'Partial echo',
       crowdBoost: matched ? 6 : ctx.grade === 'miss' ? -2 : 2,
+    };
+  },
+  a11y: defaultModeA11y({ captionsRequired: true, screenReaderHints: true }),
+  teams: {
+    supportsTeams: true,
+    defaultTeamSplit: 'auto_ab',
+    teamMeterCounts: true,
+  },
+  replay: { supported: true, includesMicAudio: false, maxFrames: 1500 },
+  telemetryKeys: ['tutorial', 'score', 'results', 'replay', 'response_match'],
+  buildResults(input) {
+    return {
+      modeId: 'CallAndResponse',
+      difficulty: input.difficulty,
+      teamScore: input.teamScore,
+      crowdMeter: input.crowdMeter,
+      winningTeam: input.winningTeam,
+      rows: input.rows,
+      headline: 'Call & Response results',
     };
   },
 };

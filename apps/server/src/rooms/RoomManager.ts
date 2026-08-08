@@ -24,12 +24,13 @@ import {
   AUDIENCE_INFLUENCE_MAX_DELTA,
   AUDIENCE_CROWD_METER_FLOOR,
   AUDIENCE_CROWD_METER_CEILING,
+  DEFAULT_CAPACITY_PROFILE,
   DEFAULT_DIFFICULTY,
   DEFAULT_GAME_MODE,
   EMPTY_TEAM_SCORES,
-  MAX_AUDIENCE_SEATS,
   MAX_PERFORMERS,
   generateRoomCode,
+  maxAudienceForProfile,
   sanitizePlayerName,
   HYPE_COOLDOWN_MS,
   comboFromStreak,
@@ -37,6 +38,7 @@ import {
   emitTelemetry,
   isTeamId,
   publicPlayerView,
+  type CapacityProfile,
 } from '@beatlink/shared';
 import {
   assertTransition,
@@ -62,7 +64,6 @@ import { getBeatmapForSong } from '../beatmaps/store.js';
 
 const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
 const MAX_PLAYERS = MAX_PERFORMERS;
-const MAX_AUDIENCE = MAX_AUDIENCE_SEATS;
 
 interface InternalRoom extends RoomState {
   beatmap: Beatmap | null;
@@ -91,6 +92,8 @@ export class RoomManager {
       gameMode?: GameModeId;
       difficulty?: DifficultyId;
       privacy?: Partial<RoomPrivacySettings>;
+      /** `event_sim` raises soft audience ceiling for Beta in-process simulation. */
+      capacityProfile?: CapacityProfile;
     } = {},
   ): RoomState & { hostToken: string } {
     let code = generateRoomCode();
@@ -101,6 +104,7 @@ export class RoomManager {
     const publicOrigin = options.publicOrigin ?? process.env.PUBLIC_ORIGIN ?? 'http://localhost:5173';
     const expiresAt = now + ROOM_TTL_MS;
     const privacy = createRoomPrivacy(options.privacy ?? {});
+    const capacityProfile = options.capacityProfile ?? DEFAULT_CAPACITY_PROFILE;
     const room: InternalRoom = {
       code,
       phase: 'lobby',
@@ -118,6 +122,7 @@ export class RoomManager {
       gameDurationMs: 45000,
       teamScore: 0,
       crowdMeter: 50,
+      capacityProfile,
       rematchRound: 0,
       joinQr: buildRoomJoinQrPayload({ code, origin: publicOrigin, expiresAt }),
       privacy,
@@ -135,7 +140,11 @@ export class RoomManager {
     };
     this.rooms.set(code, room);
     this.socketToHostRoom.set(hostSocketId, code);
-    emitTelemetry('room_created', code, { rematchRound: 0, gameMode: room.gameMode });
+    emitTelemetry('room_created', code, {
+      rematchRound: 0,
+      gameMode: room.gameMode,
+      capacityProfile: room.capacityProfile,
+    });
     return { ...this.stripInternal(room), hostToken: room.hostToken };
   }
 
@@ -277,7 +286,7 @@ export class RoomManager {
       }
     }
 
-    if (room.audience.length >= MAX_AUDIENCE) return null;
+    if (room.audience.length >= maxAudienceForProfile(room.capacityProfile)) return null;
 
     const audience: AudienceMember = {
       id: randomUUID(),

@@ -40,6 +40,11 @@ const EN: MessageCatalog = {
   'calibration.prompt': 'Tap with the click to measure latency',
   'error.room_full': 'Room is full',
   'error.auth_failed': 'Authorization failed',
+  'capacity.party': 'Party capacity',
+  'capacity.event_sim': 'Event simulation capacity',
+  'rc.digital_ready': 'Digital RC packaging ready',
+  'content.royalty_free': 'Royalty-free catalog path',
+  'content.creator_upload': 'Creator-attested upload',
 };
 
 const ES: MessageCatalog = {
