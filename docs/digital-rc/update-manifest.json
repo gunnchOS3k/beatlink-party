@@ -1,0 +1,10 @@
+{
+  "fromVersion": "0.1.0-alpha-exit",
+  "toVersion": "0.2.0-digital-rc",
+  "strategy": "replace_digital_bundle",
+  "requiresOnline": false,
+  "notes": [
+    "Digital bundle replace only — no forced cloud sync.",
+    "In-memory rooms are ephemeral across update."
+  ]
+}

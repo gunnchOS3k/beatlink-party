@@ -17,6 +17,7 @@
     "test": "vitest run",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "test:watch": "vitest",
+    "emit:digital-rc": "vitest run scripts/emit-digital-rc.test.ts",
     "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
     "typecheck": "pnpm --filter @beatlink/shared build && pnpm --filter @beatlink/game-engine build && pnpm --filter @beatlink/device-ux build && pnpm -r typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,json,md,css}\""
