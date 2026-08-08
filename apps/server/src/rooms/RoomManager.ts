@@ -4,6 +4,8 @@ import type {
   AudienceInfluenceType,
   AudienceMember,
   Beatmap,
+  DifficultyId,
+  GameModeId,
   GameResults,
   LinkResolveResult,
   Player,
@@ -17,6 +19,11 @@ import {
   AUDIENCE_COLORS,
   AUDIENCE_INFLUENCE_COOLDOWN_MS,
   AUDIENCE_INFLUENCE_MAX_PER_ROUND,
+  AUDIENCE_INFLUENCE_MAX_DELTA,
+  AUDIENCE_CROWD_METER_FLOOR,
+  AUDIENCE_CROWD_METER_CEILING,
+  DEFAULT_DIFFICULTY,
+  DEFAULT_GAME_MODE,
   generateRoomCode,
   sanitizePlayerName,
   HYPE_COOLDOWN_MS,
@@ -25,12 +32,15 @@ import {
 } from '@beatlink/shared';
 import {
   assertTransition,
+  buildRoomJoinQrPayload,
   calibratedGameTimeMs,
   computeAwards,
   findActiveVocalPrompt,
   findNearestHypeEvent,
   findNearestNote,
+  isGameModeId,
   scoreBeatTap,
+  scoreForMode,
   scoreHypeAction,
   scoreVocalPhrase,
   updatePlayerStats,
@@ -48,6 +58,8 @@ interface InternalRoom extends RoomState {
   playerTokens: Map<string, string>;
   audienceTokens: Map<string, string>;
   scoredTargets: Set<string>;
+  /** Public web origin used when minting join QR payloads. */
+  publicOrigin: string;
 }
 
 export class RoomManager {
@@ -58,12 +70,17 @@ export class RoomManager {
   private socketToAudience = new Map<string, string>();
   private socketToHostRoom = new Map<string, string>();
 
-  createRoom(hostSocketId: string): RoomState & { hostToken: string } {
+  createRoom(
+    hostSocketId: string,
+    options: { publicOrigin?: string; gameMode?: GameModeId; difficulty?: DifficultyId } = {},
+  ): RoomState & { hostToken: string } {
     let code = generateRoomCode();
     while (this.rooms.has(code)) {
       code = generateRoomCode();
     }
     const now = Date.now();
+    const publicOrigin = options.publicOrigin ?? process.env.PUBLIC_ORIGIN ?? 'http://localhost:5173';
+    const expiresAt = now + ROOM_TTL_MS;
     const room: InternalRoom = {
       code,
       phase: 'lobby',
@@ -73,6 +90,8 @@ export class RoomManager {
       selectedSongId: null,
       pastedLinkUrl: null,
       linkResolveResult: null,
+      gameMode: options.gameMode ?? DEFAULT_GAME_MODE,
+      difficulty: options.difficulty ?? DEFAULT_DIFFICULTY,
       calibrationOffsetMs: 0,
       countdown: null,
       gameStartTime: null,
@@ -80,18 +99,20 @@ export class RoomManager {
       teamScore: 0,
       crowdMeter: 50,
       rematchRound: 0,
+      joinQr: buildRoomJoinQrPayload({ code, origin: publicOrigin, expiresAt }),
       createdAt: now,
-      expiresAt: now + ROOM_TTL_MS,
+      expiresAt,
       beatmap: null,
       hypeCooldowns: new Map(),
       hostToken: randomUUID(),
       playerTokens: new Map(),
       audienceTokens: new Map(),
       scoredTargets: new Set(),
+      publicOrigin,
     };
     this.rooms.set(code, room);
     this.socketToHostRoom.set(hostSocketId, code);
-    emitTelemetry('room_created', code, { rematchRound: 0 });
+    emitTelemetry('room_created', code, { rematchRound: 0, gameMode: room.gameMode });
     return { ...this.stripInternal(room), hostToken: room.hostToken };
   }
 
@@ -113,6 +134,7 @@ export class RoomManager {
       playerTokens: _playerTokens,
       audienceTokens: _audienceTokens,
       scoredTargets: _scoredTargets,
+      publicOrigin: _publicOrigin,
       ...state
     } = room;
     void _beatmap;
@@ -121,6 +143,7 @@ export class RoomManager {
     void _playerTokens;
     void _audienceTokens;
     void _scoredTargets;
+    void _publicOrigin;
     return state;
   }
 
@@ -426,7 +449,16 @@ export class RoomManager {
     if (accepted) {
       member.lastInfluenceAt = now;
       member.influenceCount += 1;
-      crowdDelta = type === 'hype' ? 2 : 1;
+      const rawDelta = type === 'hype' ? 2 : 1;
+      crowdDelta = Math.min(AUDIENCE_INFLUENCE_MAX_DELTA, Math.max(0, rawDelta));
+      const proposed = room.crowdMeter + crowdDelta;
+      if (proposed > AUDIENCE_CROWD_METER_CEILING) {
+        crowdDelta = Math.max(0, AUDIENCE_CROWD_METER_CEILING - room.crowdMeter);
+      }
+      // Soft floor only blocks further decreases (audience path is non-negative today).
+      if (room.crowdMeter + crowdDelta < AUDIENCE_CROWD_METER_FLOOR && crowdDelta < 0) {
+        crowdDelta = Math.min(0, AUDIENCE_CROWD_METER_FLOOR - room.crowdMeter);
+      }
       room.crowdMeter = Math.min(100, Math.max(0, room.crowdMeter + crowdDelta));
     }
 
@@ -478,6 +510,28 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     if (room.hostId !== hostSocketId) return null;
+    return this.shutdownRoom(code, { reason: 'host_end', hostSocketId });
+  }
+
+  /**
+   * Clean shutdown — clears seats, tokens, maps, and marks phase closed.
+   * Accepts host token or matching host socket id.
+   */
+  shutdownRoom(
+    code: string,
+    options: { reason?: string; hostSocketId?: string; hostToken?: string } = {},
+  ): RoomState | null {
+    const room = this.rooms.get(code.toUpperCase());
+    if (!room) return null;
+    if (options.hostToken && room.hostToken !== options.hostToken) return null;
+    if (
+      options.hostSocketId &&
+      room.hostId !== options.hostSocketId &&
+      !options.hostToken
+    ) {
+      return null;
+    }
+
     for (const player of room.players) {
       this.playerToRoom.delete(player.id);
       room.playerTokens.delete(player.id);
@@ -496,9 +550,59 @@ export class RoomManager {
         this.socketToAudience.delete(socketId);
       }
     }
-    this.socketToHostRoom.delete(hostSocketId);
+    if (room.hostId) this.socketToHostRoom.delete(room.hostId);
+    room.phase = 'closed';
+    const closed = this.stripInternal({ ...room, players: [], audience: [] });
     this.rooms.delete(code.toUpperCase());
-    return this.stripInternal({ ...room, phase: 'closed' as RoomState['phase'], players: [], audience: [] });
+    emitTelemetry('room_shutdown', code, { reason: options.reason ?? 'shutdown' });
+    return closed;
+  }
+
+  /** Purge expired rooms (TTL). Returns number removed. */
+  purgeExpiredRooms(nowMs = Date.now()): string[] {
+    const removed: string[] = [];
+    for (const [code, room] of [...this.rooms.entries()]) {
+      if (nowMs > room.expiresAt) {
+        this.shutdownRoom(code, { reason: 'expired', hostToken: room.hostToken });
+        emitTelemetry('room_expired', code, { rematchRound: room.rematchRound });
+        removed.push(code);
+      }
+    }
+    return removed;
+  }
+
+  /** Refresh join QR payload (same code, updated expiry / origin). */
+  refreshJoinQr(code: string, publicOrigin?: string): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || room.phase === 'closed') return null;
+    if (publicOrigin) room.publicOrigin = publicOrigin;
+    room.joinQr = buildRoomJoinQrPayload({
+      code: room.code,
+      origin: room.publicOrigin,
+      expiresAt: room.expiresAt,
+    });
+    return this.stripInternal(room);
+  }
+
+  setGameMode(code: string, gameMode: GameModeId | string): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select' && room.phase !== 'results')) {
+      return null;
+    }
+    if (!isGameModeId(gameMode)) return null;
+    room.gameMode = gameMode;
+    emitTelemetry('mode_selected', room.code, { gameMode });
+    return this.stripInternal(room);
+  }
+
+  setDifficulty(code: string, difficulty: DifficultyId): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select' && room.phase !== 'results')) {
+      return null;
+    }
+    if (!['beginner', 'casual', 'pro', 'nightmare'].includes(difficulty)) return null;
+    room.difficulty = difficulty;
+    return this.stripInternal(room);
   }
 
   setRole(code: string, playerId: string, role: Player['role']): RoomState | null {
@@ -671,7 +775,21 @@ export class RoomManager {
         Math.abs(note.timeMs - gameTimeMs) < 200
       ) {
         room.scoredTargets.add(targetKey);
-        const result = scoreBeatTap(input, note.timeMs, gameTimeMs, player.streak);
+        const tap = scoreBeatTap(input, note.timeMs, gameTimeMs, player.streak);
+        const modeScore = scoreForMode({
+          modeId: room.gameMode,
+          difficulty: room.difficulty,
+          grade: tap.grade,
+          basePoints: tap.points,
+          streak: tap.streak,
+          meta: { role: player.role },
+        });
+        const result = {
+          ...tap,
+          points: modeScore.points,
+          message: modeScore.message,
+          crowdBoost: modeScore.crowdBoost,
+        };
         Object.assign(player, updatePlayerStats(player, result));
         room.teamScore += result.points;
         room.crowdMeter = Math.min(100, Math.max(0, room.crowdMeter + result.crowdBoost));
@@ -698,13 +816,31 @@ export class RoomManager {
         gameTimeMs <= prompt.timeMs + prompt.durationMs + 200
       ) {
         room.scoredTargets.add(targetKey);
-        const result = scoreVocalPhrase(
+        const vocal = scoreVocalPhrase(
           input,
           prompt.timeMs,
           prompt.durationMs,
           gameTimeMs,
           player.streak,
         );
+        const modeScore = scoreForMode({
+          modeId: room.gameMode,
+          difficulty: room.difficulty,
+          grade: vocal.grade,
+          basePoints: vocal.points,
+          streak: vocal.streak,
+          meta: {
+            role: player.role,
+            noRecording: true,
+            responseMatched: room.gameMode === 'CallAndResponse' && vocal.grade !== 'miss',
+          },
+        });
+        const result = {
+          ...vocal,
+          points: modeScore.points,
+          message: modeScore.message,
+          crowdBoost: modeScore.crowdBoost,
+        };
         Object.assign(player, updatePlayerStats(player, result));
         room.teamScore += result.points;
         room.crowdMeter = Math.min(100, room.crowdMeter + result.crowdBoost);
@@ -803,8 +939,21 @@ export class RoomManager {
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
-    emitTelemetry('rematch', room.code, { rematchRound: room.rematchRound });
+    room.joinQr = buildRoomJoinQrPayload({
+      code: room.code,
+      origin: room.publicOrigin,
+      expiresAt: room.expiresAt,
+    });
+    emitTelemetry('rematch', room.code, {
+      rematchRound: room.rematchRound,
+      gameMode: room.gameMode,
+    });
     return this.stripInternal(room);
+  }
+
+  /** Alias for rematch — host "Next song" control. */
+  nextRound(code: string): RoomState | null {
+    return this.rematch(code);
   }
 
   /** @deprecated Prefer rematch() — keeps seats; still supported for host UI. */

@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'node:http';
+import type { DifficultyId, GameModeId } from '@beatlink/shared';
 import { registerTelemetrySink } from '@beatlink/shared';
+import { listGameModes } from '@beatlink/game-engine';
 import { setupRealtime } from './realtime/socket.js';
 import { loadCatalog, getBeatmapForSong } from './beatmaps/store.js';
 import { getProviderAuthStatus, resolveLink } from './music/linkResolver.js';
@@ -24,8 +26,17 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'beatlink-party' });
 });
 
-app.post('/rooms', (_req, res) => {
-  const room = roomManager.createRoom('http-' + Date.now());
+app.post('/rooms', (req, res) => {
+  const body = (req.body ?? {}) as {
+    publicOrigin?: string;
+    gameMode?: GameModeId;
+    difficulty?: DifficultyId;
+  };
+  const room = roomManager.createRoom('http-' + Date.now(), {
+    publicOrigin: body.publicOrigin,
+    gameMode: body.gameMode,
+    difficulty: body.difficulty,
+  });
   res.json({ code: room.code, room });
 });
 
@@ -37,6 +48,19 @@ app.get('/rooms/:code', (req, res) => {
 
 app.get('/songs', (_req, res) => {
   res.json({ songs: loadCatalog() });
+});
+
+app.get('/modes', (_req, res) => {
+  res.json({
+    modes: listGameModes().map((m) => ({
+      id: m.id,
+      label: m.label,
+      tagline: m.tagline,
+      primaryRoles: m.primaryRoles,
+      micPolicy: m.micPolicy,
+      tutorial: m.tutorial,
+    })),
+  });
 });
 
 app.get('/beatmaps/:songId', (req, res) => {
@@ -64,6 +88,22 @@ app.post('/songs/resolve-link', async (req, res) => {
 
 const httpServer = createServer(app);
 setupRealtime(httpServer, CORS_ORIGIN);
+
+const purgeTimer = setInterval(() => {
+  roomManager.purgeExpiredRooms();
+}, 60_000);
+purgeTimer.unref?.();
+
+function cleanShutdown(signal: string) {
+  console.log(`[beatlink] clean shutdown on ${signal}`);
+  // Expire every live room so clients observe closed/absent state.
+  roomManager.purgeExpiredRooms(Number.MAX_SAFE_INTEGER);
+  httpServer.close(() => process.exit(0));
+  setTimeout(() => process.exit(0), 2000).unref?.();
+}
+
+process.on('SIGTERM', () => cleanShutdown('SIGTERM'));
+process.on('SIGINT', () => cleanShutdown('SIGINT'));
 
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`BeatLink Party server running on http://0.0.0.0:${PORT}`);

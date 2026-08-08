@@ -411,6 +411,36 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
       if (room) io.to(code).emit('room.state', room);
     });
 
+    socket.on('game.next', (data: { code: string; hostToken?: string }) => {
+      const code = data.code.toUpperCase();
+      if (!requireHost(code, socket.id, data.hostToken)) return;
+      const room = roomManager.nextRound(code);
+      if (room) io.to(code).emit('room.state', room);
+    });
+
+    socket.on(
+      'room.set_mode',
+      (data: { code: string; gameMode: string; hostToken?: string }) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) return;
+        const room = roomManager.setGameMode(code, data.gameMode);
+        if (room) io.to(code).emit('room.state', room);
+      },
+    );
+
+    socket.on(
+      'room.set_difficulty',
+      (data: { code: string; difficulty: string; hostToken?: string }) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) return;
+        const room = roomManager.setDifficulty(
+          code,
+          data.difficulty as 'beginner' | 'casual' | 'pro' | 'nightmare',
+        );
+        if (room) io.to(code).emit('room.state', room);
+      },
+    );
+
     socket.on(
       'room.end',
       (data: { code: string; hostToken?: string }, cb?: (result: { ok: boolean; error?: string }) => void) => {

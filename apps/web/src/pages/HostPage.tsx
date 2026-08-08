@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import type {
+  DifficultyId,
+  GameModeId,
   GameResults,
   LinkResolveResult,
   ProviderAuthStatus,
   RoomState,
   SongCatalogEntry,
 } from '@beatlink/shared';
-import { ROLES } from '@beatlink/shared';
+import { GAME_MODE_IDS, ROLES } from '@beatlink/shared';
 import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
 import { startCalibrationClicks, startHostMetronome, resumeAudioContext } from '../lib/hostAudio';
 import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
@@ -17,13 +19,20 @@ import {
   useAccessibility,
   useDeviceRole,
 } from '../lib/deviceSettings';
-import { resolveMediaDescriptor } from '@beatlink/game-engine';
+import { getGameMode, resolveMediaDescriptor } from '@beatlink/game-engine';
 
 function statusBadgeClass(status: LinkResolveResult['playbackStatus']): string {
   if (status === 'PLAYABLE_APPROVED' || status === 'PLAYABLE_AUTHORIZED_PLATFORM') {
     return 'status-playable';
   }
-  if (status === 'UNSUPPORTED' || status === 'BLOCKED_BY_POLICY') return 'status-blocked';
+  if (
+    status === 'UNSUPPORTED' ||
+    status === 'BLOCKED_BY_POLICY' ||
+    status === 'TAKEN_DOWN' ||
+    status === 'RIGHTS_EXPIRED'
+  ) {
+    return 'status-blocked';
+  }
   return 'status-metadata';
 }
 
@@ -318,8 +327,8 @@ export default function HostPage() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [songsError, setSongsError] = useState<string | null>(null);
   const [beatmapBpm, setBeatmapBpm] = useState(120);
-  const [difficulty, setDifficulty] = useState<'beginner' | 'casual' | 'pro' | 'nightmare'>('casual');
-  const [playMode, setPlayMode] = useState<'party' | 'competitive'>('party');
+  const [difficulty, setDifficulty] = useState<DifficultyId>('casual');
+  const [playMode, setPlayMode] = useState<GameModeId>('BeatTap');
   const [hostToken, setHostToken] = useState<string>('');
   const metronomeRef = useRef<{ stop: () => void } | null>(null);
   const { role, setRole, roles, profile } = useDeviceRole(true);
@@ -493,6 +502,16 @@ export default function HostPage() {
     setLinkUrl('');
   }
 
+  function setRoomMode(mode: GameModeId) {
+    setPlayMode(mode);
+    socket.emit('room.set_mode', { code, gameMode: mode, hostToken });
+  }
+
+  function setRoomDifficulty(next: DifficultyId) {
+    setDifficulty(next);
+    socket.emit('room.set_difficulty', { code, difficulty: next, hostToken });
+  }
+
   function endRoom() {
     socket.emit('room.end', { code, hostToken }, (result?: { ok?: boolean; error?: string }) => {
       if (result && result.ok === false) {
@@ -527,9 +546,15 @@ export default function HostPage() {
   }, [room, displayResult]);
 
   const joinUrl =
-    typeof window !== 'undefined'
+    room?.joinQr?.joinUrl ??
+    (typeof window !== 'undefined'
       ? `${window.location.origin}/join`
-      : 'http://localhost:5173/join';
+      : 'http://localhost:5173/join');
+  const qrText = room?.joinQr?.qrText ?? `beatlink:join:${code}|${joinUrl}`;
+  // Local QR image via quickchart remains optional display; payload is server-authored.
+  const qrUrl = `https://quickchart.io/qr?size=220&margin=1&text=${encodeURIComponent(qrText)}`;
+  const selectedSong = songs.find((s) => s.id === room?.selectedSongId);
+  const activeMode = getGameMode(room?.gameMode ?? playMode);
 
   if (!code) {
     return (
@@ -548,9 +573,6 @@ export default function HostPage() {
       </div>
     );
   }
-
-  const qrUrl = `https://quickchart.io/qr?size=220&margin=1&text=${encodeURIComponent(joinUrl)}`;
-  const selectedSong = songs.find((s) => s.id === room?.selectedSongId);
 
   return (
     <div className="page">
@@ -706,10 +728,8 @@ export default function HostPage() {
                 <label style={{ flex: 1, minWidth: 140 }}>
                   <span className="label">Difficulty</span>
                   <select
-                    value={difficulty}
-                    onChange={(e) =>
-                      setDifficulty(e.target.value as 'beginner' | 'casual' | 'pro' | 'nightmare')
-                    }
+                    value={room?.difficulty ?? difficulty}
+                    onChange={(e) => setRoomDifficulty(e.target.value as DifficultyId)}
                     style={{ width: '100%' }}
                   >
                     <option value="beginner">Beginner</option>
@@ -719,19 +739,25 @@ export default function HostPage() {
                   </select>
                 </label>
                 <label style={{ flex: 1, minWidth: 140 }}>
-                  <span className="label">Mode</span>
+                  <span className="label">Game Mode</span>
                   <select
-                    value={playMode}
-                    onChange={(e) => setPlayMode(e.target.value as 'party' | 'competitive')}
+                    value={room?.gameMode ?? playMode}
+                    onChange={(e) => setRoomMode(e.target.value as GameModeId)}
                     style={{ width: '100%' }}
                   >
-                    <option value="party">Party</option>
-                    <option value="competitive">Competitive</option>
+                    {GAME_MODE_IDS.map((id) => (
+                      <option key={id} value={id}>
+                        {getGameMode(id).label}
+                      </option>
+                    ))}
                   </select>
                 </label>
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
-                Selected for this room: {difficulty} · {playMode}
+                {activeMode.label}: {activeMode.tagline}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
+                Tutorial: {activeMode.tutorial[0]?.title} — {activeMode.tutorial[0]?.body}
               </p>
 
               <button

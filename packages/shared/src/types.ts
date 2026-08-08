@@ -5,6 +5,16 @@ export type SeatKind = 'player' | 'audience';
 
 export type AudienceInfluenceType = 'hype' | 'vote';
 
+/** First-class selectable game modes (Wave G alpha — roles ≠ modes). */
+export type GameModeId =
+  | 'BeatTap'
+  | 'CallAndResponse'
+  | 'KaraokePerformance'
+  | 'BandRoles'
+  | 'PredictionTrivia';
+
+export type DifficultyId = 'beginner' | 'casual' | 'pro' | 'nightmare';
+
 export type RoomPhase =
   | 'lobby'
   | 'song_select'
@@ -25,7 +35,17 @@ export type PlaybackStatus =
   | 'NEEDS_USER_UPLOAD'
   | 'NEEDS_LICENSE'
   | 'UNSUPPORTED'
-  | 'BLOCKED_BY_POLICY';
+  | 'BLOCKED_BY_POLICY'
+  | 'TAKEN_DOWN'
+  | 'RIGHTS_EXPIRED';
+
+/** Rights attestation for user-owned / creator-uploaded audio (never rip). */
+export type RightsAttestationStatus =
+  | 'attested'
+  | 'pending'
+  | 'rejected'
+  | 'expired'
+  | 'taken_down';
 
 export type InputType =
   | 'tap'
@@ -94,6 +114,10 @@ export interface RoomState {
   pastedLinkUrl: string | null;
   /** Last successful link resolve snapshot, broadcast to peers. */
   linkResolveResult: LinkResolveResult | null;
+  /** First-class selectable mode for this room round. */
+  gameMode: GameModeId;
+  /** Difficulty applied to mode scoring / chart density. */
+  difficulty: DifficultyId;
   /** Host-measured input latency offset applied to the beatmap. */
   calibrationOffsetMs: number;
   countdown: number | null;
@@ -103,7 +127,19 @@ export interface RoomState {
   crowdMeter: number;
   /** Rematch / round counter (increments on rematch). */
   rematchRound: number;
+  /** Structured join payload for QR / deep-link (no third-party dependency). */
+  joinQr: RoomJoinQrPayload | null;
   createdAt: number;
+  expiresAt: number;
+}
+
+/** Offline-friendly QR payload — clients encode locally; server never fetches remote QR APIs. */
+export interface RoomJoinQrPayload {
+  code: string;
+  joinPath: string;
+  joinUrl: string;
+  /** Deterministic payload string for QR encoders (code + path). */
+  qrText: string;
   expiresAt: number;
 }
 
@@ -121,8 +157,20 @@ export interface SongCatalogEntry {
   durationMs: number;
   bpm: number;
   beatmapId: string;
-  license: 'royalty_free' | 'public_domain' | 'demo_generated';
+  license: 'royalty_free' | 'public_domain' | 'demo_generated' | 'synthetic_original';
   description: string;
+}
+
+export interface RightsAttestation {
+  trackId: string;
+  attestorId: string;
+  status: RightsAttestationStatus;
+  attestedAtMs: number;
+  expiresAtMs: number | null;
+  /** Creator-declared ownership — never implies platform rip rights. */
+  ownsOrLicensed: boolean;
+  sourceKind: 'catalog' | 'user_upload' | 'synthetic' | 'public_domain';
+  notes?: string;
 }
 
 export interface LinkResolveResult {
@@ -176,7 +224,7 @@ export interface Beatmap {
   bpm: number;
   offsetMs: number;
   durationMs: number;
-  difficulty: 'beginner' | 'casual' | 'pro' | 'nightmare';
+  difficulty: DifficultyId;
   licenseStatus: string;
   sections: BeatmapSection[];
   notes: BeatmapNote[];
@@ -217,7 +265,12 @@ export type TelemetryEventName =
   | 'disconnect'
   | 'audience_influence'
   | 'host_migrated'
-  | 'rematch';
+  | 'rematch'
+  | 'room_expired'
+  | 'room_shutdown'
+  | 'mode_selected'
+  | 'rights_attestation'
+  | 'rights_takedown';
 
 /** Session telemetry — no PII (no names, tokens, or raw URLs). */
 export interface TelemetryEvent {
@@ -275,6 +328,26 @@ export const ROLES: Array<{ id: PlayerRole; label: string; description: string }
     description: 'Trigger crowd boosts and emotes on beat',
   },
 ];
+
+export const GAME_MODE_IDS: GameModeId[] = [
+  'BeatTap',
+  'CallAndResponse',
+  'KaraokePerformance',
+  'BandRoles',
+  'PredictionTrivia',
+];
+
+export const DEFAULT_GAME_MODE: GameModeId = 'BeatTap';
+export const DEFAULT_DIFFICULTY: DifficultyId = 'casual';
+
+/** Max absolute crowd-meter delta from a single accepted audience influence. */
+export const AUDIENCE_INFLUENCE_MAX_DELTA = 2;
+
+/** Soft floor — audience cannot drive crowd meter below this via influence alone. */
+export const AUDIENCE_CROWD_METER_FLOOR = 20;
+
+/** Soft ceiling — audience cannot push crowd meter above this via influence alone. */
+export const AUDIENCE_CROWD_METER_CEILING = 90;
 
 export const TIMING_WINDOWS_MS = {
   perfect: 40,

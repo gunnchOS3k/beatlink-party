@@ -29,6 +29,106 @@
       "beatmapId": "demo-track-3",
       "license": "demo_generated",
       "description": "Slower groove demo with longer hold notes and hype windows."
+    },
+    {
+      "id": "synth-click-train-120",
+      "title": "Click Train 120",
+      "artist": "BeatLink Synthetic Lab",
+      "durationMs": 30000,
+      "bpm": 120,
+      "beatmapId": "synth-click-120",
+      "license": "synthetic_original",
+      "description": "Original synthetic click track for audio-analysis baseline tests."
+    },
+    {
+      "id": "synth-click-train-140",
+      "title": "Click Train 140",
+      "artist": "BeatLink Synthetic Lab",
+      "durationMs": 28000,
+      "bpm": 140,
+      "beatmapId": "synth-click-140",
+      "license": "synthetic_original",
+      "description": "Faster synthetic click train — original BeatLink signal."
+    },
+    {
+      "id": "synth-lofi-metro",
+      "title": "Lo-Fi Metronome",
+      "artist": "BeatLink Synthetic Lab",
+      "durationMs": 36000,
+      "bpm": 90,
+      "beatmapId": "synth-lofi-90",
+      "license": "synthetic_original",
+      "description": "Soft synthetic metronome bed for casual karaoke prompts."
+    },
+    {
+      "id": "synth-party-stomp",
+      "title": "Party Stomp",
+      "artist": "BeatLink Synthetic Lab",
+      "durationMs": 42000,
+      "bpm": 126,
+      "beatmapId": "synth-stomp-126",
+      "license": "synthetic_original",
+      "description": "Four-on-the-floor synthetic stomp pattern for Band Roles."
+    },
+    {
+      "id": "synth-call-echo",
+      "title": "Call Echo",
+      "artist": "BeatLink Synthetic Lab",
+      "durationMs": 38000,
+      "bpm": 100,
+      "beatmapId": "synth-call-100",
+      "license": "synthetic_original",
+      "description": "Sparse synthetic call/response timing bed."
+    },
+    {
+      "id": "pd-scale-drills",
+      "title": "Public Domain Scale Drills",
+      "artist": "BeatLink Public Domain Desk",
+      "durationMs": 32000,
+      "bpm": 100,
+      "beatmapId": "pd-scale-100",
+      "license": "public_domain",
+      "description": "Public-domain scale drill pattern (original arrangement, no copyrighted melody)."
+    },
+    {
+      "id": "pd-march-grid",
+      "title": "March Grid",
+      "artist": "BeatLink Public Domain Desk",
+      "durationMs": 34000,
+      "bpm": 112,
+      "beatmapId": "pd-march-112",
+      "license": "public_domain",
+      "description": "Public-domain march-style beat grid for prediction trivia sections."
+    },
+    {
+      "id": "rf-sparkle-loop",
+      "title": "Sparkle Loop",
+      "artist": "BeatLink Royalty-Free Desk",
+      "durationMs": 40000,
+      "bpm": 118,
+      "beatmapId": "rf-sparkle-118",
+      "license": "royalty_free",
+      "description": "Internal royalty-free sparkle loop — original BeatLink composition stub."
+    },
+    {
+      "id": "rf-basement-warm",
+      "title": "Basement Warm-Up",
+      "artist": "BeatLink Royalty-Free Desk",
+      "durationMs": 44000,
+      "bpm": 96,
+      "beatmapId": "rf-basement-96",
+      "license": "royalty_free",
+      "description": "Warm royalty-free warm-up loop for karaoke no-recording path."
+    },
+    {
+      "id": "synth-prediction-pulse",
+      "title": "Prediction Pulse",
+      "artist": "BeatLink Synthetic Lab",
+      "durationMs": 35000,
+      "bpm": 130,
+      "beatmapId": "synth-predict-130",
+      "license": "synthetic_original",
+      "description": "Section-change synthetic pulse for Prediction Trivia mode."
     }
   ]
 }
