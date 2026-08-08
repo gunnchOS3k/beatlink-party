@@ -50,9 +50,8 @@ jobs:
 
       - name: Typecheck
         run: |
-          # Package exports resolve via dist types; build workspace libs first.
-          pnpm --filter @beatlink/shared build
-          pnpm --filter @beatlink/game-engine build
+          # Package exports resolve via dist types; `pnpm typecheck` builds
+          # shared, game-engine, and device-ux before recursive tsc.
           pnpm typecheck
 
       - name: Test (includes Gate1 core-loop)
