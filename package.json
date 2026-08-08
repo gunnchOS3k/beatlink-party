@@ -14,11 +14,12 @@
     "server:health": "pnpm --filter @beatlink/server health",
     "device:test:android": "node scripts/device-test-android.mjs",
     "build": "pnpm -r build",
+    "build:libs": "pnpm -r --filter './packages/**' --filter './device_ux' run build",
     "test": "vitest run",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "test:watch": "vitest",
     "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
-    "typecheck": "pnpm -r typecheck",
+    "typecheck": "pnpm build:libs && pnpm -r typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,json,md,css}\""
   },
   "devDependencies": {
