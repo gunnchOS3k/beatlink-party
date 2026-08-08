@@ -4,6 +4,7 @@
  */
 
 import { createServer } from 'node:http';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { io as ioClient, type Socket } from 'socket.io-client';
 import {
@@ -16,6 +17,40 @@ import {
 import { EVENT_AUDIENCE_TIERS, MAX_PERFORMERS, type EventAudienceTier } from '@beatlink/shared';
 import { setupRealtime } from '../realtime/socket.js';
 import { roomManager as defaultRoomManager } from '../rooms/RoomManager.js';
+
+/** Workspace package exports point at dist/; child tsx server needs them built. */
+async function ensureWorkspacePackageDists(): Promise<string | null> {
+  const sharedDist = resolve(process.cwd(), 'packages/shared/dist/index.js');
+  const engineDist = resolve(process.cwd(), 'packages/game-engine/dist/index.js');
+  if (existsSync(sharedDist) && existsSync(engineDist)) return null;
+
+  const { spawnSync } = await import('node:child_process');
+  const { rmSync } = await import('node:fs');
+  // Drop stale incremental state so tsc actually re-emits after a dist wipe.
+  for (const pkg of ['packages/shared', 'packages/game-engine']) {
+    try {
+      rmSync(resolve(process.cwd(), pkg, 'tsconfig.tsbuildinfo'), { force: true });
+    } catch {
+      // ignore
+    }
+  }
+
+  const runBuild = (filter: string) =>
+    spawnSync('pnpm', ['--filter', filter, 'build'], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      env: process.env,
+      shell: process.platform === 'win32',
+    });
+
+  const shared = runBuild('@beatlink/shared');
+  const engine = runBuild('@beatlink/game-engine');
+  if (!existsSync(sharedDist) || !existsSync(engineDist)) {
+    return `workspace_dist_missing shared_exit=${shared.status} engine_exit=${engine.status} ${(engine.stderr || shared.stderr || engine.stdout || shared.stdout || '').slice(0, 400)}`;
+  }
+  return null;
+}
+
 function connectClient(url: string): Promise<Socket> {
   return new Promise((resolve, reject) => {
     const socket = ioClient(url, {
@@ -211,12 +246,49 @@ export async function runCrossProcessNetworkLoad(options: {
   env?: Record<string, string>;
   readyTimeoutMs?: number;
 }): Promise<NetworkLoadReport> {
+  const distErr = await ensureWorkspacePackageDists();
+  if (distErr) {
+    return buildNetworkLoadReport({
+      mode: 'cross_process',
+      baseUrl: 'http://127.0.0.1:0',
+      performers: options.performers,
+      tiers: options.tiers,
+      metrics: [
+        {
+          tier: (options.tiers?.[0] ?? 25) as EventAudienceTier,
+          performers: options.performers ?? MAX_PERFORMERS,
+          audience: options.tiers?.[0] ?? 25,
+          joinRttMs: { p50: 0, p95: 0, p99: 0, samples: 0 },
+          influenceRttMs: { p50: 0, p95: 0, p99: 0, samples: 0 },
+          wallMs: 0,
+          ok: false,
+          notes: [NETWORK_LOAD_DISCLAIMER, distErr],
+        },
+      ],
+    });
+  }
+
   const port = options.port ?? 3200 + Math.floor(Math.random() * 400);
   const baseUrl = `http://127.0.0.1:${port}`;
   const { spawn } = await import('node:child_process');
+  const { createRequire } = await import('node:module');
   const serverEntry = resolve(process.cwd(), 'apps/server/src/index.ts');
-  // `node --import tsx` is reliable under pnpm CI (avoids .bin shim issues).
-  const child = spawn(process.execPath, ['--import', 'tsx', serverEntry], {
+  // Resolve tsx by absolute path — Gate1/CI pnpm layouts can miss bare `--import tsx`
+  // and `.bin/tsx` shims are unreliable when spawned without a shell.
+  const requireFromRoot = createRequire(resolve(process.cwd(), 'package.json'));
+  let tsxImportSpec = 'tsx';
+  try {
+    tsxImportSpec = requireFromRoot.resolve('tsx');
+  } catch {
+    try {
+      tsxImportSpec = createRequire(
+        resolve(process.cwd(), 'apps/server/package.json'),
+      ).resolve('tsx');
+    } catch {
+      // keep bare specifier; Node resolves from cwd
+    }
+  }
+  const child = spawn(process.execPath, ['--import', tsxImportSpec, serverEntry], {
     cwd: process.cwd(),
     env: {
       ...process.env,
@@ -228,6 +300,9 @@ export async function runCrossProcessNetworkLoad(options: {
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let stderrBuf = '';
+  child.on('error', (err) => {
+    stderrBuf += `spawn_error=${err instanceof Error ? err.message : String(err)}\n`;
+  });
   child.stderr?.on('data', (chunk: Buffer) => {
     stderrBuf += chunk.toString();
   });
@@ -270,7 +345,7 @@ export async function runCrossProcessNetworkLoad(options: {
           ok: false,
           notes: [
             NETWORK_LOAD_DISCLAIMER,
-            `child_not_ready exit=${child.exitCode} launcher=node --import tsx`,
+            `child_not_ready exit=${child.exitCode} launcher=node --import ${tsxImportSpec}`,
             stderrBuf.slice(0, 800),
           ],
         },
