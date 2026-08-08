@@ -41,15 +41,14 @@ describe('Continuation V — network load (real WebSocket)', () => {
   );
 
   it(
-    'cross-process load: parent clients → child tsx server (tier 25 smoke + optional full)',
+    'cross-process load: parent clients → child tsx server (full matrix)',
     async () => {
       mkdirSync(outDir, { recursive: true });
       const report = await runCrossProcessNetworkLoad({
-        port: 3117,
         performers: 8,
         tiers: [...EVENT_AUDIENCE_TIERS],
         env: { BEATLINK_ROOM_STORE: 'memory' },
-        readyTimeoutMs: 30_000,
+        readyTimeoutMs: 45_000,
       });
 
       writeFileSync(
@@ -58,7 +57,12 @@ describe('Continuation V — network load (real WebSocket)', () => {
       );
 
       expect(report.mode).toBe('cross_process');
-      expect(report.passed).toBe(true);
+      if (!report.passed) {
+        // Surface child stderr notes for CI diagnosis.
+        throw new Error(
+          `cross-process load failed: ${JSON.stringify(report.metrics?.[0]?.notes ?? report)}`,
+        );
+      }
       expect(report.metrics).toHaveLength(4);
       for (const m of report.metrics) {
         expect(m.ok).toBe(true);

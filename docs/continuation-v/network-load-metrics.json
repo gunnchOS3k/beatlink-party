@@ -1,7 +1,7 @@
 {
   "disclaimer": "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim.",
   "mode": "in_process_socket",
-  "baseUrl": "http://127.0.0.1:54730",
+  "baseUrl": "http://127.0.0.1:55905",
   "performers": 8,
   "tiers": [
     25,
@@ -16,17 +16,17 @@
       "audience": 25,
       "joinRttMs": {
         "p50": 1,
-        "p95": 4,
-        "p99": 5,
+        "p95": 2,
+        "p99": 2,
         "samples": 33
       },
       "influenceRttMs": {
-        "p50": 3,
+        "p50": 2,
         "p95": 3,
-        "p99": 5,
+        "p99": 3,
         "samples": 25
       },
-      "wallMs": 168,
+      "wallMs": 131,
       "ok": true,
       "notes": [
         "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim."
@@ -39,7 +39,7 @@
       "joinRttMs": {
         "p50": 1,
         "p95": 3,
-        "p99": 4,
+        "p99": 3,
         "samples": 58
       },
       "influenceRttMs": {
@@ -48,7 +48,7 @@
         "p99": 6,
         "samples": 40
       },
-      "wallMs": 340,
+      "wallMs": 328,
       "ok": true,
       "notes": [
         "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim."
@@ -61,16 +61,16 @@
       "joinRttMs": {
         "p50": 3,
         "p95": 7,
-        "p99": 8,
+        "p99": 7,
         "samples": 108
       },
       "influenceRttMs": {
-        "p50": 15,
-        "p95": 18,
-        "p99": 31,
+        "p50": 14,
+        "p95": 15,
+        "p99": 15,
         "samples": 40
       },
-      "wallMs": 1038,
+      "wallMs": 967,
       "ok": true,
       "notes": [
         "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim."
@@ -82,17 +82,17 @@
       "audience": 300,
       "joinRttMs": {
         "p50": 14,
-        "p95": 46,
-        "p99": 50,
+        "p95": 45,
+        "p99": 49,
         "samples": 308
       },
       "influenceRttMs": {
-        "p50": 97,
-        "p95": 116,
-        "p99": 126,
+        "p50": 96,
+        "p95": 177,
+        "p99": 361,
         "samples": 40
       },
-      "wallMs": 9947,
+      "wallMs": 10328,
       "ok": true,
       "notes": [
         "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim."

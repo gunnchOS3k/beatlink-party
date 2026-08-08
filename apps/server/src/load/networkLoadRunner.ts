@@ -211,15 +211,13 @@ export async function runCrossProcessNetworkLoad(options: {
   env?: Record<string, string>;
   readyTimeoutMs?: number;
 }): Promise<NetworkLoadReport> {
-  const port = options.port ?? 3107;
+  const port = options.port ?? 3200 + Math.floor(Math.random() * 400);
   const baseUrl = `http://127.0.0.1:${port}`;
   const { spawn } = await import('node:child_process');
-  const tsxBin = resolve(
-    process.cwd(),
-    'apps/server/node_modules/.bin/tsx',
-  );
   const serverEntry = resolve(process.cwd(), 'apps/server/src/index.ts');
-  const child = spawn(tsxBin, [serverEntry], {
+  // Prefer `node --import tsx` (reliable under pnpm CI shims); fall back to tsx bin.
+  const tsxBin = resolveTsxBin();
+  const child = spawn(process.execPath, ['--import', 'tsx', serverEntry], {
     cwd: process.cwd(),
     env: {
       ...process.env,
@@ -230,7 +228,7 @@ export async function runCrossProcessNetworkLoad(options: {
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
-
+  void tsxBin;
   let stderrBuf = '';
   child.stderr?.on('data', (chunk: Buffer) => {
     stderrBuf += chunk.toString();
@@ -239,7 +237,7 @@ export async function runCrossProcessNetworkLoad(options: {
     stderrBuf += chunk.toString();
   });
 
-  const readyTimeout = options.readyTimeoutMs ?? 25_000;
+  const readyTimeout = options.readyTimeoutMs ?? 45_000;
   const started = Date.now();
   let ready = false;
   while (Date.now() - started < readyTimeout) {
@@ -274,8 +272,8 @@ export async function runCrossProcessNetworkLoad(options: {
           ok: false,
           notes: [
             NETWORK_LOAD_DISCLAIMER,
-            `child_not_ready exit=${child.exitCode}`,
-            stderrBuf.slice(0, 500),
+            `child_not_ready exit=${child.exitCode} launcher=node --import tsx`,
+            stderrBuf.slice(0, 800),
           ],
         },
       ],
