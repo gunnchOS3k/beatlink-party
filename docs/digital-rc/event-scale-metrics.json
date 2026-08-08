@@ -15,7 +15,7 @@
       "reconnects": 2,
       "hostMigrated": true,
       "shutdownOk": true,
-      "wallMs": 0,
+      "wallMs": 1,
       "ok": true
     },
     {
@@ -30,7 +30,7 @@
       "reconnects": 3,
       "hostMigrated": true,
       "shutdownOk": true,
-      "wallMs": 1,
+      "wallMs": 2,
       "ok": true
     },
     {
@@ -45,7 +45,7 @@
       "reconnects": 5,
       "hostMigrated": true,
       "shutdownOk": true,
-      "wallMs": 2,
+      "wallMs": 5,
       "ok": true
     },
     {
@@ -60,7 +60,7 @@
       "reconnects": 15,
       "hostMigrated": true,
       "shutdownOk": true,
-      "wallMs": 3,
+      "wallMs": 11,
       "ok": true
     }
   ],

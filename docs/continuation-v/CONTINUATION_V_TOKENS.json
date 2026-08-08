@@ -23,27 +23,24 @@
   "revalidation": {
     "BETA": "REVOKED_OR_NOT_EARNED — premature (commercial providers EXTERNAL, no live pilot)",
     "RC": "REVOKED_OR_NOT_EARNED — premature (digital RC ≠ store/HSM/physical RC)",
-    "note": "Continuation V revalidated: product BETA/RC remain false; digital closure tokens earned."
+    "note": "Digital closure tokens earned; product BETA/RC remain false."
   },
-  "event_scale_simulation": {
-    "disclaimer": "In-process event-scale simulation only — not a live event, cloud soak, or SLA claim.",
-    "performers": 8,
-    "tiers": [25, 50, 100, 300],
-    "artifact": "docs/digital-rc/event-scale-metrics.json",
-    "live_event": false
+  "local_ci": {
+    "typecheck": "pass",
+    "test": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "tests_passed": 99
   },
   "network_load": {
     "disclaimer": "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim.",
+    "performers": 8,
+    "tiers": [25, 50, 100, 300],
     "artifacts": [
       "docs/continuation-v/network-load-metrics.json",
       "docs/continuation-v/network-load-cross-process.json"
-    ]
-  },
-  "digital_rc": {
-    "disclaimer": "Digital RC packaging only — not store submission, production HSM, or physical device RC.",
-    "version_name": "0.2.0-digital-rc",
-    "signing_mode": "DEV",
-    "artifacts": "docs/digital-rc/"
+    ],
+    "live_pilot": false
   },
   "gaps_remaining": [
     "commercial_lyrics_music_providers_external",

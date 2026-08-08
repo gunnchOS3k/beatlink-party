@@ -54,8 +54,11 @@ jobs:
           # shared, game-engine, and device-ux before recursive tsc.
           pnpm typecheck
 
-      - name: Test (includes Gate1 core-loop)
+      - name: Test (includes Gate1 core-loop + Continuation V network load)
         run: pnpm test
+        env:
+          # Network load uses real Socket.IO; keep store memory unless Redis service attached.
+          BEATLINK_ROOM_STORE: memory
 
       - name: Gate1 core-loop focused
         run: pnpm vitest run tests/gate1_core_loop.test.ts
@@ -71,5 +74,7 @@ jobs:
           path: |
             gate1/evidence/out/*summary*.json
             gate1/status/gate1_core_loop_status.json
+            docs/continuation-v/network-load*.json
+            docs/continuation-v/CONTINUATION_V_TOKENS.json
           if-no-files-found: ignore
           retention-days: 14
