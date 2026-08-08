@@ -173,7 +173,9 @@ export function gateMusicSource(input: {
       license === 'synthetic_original' ||
       license === 'public_domain' ||
       license === 'royalty_free' ||
-      license === 'licensed_pack'
+      license === 'licensed_pack' ||
+      license === 'creative_commons' ||
+      license === 'creator_owned'
     ) {
       return { ok: true, playbackStatus: 'PLAYABLE_APPROVED' };
     }

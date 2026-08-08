@@ -1,0 +1,212 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Offline legal launch catalog — public-domain / original / Creative Commons / creator-owned only. No ripping, no DRM bypass, no copyrighted commercial lyrics.",
+  "rip_forbidden": true,
+  "drm_bypass_forbidden": true,
+  "songs": [
+    {
+      "id": "launch-pd-tap-grid",
+      "title": "Public Domain Tap Grid",
+      "artist": "BeatLink Public Domain Desk",
+      "durationMs": 36000,
+      "bpm": 120,
+      "beatmapId": "launch-pd-tap-120",
+      "license": "public_domain",
+      "description": "Public-domain beat grid for BeatTap offline launch.",
+      "modes": ["BeatTap"],
+      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "analysisEligible": true,
+      "launchEligible": true,
+      "chart": {
+        "beatmapId": "launch-pd-tap-120",
+        "difficulties": ["beginner", "casual", "pro", "nightmare"],
+        "noteRoles": ["beat_tapper"]
+      },
+      "karaokeMeta": {
+        "prompts": ["Tap the pulse!", "Keep the grid!", "Stay on beat!"],
+        "noRecording": true,
+        "pitchHintHz": null,
+        "language": "en"
+      },
+      "rights": {
+        "license": "public_domain",
+        "attribution": "BeatLink original public-domain arrangement (no copyrighted melody).",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "public_domain",
+        "ccDeedUrl": null
+      }
+    },
+    {
+      "id": "launch-orig-call-mirror",
+      "title": "Call Mirror",
+      "artist": "BeatLink Original Studio",
+      "durationMs": 38000,
+      "bpm": 100,
+      "beatmapId": "launch-orig-call-100",
+      "license": "synthetic_original",
+      "description": "Original synthetic call/response bed for CallAndResponse.",
+      "modes": ["CallAndResponse"],
+      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "analysisEligible": true,
+      "launchEligible": true,
+      "chart": {
+        "beatmapId": "launch-orig-call-100",
+        "difficulties": ["beginner", "casual", "pro", "nightmare"],
+        "noteRoles": ["beat_tapper", "vocalist"]
+      },
+      "karaokeMeta": {
+        "prompts": ["Echo the call!", "Answer the host!", "Mirror the phrase!"],
+        "noRecording": true,
+        "pitchHintHz": 220,
+        "language": "en"
+      },
+      "rights": {
+        "license": "synthetic_original",
+        "attribution": "BeatLink Original Studio — synthetic_original.",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "original",
+        "ccDeedUrl": null
+      }
+    },
+    {
+      "id": "launch-cc-karaoke-warm",
+      "title": "Warm CC Karaoke",
+      "artist": "BeatLink CC Desk",
+      "durationMs": 42000,
+      "bpm": 96,
+      "beatmapId": "launch-cc-karaoke-96",
+      "license": "creative_commons",
+      "description": "CC0-style karaoke warm-up — placeholder prompts only, no commercial lyrics.",
+      "modes": ["KaraokePerformance"],
+      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "analysisEligible": true,
+      "launchEligible": true,
+      "chart": {
+        "beatmapId": "launch-cc-karaoke-96",
+        "difficulties": ["beginner", "casual", "pro", "nightmare"],
+        "noteRoles": ["vocalist"]
+      },
+      "karaokeMeta": {
+        "prompts": ["Sing the warm-up!", "Hold the vowel!", "Soft chorus cue!"],
+        "noRecording": true,
+        "pitchHintHz": 196,
+        "language": "en"
+      },
+      "rights": {
+        "license": "creative_commons",
+        "attribution": "BeatLink CC Desk — CC0 dedication for offline digital launch.",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "creative_commons",
+        "ccDeedUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+      }
+    },
+    {
+      "id": "launch-creator-band-stomp",
+      "title": "Creator Band Stomp",
+      "artist": "BeatLink Creator Attestation Desk",
+      "durationMs": 40000,
+      "bpm": 126,
+      "beatmapId": "launch-creator-band-126",
+      "license": "creator_owned",
+      "description": "Creator-owned four-on-the-floor bed for BandRoles.",
+      "modes": ["BandRoles"],
+      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "analysisEligible": true,
+      "launchEligible": true,
+      "chart": {
+        "beatmapId": "launch-creator-band-126",
+        "difficulties": ["beginner", "casual", "pro", "nightmare"],
+        "noteRoles": ["beat_tapper", "vocalist", "hype_captain"]
+      },
+      "karaokeMeta": {
+        "prompts": ["Band hit!", "Hype the drop!", "Hold the stomp!"],
+        "noRecording": true,
+        "pitchHintHz": 180,
+        "language": "en"
+      },
+      "rights": {
+        "license": "creator_owned",
+        "attribution": "Creator-attested original — BeatLink Creator Attestation Desk.",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "creator_owned",
+        "ccDeedUrl": null
+      }
+    },
+    {
+      "id": "launch-pd-predict-pulse",
+      "title": "Prediction Pulse PD",
+      "artist": "BeatLink Public Domain Desk",
+      "durationMs": 35000,
+      "bpm": 130,
+      "beatmapId": "launch-pd-predict-130",
+      "license": "public_domain",
+      "description": "Public-domain section-change pulse for PredictionTrivia.",
+      "modes": ["PredictionTrivia"],
+      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "analysisEligible": true,
+      "launchEligible": true,
+      "chart": {
+        "beatmapId": "launch-pd-predict-130",
+        "difficulties": ["beginner", "casual", "pro", "nightmare"],
+        "noteRoles": ["hype_captain"]
+      },
+      "karaokeMeta": {
+        "prompts": ["Predict the drop!", "Call the section!", "Vote the fill!"],
+        "noRecording": true,
+        "pitchHintHz": null,
+        "language": "en"
+      },
+      "rights": {
+        "license": "public_domain",
+        "attribution": "BeatLink PD desk — original arrangement, no copyrighted melody.",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "public_domain",
+        "ccDeedUrl": null
+      }
+    },
+    {
+      "id": "launch-cc-multi-party",
+      "title": "CC Multi-Mode Party",
+      "artist": "BeatLink CC Desk",
+      "durationMs": 44000,
+      "bpm": 118,
+      "beatmapId": "launch-cc-multi-118",
+      "license": "creative_commons",
+      "description": "CC-BY sparkle loop covering all five modes for rematch coverage.",
+      "modes": [
+        "BeatTap",
+        "CallAndResponse",
+        "KaraokePerformance",
+        "BandRoles",
+        "PredictionTrivia"
+      ],
+      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "analysisEligible": true,
+      "launchEligible": true,
+      "chart": {
+        "beatmapId": "launch-cc-multi-118",
+        "difficulties": ["beginner", "casual", "pro", "nightmare"],
+        "noteRoles": ["beat_tapper", "vocalist", "hype_captain"]
+      },
+      "karaokeMeta": {
+        "prompts": ["Party sparkle!", "All-mode cue!", "Crowd cheer!"],
+        "noRecording": true,
+        "pitchHintHz": 208,
+        "language": "en"
+      },
+      "rights": {
+        "license": "creative_commons",
+        "attribution": "BeatLink CC Desk — CC-BY 4.0 offline digital launch stub.",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "creative_commons",
+        "ccDeedUrl": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  ]
+}

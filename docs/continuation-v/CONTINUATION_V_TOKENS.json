@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "updated_at_utc": "2026-08-08T20:21:00Z",
+  "updated_at_utc": "2026-08-08T21:09:01.563Z",
   "branch": "cursor/full-product-continuation-v-beatlink-closure",
   "base_sha": "dd9f32dbc550e28138d7764813ad07256bfffd6b",
   "tokens": {
@@ -24,23 +24,6 @@
     "BETA": "REVOKED_OR_NOT_EARNED — premature (commercial providers EXTERNAL, no live pilot)",
     "RC": "REVOKED_OR_NOT_EARNED — premature (digital RC ≠ store/HSM/physical RC)",
     "note": "Digital closure tokens earned; product BETA/RC remain false."
-  },
-  "local_ci": {
-    "typecheck": "pass",
-    "test": "pass",
-    "lint": "pass",
-    "build": "pass",
-    "tests_passed": 99
-  },
-  "network_load": {
-    "disclaimer": "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim.",
-    "performers": 8,
-    "tiers": [25, 50, 100, 300],
-    "artifacts": [
-      "docs/continuation-v/network-load-metrics.json",
-      "docs/continuation-v/network-load-cross-process.json"
-    ],
-    "live_pilot": false
   },
   "gaps_remaining": [
     "commercial_lyrics_music_providers_external",

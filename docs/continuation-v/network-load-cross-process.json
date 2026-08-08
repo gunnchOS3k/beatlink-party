@@ -1,7 +1,7 @@
 {
   "disclaimer": "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim.",
   "mode": "cross_process",
-  "baseUrl": "http://127.0.0.1:3212",
+  "baseUrl": "http://127.0.0.1:3378",
   "performers": 8,
   "tiers": [
     25,
@@ -16,21 +16,23 @@
       "audience": 25,
       "joinRttMs": {
         "p50": 1,
-        "p95": 2,
-        "p99": 2,
+        "p95": 1,
+        "p99": 1,
         "samples": 33
       },
       "influenceRttMs": {
         "p50": 2,
-        "p95": 3,
-        "p99": 3,
-        "samples": 25
+        "p95": 5,
+        "p99": 5,
+        "samples": 16
       },
-      "wallMs": 130,
+      "wallMs": 76,
       "ok": true,
       "notes": [
-        "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim."
-      ]
+        "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim.",
+        "event_loss=0"
+      ],
+      "eventLoss": 0
     },
     {
       "tier": 50,
@@ -39,20 +41,22 @@
       "joinRttMs": {
         "p50": 1,
         "p95": 3,
-        "p99": 4,
+        "p99": 8,
         "samples": 58
       },
       "influenceRttMs": {
-        "p50": 4,
-        "p95": 6,
-        "p99": 7,
-        "samples": 40
+        "p50": 6,
+        "p95": 9,
+        "p99": 9,
+        "samples": 16
       },
-      "wallMs": 288,
+      "wallMs": 186,
       "ok": true,
       "notes": [
-        "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim."
-      ]
+        "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim.",
+        "event_loss=0"
+      ],
+      "eventLoss": 0
     },
     {
       "tier": 100,
@@ -61,42 +65,46 @@
       "joinRttMs": {
         "p50": 2,
         "p95": 7,
-        "p99": 7,
+        "p99": 9,
         "samples": 108
       },
       "influenceRttMs": {
-        "p50": 14,
-        "p95": 22,
-        "p99": 24,
-        "samples": 40
+        "p50": 11,
+        "p95": 50,
+        "p99": 50,
+        "samples": 16
       },
-      "wallMs": 898,
+      "wallMs": 617,
       "ok": true,
       "notes": [
-        "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim."
-      ]
+        "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim.",
+        "event_loss=0"
+      ],
+      "eventLoss": 0
     },
     {
       "tier": 300,
       "performers": 8,
       "audience": 300,
       "joinRttMs": {
-        "p50": 14,
-        "p95": 43,
-        "p99": 47,
+        "p50": 15,
+        "p95": 50,
+        "p99": 63,
         "samples": 308
       },
       "influenceRttMs": {
-        "p50": 93,
-        "p95": 125,
-        "p99": 130,
-        "samples": 40
+        "p50": 110,
+        "p95": 499,
+        "p99": 499,
+        "samples": 16
       },
-      "wallMs": 9285,
+      "wallMs": 9032,
       "ok": true,
       "notes": [
-        "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim."
-      ]
+        "Cross-process localhost WebSocket load — DEV/local measurement only; not a live pilot, venue Wi-Fi, or SLA claim.",
+        "event_loss=0"
+      ],
+      "eventLoss": 0
     }
   ],
   "passed": true,

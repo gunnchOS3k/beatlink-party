@@ -13,9 +13,23 @@ const beatmapCache = new Map<string, Beatmap>();
 
 export function loadCatalog(): SongCatalogEntry[] {
   if (catalog.length === 0) {
-    const raw = readFileSync(join(contentRoot, 'songs/approved-demo-catalog.json'), 'utf-8');
-    const parsed = JSON.parse(raw) as { songs: SongCatalogEntry[] };
-    catalog = parsed.songs;
+    const demoRaw = readFileSync(join(contentRoot, 'songs/approved-demo-catalog.json'), 'utf-8');
+    const demo = JSON.parse(demoRaw) as { songs: SongCatalogEntry[] };
+    let launch: SongCatalogEntry[] = [];
+    try {
+      const launchRaw = readFileSync(
+        join(contentRoot, 'songs/offline-launch-catalog.json'),
+        'utf-8',
+      );
+      launch = (JSON.parse(launchRaw) as { songs: SongCatalogEntry[] }).songs ?? [];
+    } catch {
+      launch = [];
+    }
+    const byId = new Map<string, SongCatalogEntry>();
+    for (const song of [...demo.songs, ...launch]) {
+      byId.set(song.id, song);
+    }
+    catalog = [...byId.values()];
   }
   return catalog;
 }

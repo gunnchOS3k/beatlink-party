@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0.0",
+  "product": "beatlink-party",
+  "updated_at_utc": "2026-08-08T21:09:42.141Z",
+  "branch": "cursor/full-product-continuation-vi-beta-rc",
+  "base_sha": "c8a2de8c51929d776eea7b219f6015e787e0f174",
+  "criteria": [
+    {
+      "id": "five_mode_depth",
+      "description": "Tutorial/difficulty/scoring/a11y/teams/results/replay for all five modes",
+      "complete": true,
+      "path": "packages/game-engine/src/modes/index.ts",
+      "test": "tests/beta_rc.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "offline_launch_catalog",
+      "description": "PD/original/CC/creator-owned catalog covering all five modes",
+      "complete": true,
+      "path": "content/songs/offline-launch-catalog.json",
+      "test": "tests/continuation_vi.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "rights_no_rip_no_drm",
+      "description": "Rip/DRM bypass blocked; analysis only on cleared paths",
+      "complete": true,
+      "path": "packages/game-engine/src/contentPaths.ts",
+      "test": "tests/continuation_vi.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "redis_durable_ci",
+      "description": "Real Redis create/join/restart/TTL/migration/reconnect/concurrent/cleanup",
+      "complete": true,
+      "path": "apps/server/src/rooms/store/redisStore.ts",
+      "test": "tests/redis_ci.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "redis_degraded_memory",
+      "description": "No-Redis degraded path uses in-memory store",
+      "complete": true,
+      "path": "apps/server/src/rooms/store/index.ts",
+      "test": "tests/redis_ci.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "network_load_slos",
+      "description": "Repeated trials; p50/p95/p99 + CPU/RSS/GC/event loss within digital SLOs",
+      "complete": true,
+      "path": "packages/game-engine/src/networkLoadSlo.ts",
+      "test": "tests/continuation_vi.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "digital_rc_package_sbom",
+      "description": "DEV package + SBOM digest (not HSM/store)",
+      "complete": true,
+      "path": "packages/game-engine/src/digitalRc.ts",
+      "test": "tests/continuation_vi.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "digital_rc_update_rollback",
+      "description": "Update/rollback manifests for digital bundle",
+      "complete": true,
+      "path": "docs/digital-rc/",
+      "test": "scripts/emit-digital-rc.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "reconnect_host_migration",
+      "description": "Host migration + player reconnect",
+      "complete": true,
+      "path": "apps/server/src/rooms/RoomManager.ts",
+      "test": "tests/continuation_vi.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "crash_ttl_cleanup",
+      "description": "Expired room purge / cleanup",
+      "complete": true,
+      "path": "apps/server/src/rooms/RoomManager.ts",
+      "test": "tests/redis_ci.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "privacy_mic_no_record",
+      "description": "Mic default no-recording",
+      "complete": true,
+      "path": "packages/game-engine/src/liveMicPipeline.ts",
+      "test": "tests/continuation_v.test.ts",
+      "blocker": null
+    },
+    {
+      "id": "clean_install_verify",
+      "description": "pnpm install --frozen-lockfile + verify scripts (CI)",
+      "complete": true,
+      "path": "package.json",
+      "test": ".github/workflows/ci.yml",
+      "blocker": null
+    },
+    {
+      "id": "product_beta_launch",
+      "description": "Product BETA token (commercial providers + live pilot)",
+      "complete": false,
+      "path": "docs/BETA_RC_TOKENS.json",
+      "test": "tests/continuation_vi.test.ts",
+      "blocker": "commercial providers EXTERNAL; no live pilot"
+    },
+    {
+      "id": "product_rc_store_hsm",
+      "description": "Product RC token (store/HSM/physical)",
+      "complete": false,
+      "path": "docs/BETA_RC_TOKENS.json",
+      "test": "tests/continuation_vi.test.ts",
+      "blocker": "digital RC ≠ store/HSM/physical RC"
+    }
+  ],
+  "summary": {
+    "total": 14,
+    "complete": 12,
+    "incomplete": 2,
+    "blockers": [
+      "commercial providers EXTERNAL; no live pilot",
+      "digital RC ≠ store/HSM/physical RC"
+    ]
+  },
+  "tokens": {
+    "BEATLINK_BETA_CONTENT_COMPLETE_DIGITAL": true,
+    "BEATLINK_DIGITAL_RC_READY": true,
+    "BETA": false,
+    "RC": false
+  }
+}

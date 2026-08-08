@@ -23,3 +23,6 @@ export * from './eventLifecycle.js';
 export * from './contentPaths.js';
 export * from './digitalRc.js';
 export * from './providers.js';
+export * from './launchCatalog.js';
+export * from './networkLoadSlo.js';
+export * from './betaGapAudit.js';

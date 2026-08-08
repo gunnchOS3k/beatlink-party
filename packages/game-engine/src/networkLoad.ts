@@ -24,6 +24,8 @@ export interface NetworkLoadTierMetrics {
   wallMs: number;
   ok: boolean;
   notes: string[];
+  /** Failed join/influence events (digital SLO — must stay 0). */
+  eventLoss?: number;
 }
 
 export interface NetworkLoadReport {

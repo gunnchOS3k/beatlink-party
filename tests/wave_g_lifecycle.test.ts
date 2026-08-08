@@ -157,6 +157,8 @@ describe('catalog floor', () => {
         'public_domain',
         'royalty_free',
         'licensed_pack',
+        'creative_commons',
+        'creator_owned',
       ]).toContain(song.license);
     }
   });
