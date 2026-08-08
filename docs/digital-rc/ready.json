@@ -1,0 +1,8 @@
+{
+  "ready": true,
+  "gaps": [],
+  "token": "BEATLINK_DIGITAL_RC_READY",
+  "disclaimer": "Digital RC packaging only — not store submission, production HSM, or physical device RC.",
+  "packageDigestSha256": "c8ee65adc138828c298c9c3b39c70aff869b2d4772c510ed321c50bb9678843d",
+  "builtAtUtc": "2026-08-08T19:00:00.000Z"
+}

@@ -1,0 +1,69 @@
+{
+  "disclaimer": "In-process event-scale simulation only — not a live event, cloud soak, or SLA claim.",
+  "token": "BEATLINK_EVENT_SCALE_SIM_PASS",
+  "performerCount": 8,
+  "metrics": [
+    {
+      "tier": 25,
+      "performersJoined": 8,
+      "audienceJoined": 25,
+      "joinLatencyMsP50": 0,
+      "joinLatencyMsP95": 0,
+      "influenceAccepted": 25,
+      "influenceRejected": 0,
+      "disconnects": 2,
+      "reconnects": 2,
+      "hostMigrated": true,
+      "shutdownOk": true,
+      "wallMs": 0,
+      "ok": true
+    },
+    {
+      "tier": 50,
+      "performersJoined": 8,
+      "audienceJoined": 50,
+      "joinLatencyMsP50": 0,
+      "joinLatencyMsP95": 0,
+      "influenceAccepted": 40,
+      "influenceRejected": 0,
+      "disconnects": 3,
+      "reconnects": 3,
+      "hostMigrated": true,
+      "shutdownOk": true,
+      "wallMs": 1,
+      "ok": true
+    },
+    {
+      "tier": 100,
+      "performersJoined": 8,
+      "audienceJoined": 100,
+      "joinLatencyMsP50": 0,
+      "joinLatencyMsP95": 0,
+      "influenceAccepted": 40,
+      "influenceRejected": 0,
+      "disconnects": 5,
+      "reconnects": 5,
+      "hostMigrated": true,
+      "shutdownOk": true,
+      "wallMs": 2,
+      "ok": true
+    },
+    {
+      "tier": 300,
+      "performersJoined": 8,
+      "audienceJoined": 300,
+      "joinLatencyMsP50": 0,
+      "joinLatencyMsP95": 0,
+      "influenceAccepted": 40,
+      "influenceRejected": 0,
+      "disconnects": 15,
+      "reconnects": 15,
+      "hostMigrated": true,
+      "shutdownOk": true,
+      "wallMs": 3,
+      "ok": true
+    }
+  ],
+  "liveEvent": false,
+  "simulation": true
+}
