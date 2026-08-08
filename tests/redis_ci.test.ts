@@ -76,7 +76,7 @@ describe('Continuation VI — real Redis durable rooms', () => {
 
     b.shutdownRoom(room.code, { hostToken: room.hostToken });
     await store2.flush();
-    await store2.close();
+    await store2.close({ quit: false });
   });
 
   it('TTL expiry + purge cleanup', async () => {
@@ -92,7 +92,7 @@ describe('Continuation VI — real Redis durable rooms', () => {
     const store2 = new RedisRoomStore(redis!);
     await store2.hydrate();
     expect(store2.get(room.code)).toBeNull();
-    await store2.close();
+    await store2.close({ quit: false });
   });
 
   it('host migration + player/audience reconnect', async () => {
