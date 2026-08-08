@@ -23,13 +23,13 @@ describe('RoomManager', () => {
     expect(result!.room.players).toHaveLength(1);
   });
 
-  it('rejects join when room is full (6 players)', () => {
+  it('rejects join when room is full (8 performers per ADR)', () => {
     const room = manager.createRoom('host-1');
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       manager.joinRoom(room.code, `socket-${i}`, `Player${i}`);
     }
-    const seventh = manager.joinRoom(room.code, 'socket-7', 'Overflow');
-    expect(seventh).toBeNull();
+    const ninth = manager.joinRoom(room.code, 'socket-9', 'Overflow');
+    expect(ninth).toBeNull();
   });
 
   it('transitions song_select → calibrating → countdown → playing', () => {

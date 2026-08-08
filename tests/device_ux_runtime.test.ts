@@ -53,14 +53,20 @@ describe('device role runtime', () => {
 
 describe('accessibility helpers', () => {
   it('maps settings to CSS classes', () => {
-    expect(accessibilityClassList(DEFAULT_ACCESSIBILITY)).toEqual([]);
+    expect(accessibilityClassList(DEFAULT_ACCESSIBILITY)).toEqual([
+      'a11y-captions',
+      'a11y-screen-reader',
+    ]);
     expect(
       accessibilityClassList({
         reduceMotion: true,
         highContrast: true,
         largerHitTargets: true,
+        captions: false,
+        colorBlindSafe: true,
+        screenReaderHints: false,
       }),
-    ).toEqual(['a11y-reduce-motion', 'a11y-high-contrast', 'a11y-large-targets']);
+    ).toEqual(['a11y-reduce-motion', 'a11y-high-contrast', 'a11y-large-targets', 'a11y-color-blind']);
   });
 });
 

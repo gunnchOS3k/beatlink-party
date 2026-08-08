@@ -13,6 +13,9 @@ export function loadAccessibilitySettings(): AccessibilitySettings {
       reduceMotion: Boolean(parsed.reduceMotion),
       highContrast: Boolean(parsed.highContrast),
       largerHitTargets: Boolean(parsed.largerHitTargets),
+      captions: parsed.captions ?? DEFAULT_ACCESSIBILITY.captions,
+      colorBlindSafe: Boolean(parsed.colorBlindSafe),
+      screenReaderHints: parsed.screenReaderHints ?? DEFAULT_ACCESSIBILITY.screenReaderHints,
     };
   } catch {
     return { ...DEFAULT_ACCESSIBILITY };
@@ -30,6 +33,9 @@ export function accessibilityClassList(settings: AccessibilitySettings): string[
   if (settings.reduceMotion) classes.push('a11y-reduce-motion');
   if (settings.highContrast) classes.push('a11y-high-contrast');
   if (settings.largerHitTargets) classes.push('a11y-large-targets');
+  if (settings.captions) classes.push('a11y-captions');
+  if (settings.colorBlindSafe) classes.push('a11y-color-blind');
+  if (settings.screenReaderHints) classes.push('a11y-screen-reader');
   return classes;
 }
 
@@ -40,10 +46,21 @@ export function applyAccessibilityToDocument(settings: AccessibilitySettings): v
     'a11y-reduce-motion',
     'a11y-high-contrast',
     'a11y-large-targets',
+    'a11y-captions',
+    'a11y-color-blind',
+    'a11y-screen-reader',
   ]) {
     root.classList.remove(cls);
   }
   for (const cls of accessibilityClassList(settings)) {
     root.classList.add(cls);
   }
+  root.dataset.a11yCaptions = settings.captions ? '1' : '0';
+  root.dataset.a11yScreenReader = settings.screenReaderHints ? '1' : '0';
+}
+
+/** Localized phase hint for aria-live regions (caller supplies translated string). */
+export function phaseAnnouncement(phaseLabel: string, enabled: boolean): string | null {
+  if (!enabled) return null;
+  return phaseLabel;
 }
