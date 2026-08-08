@@ -64,6 +64,9 @@ export type DeviceRoleId =
   | 'edge_io_rings'
   | 'docked';
 
+/** Competitive team seat for versus / band split scoring. */
+export type TeamId = 'A' | 'B' | 'solo';
+
 export interface Player {
   id: string;
   name: string;
@@ -77,6 +80,8 @@ export interface Player {
   color: string;
   /** Combo multiplier derived from streak (exposed to clients). */
   combo: number;
+  /** Team assignment — defaults to solo until host assigns A/B. */
+  teamId: TeamId;
 }
 
 /** Spectator seat — cannot score as a player; moderated influence only. */
@@ -129,8 +134,29 @@ export interface RoomState {
   rematchRound: number;
   /** Structured join payload for QR / deep-link (no third-party dependency). */
   joinQr: RoomJoinQrPayload | null;
+  /** Room privacy posture — controls telemetry retention + name visibility. */
+  privacy: RoomPrivacySettings;
+  /** Team scoreboard when players are assigned to A/B. */
+  teamScores: TeamScoreboard;
   createdAt: number;
   expiresAt: number;
+}
+
+export interface RoomPrivacySettings {
+  /** When true, display names are redacted in public broadcasts. */
+  redactDisplayNames: boolean;
+  /** Allow session telemetry sinks (still never includes tokens/raw URLs). */
+  telemetryEnabled: boolean;
+  /** Soft retention hint for local buffers (ms). */
+  telemetryRetentionMs: number;
+  /** Audience must stay sandboxed until host unsandboxes (anti-grief default). */
+  audienceSandboxByDefault: boolean;
+}
+
+export interface TeamScoreboard {
+  A: number;
+  B: number;
+  solo: number;
 }
 
 /** Offline-friendly QR payload — clients encode locally; server never fetches remote QR APIs. */
@@ -255,6 +281,12 @@ export interface AccessibilitySettings {
   reduceMotion: boolean;
   highContrast: boolean;
   largerHitTargets: boolean;
+  /** Prefer captions / on-screen text over audio-only cues. */
+  captions: boolean;
+  /** Soften red/green grade colors for color-vision deficiency. */
+  colorBlindSafe: boolean;
+  /** Announce critical phase changes via aria-live friendly copy. */
+  screenReaderHints: boolean;
 }
 
 export type TelemetryEventName =
@@ -270,7 +302,12 @@ export type TelemetryEventName =
   | 'room_shutdown'
   | 'mode_selected'
   | 'rights_attestation'
-  | 'rights_takedown';
+  | 'rights_takedown'
+  | 'team_assigned'
+  | 'privacy_updated'
+  | 'calibration_submitted'
+  | 'moderation_action'
+  | 'load_harness';
 
 /** Session telemetry — no PII (no names, tokens, or raw URLs). */
 export interface TelemetryEvent {
@@ -291,10 +328,13 @@ export interface Award {
 export interface GameResults {
   teamScore: number;
   crowdMeter: number;
+  teamScores: TeamScoreboard;
+  winningTeam: TeamId | 'tie' | null;
   players: Array<{
     id: string;
     name: string;
     role: PlayerRole | null;
+    teamId: TeamId;
     score: number;
     accuracy: number;
     maxStreak: number;
@@ -383,7 +423,24 @@ export const DEFAULT_ACCESSIBILITY: AccessibilitySettings = {
   reduceMotion: false,
   highContrast: false,
   largerHitTargets: false,
+  captions: true,
+  colorBlindSafe: false,
+  screenReaderHints: true,
 };
+
+export const DEFAULT_ROOM_PRIVACY: RoomPrivacySettings = {
+  redactDisplayNames: false,
+  telemetryEnabled: true,
+  telemetryRetentionMs: 15 * 60 * 1000,
+  audienceSandboxByDefault: false,
+};
+
+export const EMPTY_TEAM_SCORES: TeamScoreboard = { A: 0, B: 0, solo: 0 };
+
+/** ADR-GAME-BL-001 performer floor/ceiling for Alpha digital party loop. */
+export const MIN_PERFORMERS = 2;
+export const MAX_PERFORMERS = 8;
+export const MAX_AUDIENCE_SEATS = 50;
 
 /** Combo multiplier steps from streak length. */
 export function comboFromStreak(streak: number): number {

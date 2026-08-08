@@ -344,6 +344,66 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
       },
     );
 
+    socket.on(
+      'game.calibration_sample',
+      (data: {
+        code: string;
+        expectedMs: number;
+        tappedMs: number;
+        hostToken?: string;
+      }) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) return;
+        const room = roomManager.recordCalibrationSample(code, {
+          expectedMs: data.expectedMs,
+          tappedMs: data.tappedMs,
+        });
+        if (room) io.to(code).emit('room.state', room);
+      },
+    );
+
+    socket.on(
+      'room.set_team',
+      (data: {
+        code: string;
+        playerId: string;
+        teamId: string;
+        hostToken?: string;
+      }) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) return;
+        const room = roomManager.setPlayerTeam(code, data.playerId, data.teamId);
+        if (room) io.to(code).emit('room.state', room);
+      },
+    );
+
+    socket.on('room.auto_teams', (data: { code: string; hostToken?: string }) => {
+      const code = data.code.toUpperCase();
+      if (!requireHost(code, socket.id, data.hostToken)) return;
+      const room = roomManager.autoAssignTeams(code);
+      if (room) io.to(code).emit('room.state', room);
+    });
+
+    socket.on(
+      'room.update_privacy',
+      (data: {
+        code: string;
+        hostToken?: string;
+        redactDisplayNames?: boolean;
+        telemetryEnabled?: boolean;
+        audienceSandboxByDefault?: boolean;
+      }) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) return;
+        const room = roomManager.updatePrivacy(code, {
+          redactDisplayNames: data.redactDisplayNames,
+          telemetryEnabled: data.telemetryEnabled,
+          audienceSandboxByDefault: data.audienceSandboxByDefault,
+        });
+        if (room) io.to(code).emit('room.state', room);
+      },
+    );
+
     socket.on('game.start_countdown', (data: { code: string; hostToken?: string }) => {
       const code = data.code.toUpperCase();
       if (!requireHost(code, socket.id, data.hostToken)) return;

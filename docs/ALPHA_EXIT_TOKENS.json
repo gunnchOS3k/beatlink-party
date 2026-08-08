@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at_utc": "2026-08-08T01:24:00Z",
+  "branch": "cursor/full-product-beatlink-alpha-exit",
+  "base_repair_sha": "173c890f9163fae166b8d7bcc03e075b160b4f6c",
+  "tokens": {
+    "BEATLINK_ALPHA_EXIT_DIGITAL_PASS": true,
+    "BEATLINK_LOAD_HARNESS_SCAFFOLD_PASS": true,
+    "FULL_PRODUCT_CONTENT_COMPLETE": false,
+    "FULL_PRODUCT_FEATURE_COMPLETE": false,
+    "BETA": false,
+    "RC": false,
+    "LAUNCH": false
+  },
+  "local_ci": {
+    "typecheck": "pass",
+    "test": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "tests_passed": 79
+  },
+  "gaps_remaining": [
+    "in_memory_rooms_no_redis",
+    "no_live_getUserMedia_pitch",
+    "no_licensed_lyrics_or_platform_sdks",
+    "i18n_seed_catalogs_not_full_ui",
+    "load_harness_scaffold_not_sla",
+    "origin_main_red_until_pr10_merge"
+  ]
+}

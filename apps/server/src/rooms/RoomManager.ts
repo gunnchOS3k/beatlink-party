@@ -11,8 +11,10 @@ import type {
   Player,
   PlayerInputEvent,
   RoomPhase,
+  RoomPrivacySettings,
   RoomState,
   ScoreEvent,
+  TeamId,
 } from '@beatlink/shared';
 import {
   PLAYER_COLORS,
@@ -24,32 +26,43 @@ import {
   AUDIENCE_CROWD_METER_CEILING,
   DEFAULT_DIFFICULTY,
   DEFAULT_GAME_MODE,
+  EMPTY_TEAM_SCORES,
+  MAX_AUDIENCE_SEATS,
+  MAX_PERFORMERS,
   generateRoomCode,
   sanitizePlayerName,
   HYPE_COOLDOWN_MS,
   comboFromStreak,
+  createRoomPrivacy,
   emitTelemetry,
+  isTeamId,
+  publicPlayerView,
 } from '@beatlink/shared';
 import {
   assertTransition,
   buildRoomJoinQrPayload,
   calibratedGameTimeMs,
+  clampCalibrationOffset,
   computeAwards,
+  computeCalibrationOffset,
   findActiveVocalPrompt,
   findNearestHypeEvent,
   findNearestNote,
   isGameModeId,
+  recomputeTeamScores,
   scoreBeatTap,
   scoreForMode,
   scoreHypeAction,
   scoreVocalPhrase,
   updatePlayerStats,
+  winningTeam,
+  type CalibrationSample,
 } from '@beatlink/game-engine';
 import { getBeatmapForSong } from '../beatmaps/store.js';
 
 const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
-const MAX_PLAYERS = 6;
-const MAX_AUDIENCE = 20;
+const MAX_PLAYERS = MAX_PERFORMERS;
+const MAX_AUDIENCE = MAX_AUDIENCE_SEATS;
 
 interface InternalRoom extends RoomState {
   beatmap: Beatmap | null;
@@ -60,6 +73,7 @@ interface InternalRoom extends RoomState {
   scoredTargets: Set<string>;
   /** Public web origin used when minting join QR payloads. */
   publicOrigin: string;
+  calibrationSamples: CalibrationSample[];
 }
 
 export class RoomManager {
@@ -72,7 +86,12 @@ export class RoomManager {
 
   createRoom(
     hostSocketId: string,
-    options: { publicOrigin?: string; gameMode?: GameModeId; difficulty?: DifficultyId } = {},
+    options: {
+      publicOrigin?: string;
+      gameMode?: GameModeId;
+      difficulty?: DifficultyId;
+      privacy?: Partial<RoomPrivacySettings>;
+    } = {},
   ): RoomState & { hostToken: string } {
     let code = generateRoomCode();
     while (this.rooms.has(code)) {
@@ -81,6 +100,7 @@ export class RoomManager {
     const now = Date.now();
     const publicOrigin = options.publicOrigin ?? process.env.PUBLIC_ORIGIN ?? 'http://localhost:5173';
     const expiresAt = now + ROOM_TTL_MS;
+    const privacy = createRoomPrivacy(options.privacy ?? {});
     const room: InternalRoom = {
       code,
       phase: 'lobby',
@@ -100,6 +120,8 @@ export class RoomManager {
       crowdMeter: 50,
       rematchRound: 0,
       joinQr: buildRoomJoinQrPayload({ code, origin: publicOrigin, expiresAt }),
+      privacy,
+      teamScores: { ...EMPTY_TEAM_SCORES },
       createdAt: now,
       expiresAt,
       beatmap: null,
@@ -109,6 +131,7 @@ export class RoomManager {
       audienceTokens: new Map(),
       scoredTargets: new Set(),
       publicOrigin,
+      calibrationSamples: [],
     };
     this.rooms.set(code, room);
     this.socketToHostRoom.set(hostSocketId, code);
@@ -135,6 +158,7 @@ export class RoomManager {
       audienceTokens: _audienceTokens,
       scoredTargets: _scoredTargets,
       publicOrigin: _publicOrigin,
+      calibrationSamples: _calibrationSamples,
       ...state
     } = room;
     void _beatmap;
@@ -144,7 +168,12 @@ export class RoomManager {
     void _audienceTokens;
     void _scoredTargets;
     void _publicOrigin;
-    return state;
+    void _calibrationSamples;
+    if (!room.privacy.redactDisplayNames) return state;
+    return {
+      ...state,
+      players: room.players.map((p, i) => publicPlayerView(p, room.privacy, i)),
+    };
   }
 
   getHostToken(code: string, socketId: string): string | null {
@@ -215,6 +244,7 @@ export class RoomManager {
       streak: 0,
       maxStreak: 0,
       combo: 1,
+      teamId: 'solo',
       color: PLAYER_COLORS[room.players.length % PLAYER_COLORS.length],
     };
     room.players.push(player);
@@ -254,7 +284,7 @@ export class RoomManager {
       name: sanitizePlayerName(name) || 'Spectator',
       connected: true,
       muted: false,
-      sandboxed: false,
+      sandboxed: room.privacy.audienceSandboxByDefault,
       influenceCount: 0,
       lastInfluenceAt: null,
       color: AUDIENCE_COLORS[room.audience.length % AUDIENCE_COLORS.length],
@@ -390,6 +420,7 @@ export class RoomManager {
     const member = room.audience.find((a) => a.id === audienceId);
     if (!member) return null;
     member.muted = muted;
+    emitTelemetry('moderation_action', room.code, { action: 'mute', muted });
     return this.stripInternal(room);
   }
 
@@ -403,6 +434,68 @@ export class RoomManager {
     const member = room.audience.find((a) => a.id === audienceId);
     if (!member) return null;
     member.sandboxed = sandboxed;
+    emitTelemetry('moderation_action', room.code, { action: 'sandbox', sandboxed });
+    return this.stripInternal(room);
+  }
+
+  /** Assign player to team A / B / solo (lobby / results / song_select). */
+  setPlayerTeam(code: string, playerId: string, teamId: TeamId | string): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select' && room.phase !== 'results')) {
+      return null;
+    }
+    if (!isTeamId(teamId)) return null;
+    const player = room.players.find((p) => p.id === playerId);
+    if (!player) return null;
+    player.teamId = teamId;
+    room.teamScores = recomputeTeamScores(room.players);
+    emitTelemetry('team_assigned', room.code, { teamId });
+    return this.stripInternal(room);
+  }
+
+  /** Auto-split connected players into A/B. */
+  autoAssignTeams(code: string): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select' && room.phase !== 'results')) {
+      return null;
+    }
+    room.players.forEach((p, i) => {
+      p.teamId = i % 2 === 0 ? 'A' : 'B';
+    });
+    room.teamScores = recomputeTeamScores(room.players);
+    emitTelemetry('team_assigned', room.code, { auto: true });
+    return this.stripInternal(room);
+  }
+
+  updatePrivacy(
+    code: string,
+    patch: Partial<RoomPrivacySettings>,
+  ): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select' && room.phase !== 'results')) {
+      return null;
+    }
+    const next = { ...room.privacy };
+    for (const [key, value] of Object.entries(patch) as Array<
+      [keyof RoomPrivacySettings, RoomPrivacySettings[keyof RoomPrivacySettings] | undefined]
+    >) {
+      if (value !== undefined) {
+        (next as Record<string, unknown>)[key] = value;
+      }
+    }
+    room.privacy = next;
+    emitTelemetry('privacy_updated', room.code, {
+      redactDisplayNames: room.privacy.redactDisplayNames,
+      telemetryEnabled: room.privacy.telemetryEnabled,
+    });
+    return this.stripInternal(room);
+  }
+
+  /** Test / harness hook — force phase without full transition checks. */
+  forcePhase(code: string, phase: RoomPhase): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    room.phase = phase;
     return this.stripInternal(room);
   }
 
@@ -677,13 +770,57 @@ export class RoomManager {
     }
     assertTransition(room.phase, 'calibrating');
     room.phase = 'calibrating';
+    room.calibrationSamples = [];
     return this.stripInternal(room);
   }
 
-  submitCalibration(code: string, offsetMs: number): RoomState | null {
+  /** Record a single calibration tap sample (expected vs tapped). */
+  recordCalibrationSample(
+    code: string,
+    sample: CalibrationSample,
+  ): RoomState | null {
     const room = this.getRoom(code);
     if (!room || room.phase !== 'calibrating') return null;
-    const clamped = Math.max(-500, Math.min(500, Math.round(offsetMs)));
+    room.calibrationSamples.push(sample);
+    return this.stripInternal(room);
+  }
+
+  submitCalibration(code: string, offsetMs?: number): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || room.phase !== 'calibrating') return null;
+
+    let clamped: number;
+    if (typeof offsetMs === 'number' && Number.isFinite(offsetMs)) {
+      clamped = clampCalibrationOffset(offsetMs);
+    } else if (room.calibrationSamples.length > 0) {
+      const computed = computeCalibrationOffset(room.calibrationSamples);
+      if (!computed.accepted) {
+        // Still apply best-effort offset so hosts can proceed; confidence is in telemetry.
+        clamped = computed.offsetMs;
+        emitTelemetry('calibration_submitted', room.code, {
+          accepted: false,
+          reason: computed.reason ?? 'rejected',
+          confidence: computed.confidence,
+          sampleCount: computed.sampleCount,
+        });
+      } else {
+        clamped = computed.offsetMs;
+        emitTelemetry('calibration_submitted', room.code, {
+          accepted: true,
+          confidence: computed.confidence,
+          sampleCount: computed.sampleCount,
+          stdDevMs: Math.round(computed.stdDevMs),
+        });
+      }
+    } else {
+      clamped = 0;
+      emitTelemetry('calibration_submitted', room.code, {
+        accepted: true,
+        confidence: 0.2,
+        sampleCount: 0,
+      });
+    }
+
     room.calibrationOffsetMs = clamped;
     if (room.beatmap) {
       room.beatmap = {
@@ -720,6 +857,7 @@ export class RoomManager {
       a.lastInfluenceAt = null;
     }
     room.teamScore = 0;
+    room.teamScores = { ...EMPTY_TEAM_SCORES };
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
@@ -792,6 +930,7 @@ export class RoomManager {
         };
         Object.assign(player, updatePlayerStats(player, result));
         room.teamScore += result.points;
+        room.teamScores = recomputeTeamScores(room.players);
         room.crowdMeter = Math.min(100, Math.max(0, room.crowdMeter + result.crowdBoost));
         scoreEvent = {
           playerId: player.id,
@@ -843,6 +982,7 @@ export class RoomManager {
         };
         Object.assign(player, updatePlayerStats(player, result));
         room.teamScore += result.points;
+        room.teamScores = recomputeTeamScores(room.players);
         room.crowdMeter = Math.min(100, room.crowdMeter + result.crowdBoost);
         scoreEvent = {
           playerId: player.id,
@@ -863,6 +1003,7 @@ export class RoomManager {
       const result = scoreHypeAction(gameTimeMs, targetTime, player.streak);
       Object.assign(player, updatePlayerStats(player, result));
       room.teamScore += result.points;
+      room.teamScores = recomputeTeamScores(room.players);
       room.crowdMeter = Math.min(100, room.crowdMeter + result.crowdBoost);
       room.hypeCooldowns.set(player.id, Date.now());
       scoreEvent = {
@@ -894,14 +1035,18 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     room.phase = 'results';
+    room.teamScores = recomputeTeamScores(room.players);
     const awards = computeAwards(room.players);
     return {
       teamScore: room.teamScore,
       crowdMeter: room.crowdMeter,
+      teamScores: { ...room.teamScores },
+      winningTeam: winningTeam(room.teamScores),
       players: room.players.map((p) => ({
         id: p.id,
         name: p.name,
         role: p.role,
+        teamId: p.teamId,
         score: p.score,
         accuracy: p.accuracy,
         maxStreak: p.maxStreak,
@@ -921,6 +1066,7 @@ export class RoomManager {
     room.pastedLinkUrl = null;
     room.linkResolveResult = null;
     room.calibrationOffsetMs = 0;
+    room.calibrationSamples = [];
     room.selectedSongId = null;
     room.beatmap = null;
     for (const p of room.players) {
@@ -936,6 +1082,7 @@ export class RoomManager {
       a.lastInfluenceAt = null;
     }
     room.teamScore = 0;
+    room.teamScores = { ...EMPTY_TEAM_SCORES };
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
