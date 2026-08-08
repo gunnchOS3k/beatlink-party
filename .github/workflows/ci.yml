@@ -50,8 +50,8 @@ jobs:
 
       - name: Typecheck
         run: |
-          # Package exports resolve via dist types; `pnpm typecheck` runs
-          # build:libs (shared, game-engine, device-ux) then recursive tsc.
+          # Package exports resolve via dist types; `pnpm typecheck` builds
+          # shared, game-engine, and device-ux before recursive tsc.
           pnpm typecheck
 
       - name: Test (includes Gate1 core-loop)
