@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "continuation": "VII",
+  "updated_at_utc": "2026-08-09T17:00:00.000Z",
+  "base_sha": "9948646870cd2caa9c85ae2796b40292d7343d88",
+  "tokens": {
+    "BEATLINK_ALPHA_EXIT_DIGITAL_PASS": true,
+    "BEATLINK_LOAD_HARNESS_SCAFFOLD_PASS": true,
+    "BEATLINK_BETA_CONTENT_COMPLETE_DIGITAL": true,
+    "BEATLINK_EVENT_LIFECYCLE_STRESS_PASS": true,
+    "BEATLINK_EVENT_SCALE_SIM_PASS": true,
+    "BEATLINK_DIGITAL_RC_READY": true,
+    "BEATLINK_REDIS_DURABLE_ROOMS_PASS": true,
+    "BEATLINK_LIVE_MIC_PIPELINE_PASS": true,
+    "BEATLINK_PROVIDER_INTERFACE_PASS": true,
+    "BEATLINK_NETWORK_LOAD_PASS": true,
+    "FULL_PRODUCT_CONTENT_COMPLETE": false,
+    "FULL_PRODUCT_FEATURE_COMPLETE": false,
+    "BETA": false,
+    "RC": false,
+    "LAUNCH": false
+  },
+  "axes": {
+    "digital_beta_rc": "EARNED — see BEATLINK_*_DIGITAL / DIGITAL_RC_READY",
+    "commercial_beta_rc": "NOT_EARNED — BETA/RC/LAUNCH remain false"
+  },
+  "gunnchos_packaging": "docs/continuation-vii/GUNNCHOS_PACKAGING.json"
+}

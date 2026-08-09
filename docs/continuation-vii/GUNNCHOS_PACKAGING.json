@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "continuation": "VII",
+  "generated_at_utc": "2026-08-09T17:00:00.000Z",
+  "base_main_sha": "9948646870cd2caa9c85ae2796b40292d7343d88",
+  "axes": {
+    "digital": {
+      "BEATLINK_BETA_CONTENT_COMPLETE_DIGITAL": true,
+      "BEATLINK_DIGITAL_RC_READY": true,
+      "note": "Digitally executable packaging + event depth"
+    },
+    "commercial_product": {
+      "BETA": false,
+      "RC": false,
+      "LAUNCH": false,
+      "note": "Remain false — digital RC ≠ store/HSM/physical/commercial BETA"
+    }
+  },
+  "gunnchos_packaging": {
+    "device_os_game_id": "beatlink-party-web",
+    "device_os_entry": "games/beatlink-party-web/index.html",
+    "digital_rc_ready_path": "docs/digital-rc/ready.json",
+    "package_manifest_path": "docs/digital-rc/package-manifest.json",
+    "production_keys_used": false,
+    "realm": "DEV",
+    "claim_boundary": "Digital first-party packaging bridge only — not app store certification."
+  },
+  "ci_reproof": {
+    "main_tip": "9948646870cd2caa9c85ae2796b40292d7343d88",
+    "expected_checks": ["build-and-test", "gate1-core-loop"],
+    "note": "Cont VI #15 Redis CI fix accepted on main; Cont VII re-proves green without merge."
+  }
+}
