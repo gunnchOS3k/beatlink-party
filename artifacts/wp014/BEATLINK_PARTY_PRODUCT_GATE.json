@@ -6,32 +6,32 @@
   "branch": "operating-cycle-3b/wp-014-beatlink-party",
   "base": "origin/main",
   "base_commit": "e0c18f3dbb964608271c14611e1068cff9c17205",
-  "generated_at": "2026-08-11T20:54:09Z",
+  "generated_at": "2026-08-11T21:39:06Z",
   "evidence_file": "gate1/evidence/out/actual_production_runtime.json",
   "priority_blocker_addressed": {
     "claim": "Production runtime must be real Socket.IO HTTP server, not RoomManager-only gate1 mirror; save/load, host loss, and crash resilience must be evidenced against that real server.",
-    "finding": "gate1/tools/core_loop_runner.ts constructs RoomManager in-process with zero WebSocket frames — not ACTUAL_PRODUCTION_RUNTIME. Beyond that gap, every socket.io event handler read request payload fields (e.g. `data.code.toUpperCase()`, `input.playerId`) with no null/shape checks. A single malformed event from any one client (host, player, or a stray/attacker connection) threw synchronously inside the socket.io callback and crashed the entire Node process for every room and every connected client — a real one-client denial-of-service, not a harness artifact.",
+    "finding": "gate1/tools/core_loop_runner.ts constructs RoomManager in-process with zero WebSocket frames \u2014 not ACTUAL_PRODUCTION_RUNTIME. Beyond that gap, every socket.io event handler read request payload fields (e.g. `data.code.toUpperCase()`, `input.playerId`) with no null/shape checks. A single malformed event from any one client (host, player, or a stray/attacker connection) threw synchronously inside the socket.io callback and crashed the entire Node process for every room and every connected client \u2014 a real one-client denial-of-service, not a harness artifact.",
     "fix": "Added apps/server/src/load/wp014ProductionGate.ts, which binds setupRealtime on an ephemeral HTTP server and drives room.create/join/select_song/roles/calibration/countdown/game.input/end/rematch/host_reconnect/host-loss/player-reconnect over real socket.io-client WebSockets end to end. Hardened apps/server/src/realtime/socket.ts by monkey-patching socket.on immediately on connection so every handler registered afterward is wrapped in try/catch: a thrown error is logged and reported to the offending client via a `room.error` event instead of crashing the process. Added a real Web Audio unit test (apps/web/src/lib/hostAudio.test.ts) driving playClick/resumeAudioContext/startHostMetronome against a spec-shaped AudioContext double.",
     "real_defect_found_and_fixed": "Unguarded field access in socket.io handlers (`room.select_song`, `game.input`, `room.join`, etc.) let one malformed client payload crash the whole server process for all rooms/players. Verified before/after: the harness's crash_recovery_malformed_input step sends exactly these malformed payloads on a throwaway connection and then proves the server still answers a legitimate room.create on the same connection afterward."
   },
   "gates": {
     "ACTUAL_PRODUCTION_RUNTIME": "PASS",
-    "TITLE_MENU_PASS": "PARTIAL — server+socket evidenced; web React title screen not separately driven this cycle",
+    "TITLE_MENU_PASS": "PARTIAL \u2014 server+socket evidenced; web React title screen not separately driven this cycle",
     "NEW_GAME_SESSION_PASS": "PASS",
     "INPUT_PASS": "PASS",
     "CORE_GAME_LOOP_PASS": "PASS",
-    "PAUSE_PASS": "PENDING — no soft-pause path exercised this cycle",
+    "PAUSE_PASS": "PENDING \u2014 no soft-pause path exercised this cycle",
     "SAVE_PASS": "PASS",
     "LOAD_PASS": "PASS",
-    "SUSPEND_RESUME_OR_CHECKPOINT_PASS": "PASS — host reconnect via persisted hostToken, player reconnect via persisted playerToken, host-loss migrates hosting to a connected player",
+    "SUSPEND_RESUME_OR_CHECKPOINT_PASS": "PASS \u2014 host reconnect via persisted hostToken, player reconnect via persisted playerToken, host-loss migrates hosting to a connected player",
     "SETTINGS_PASS": "PENDING",
-    "AUDIO_HOOK_PASS": "PASS — real Web Audio oscillator/gain node chain (hostAudio.ts) unit-verified via apps/web/src/lib/hostAudio.test.ts",
-    "A11Y_BASELINE_PASS": "PARTIAL — prior digital RC",
-    "CRASH_RECOVERY_PASS": "PASS — malformed payloads on room.select_song/game.input/room.join no longer crash the process; server still answers a legitimate request afterward",
-    "LOGGING_PASS": "PARTIAL — handler errors now logged server-side + reported to the offending client via room.error",
-    "PERF_TELEMETRY_PASS": "PASS — 12-sample real websocket join-latency capture (p50/p95/max) in the same harness; see network_load tests for broader-scale SLOs",
+    "AUDIO_HOOK_PASS": "PASS \u2014 real Web Audio oscillator/gain node chain (hostAudio.ts) unit-verified via apps/web/src/lib/hostAudio.test.ts",
+    "A11Y_BASELINE_PASS": "PARTIAL \u2014 prior digital RC",
+    "CRASH_RECOVERY_PASS": "PASS \u2014 malformed payloads on room.select_song/game.input/room.join no longer crash the process; server still answers a legitimate request afterward",
+    "LOGGING_PASS": "PARTIAL \u2014 handler errors now logged server-side + reported to the offending client via room.error",
+    "PERF_TELEMETRY_PASS": "PASS \u2014 12-sample real websocket join-latency capture (p50/p95/max) in the same harness; see network_load tests for broader-scale SLOs",
     "CLEAN_EXIT_PASS": "PASS",
-    "DEVICE_LAB_PASS": "PARTIAL_PENDING_WP-011R_GUEST",
+    "DEVICE_LAB_PASS": "PASS",
     "PHYSICAL_HARDWARE_PLAYTEST": "PENDING"
   },
   "gate_evidence_detail": {
@@ -112,14 +112,23 @@
   },
   "false_positive_rejected": [
     "gate1 RoomManager-only core_loop_runner is not ACTUAL_PRODUCTION_RUNTIME",
-    "Scores come from RoomManager.endGame — not hardcoded in this harness",
+    "Scores come from RoomManager.endGame \u2014 not hardcoded in this harness",
     "Save/load claim is backed by an actual socket disconnect + fresh-socket reconnect using only the persisted token, not an in-memory reference"
   ],
   "defects": {
     "S0_open": 0,
     "S1_open": 0,
     "S1_found_and_fixed_this_cycle": 1,
-    "S1_fixed_detail": "Unwrapped socket.io event handlers crashed the entire Node process on a single malformed client payload (null/wrong-typed fields on room.select_song, game.input, room.join, etc.) — fixed by wrapping every handler registered via socket.on in a try/catch that reports room.error to the offending client instead of taking the whole server down."
+    "S1_fixed_detail": "Unwrapped socket.io event handlers crashed the entire Node process on a single malformed client payload (null/wrong-typed fields on room.select_song, game.input, room.join, etc.) \u2014 fixed by wrapping every handler registered via socket.on in a try/catch that reports room.error to the offending client instead of taking the whole server down."
   },
-  "market_parity_claim": "None. Digital automated-evidence production-runtime only."
+  "market_parity_claim": "None. Digital automated-evidence production-runtime only.",
+  "device_lab": {
+    "DEVICE_LAB_PASS": "PASS",
+    "runtime_class": "GUEST_CHROMIUM_WAYLAND",
+    "guest_game_id": "beatlink-party",
+    "evidence": "gunnchos-device-os@264b9c9 artifacts/wp011r/games/four_games_in_guest.json \u2014 GUEST_CHROMIUM_WAYLAND for Device Lab web package; HOST_PLAYWRIGHT_REJECTED; http.server alone rejected",
+    "HOST_PLAYWRIGHT_REJECTED": true,
+    "note": "Earned via WP-011R Interactive Guest in-guest Chromium proof of the corresponding Device Lab web package. Not a claim of Godot-in-guest for the full product binary; physical playtest still PENDING.",
+    "wp011r_pr": "https://github.com/gunnchOS3k/gunnchos-device-os/pull/103"
+  }
 }
