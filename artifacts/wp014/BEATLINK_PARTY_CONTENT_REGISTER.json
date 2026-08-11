@@ -1,25 +1,43 @@
 {
   "schema": "wp014_content_register/v1",
   "game": "beatlink-party",
-  "generated_at": "2026-08-11T19:52:51Z",
+  "generated_at": "2026-08-11T20:54:09Z",
   "source_commit": "e0c18f3dbb964608271c14611e1068cff9c17205",
   "counts": {
-    "demo_songs": 14
+    "demo_songs": 14,
+    "band_roles": 3
+  },
+  "band_roles_present": ["beat_tapper", "vocalist", "hype_captain"],
+  "modes_present": {
+    "beat_tap": true,
+    "band_roles": true,
+    "karaoke": "partial — mic scoring engine (packages/game-engine/karaokeMic.ts) unit-tested via tests/karaoke_digital.test.ts; not driven through this socket harness",
+    "call_response": false,
+    "prediction_trivia": false
   },
   "systems_verified_this_cycle": [
-    "real Socket.IO room create/join/audience",
-    "fixture song select over websocket",
-    "role+ready via socket",
+    "real Socket.IO room create/join/audience over a live HTTP+WebSocket server",
+    "fixture song select over websocket (legal/local demo_generated catalog only)",
+    "role+ready via socket (band_roles: beat_tapper)",
     "calibration + countdown to playing",
     "game.input tap over websocket",
-    "endGame score from engine",
+    "endGame score from engine (RoomManager.endGame, not hardcoded)",
     "rematch to lobby",
-    "host token authorizeHost"
+    "host token authorizeHost",
+    "save/load: host disconnect + fresh-socket reconnect using only the persisted {code, hostToken}, room state (players) preserved",
+    "host loss: host socket drops without reconnecting, hosting migrates to a connected player",
+    "player reconnect: fresh socket rejoin using only the persisted {playerId, playerToken}",
+    "crash recovery: malformed payloads on room.select_song/game.input/room.join no longer crash the server process (global socket.on error wrapper)",
+    "perf telemetry: 12-sample real websocket join-latency capture (p50/p95/max)",
+    "audio hook: real Web Audio oscillator+gain node chain (hostAudio.ts) unit-verified against a spec-shaped AudioContext double"
   ],
   "not_claimed": [
-    "No commercial music rights",
+    "No commercial music rights — approved-demo-catalog is demo_generated/legal-local fixtures only",
     "No physical device pass",
-    "gate1 RoomManager-only core_loop is not production evidence"
+    "gate1 RoomManager-only core_loop is not production evidence",
+    "Call/Response and Prediction/Trivia modes are not implemented in this codebase — not claimed, not tested",
+    "Karaoke vocal scoring is unit-tested at the engine level but not driven end-to-end through this socket production harness",
+    "In-game Settings UI and a full a11y baseline sweep not independently re-probed this cycle"
   ],
   "provenance": {
     "audio": "content/songs approved-demo-catalog demo_generated only"

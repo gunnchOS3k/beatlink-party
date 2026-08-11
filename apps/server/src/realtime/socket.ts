@@ -22,6 +22,30 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
   });
 
   io.on('connection', (socket) => {
+    // Every handler below assumes well-formed payloads (e.g. `data.code.toUpperCase()`
+    // with no null check) — a single malformed/garbage event from any client
+    // (missing/null `code`, wrong types, etc.) threw synchronously inside a
+    // socket.io event callback and crashed the *entire* Node process for
+    // every room/player, a real denial-of-service reachable by one bad
+    // client. Wrap every handler registered on this socket so a thrown
+    // error is caught, logged, and reported to the offending client only —
+    // it can no longer take the whole server down.
+    const rawOn = socket.on.bind(socket);
+    socket.on = ((event: string, handler: (...args: unknown[]) => void) => {
+      return rawOn(event, (...args: unknown[]) => {
+        try {
+          handler(...args);
+        } catch (err) {
+          console.error(`[socket] handler error on "${event}":`, err);
+          socket.emit('room.error', {
+            error: 'internal_error',
+            event,
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
+      });
+    }) as typeof socket.on;
+
     socket.on(
       'room.create',
       (

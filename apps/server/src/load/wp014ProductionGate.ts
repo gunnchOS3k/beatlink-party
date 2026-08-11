@@ -203,8 +203,97 @@ async function main() {
       phase: rematch?.phase,
     });
 
-    const authed = roomManager.authorizeHost(created.code, host.id, created.hostToken);
+    // connect() only resolves after the 'connect' event, so `id` is always
+    // assigned at runtime — socket.io-client's type just doesn't narrow it.
+    const authed = roomManager.authorizeHost(created.code, host.id!, created.hostToken);
     emit('host_auth_path', !!authed, { authed });
+
+    // SAVE/LOAD: the hostToken issued at room.create is the durable "save" —
+    // disconnect the host socket entirely and reconnect a *new* socket with
+    // only the persisted {code, hostToken}, the same way a refreshed
+    // browser tab or a reconnecting phone would.
+    const roomBeforeDisconnect = roomManager.getRoom(created.code);
+    host.close();
+    await wait(60);
+    const hostReconnectSocket = await connect(baseUrl);
+    const reconnected = await emitAck<{ ok: boolean; room?: { code: string; phase: string } }>(
+      hostReconnectSocket,
+      'room.host_reconnect',
+      { code: created.code, hostToken: created.hostToken },
+    );
+    emit('save_load_host_reconnect', !!reconnected?.ok && reconnected.room?.code === created.code, {
+      code: reconnected?.room?.code,
+      phase: reconnected?.room?.phase,
+      players_preserved: roomBeforeDisconnect?.players.length === roomManager.getRoom(created.code)?.players.length,
+    });
+
+    // Host loss: disconnect the (now reconnected) host socket WITHOUT a
+    // reconnect, and confirm the room migrates hosting to a connected
+    // player rather than the room silently becoming unownable.
+    hostReconnectSocket.close();
+    await wait(80);
+    const afterHostLoss = roomManager.getRoom(created.code);
+    emit(
+      'host_loss_migration',
+      !!afterHostLoss && afterHostLoss.hostId !== null && afterHostLoss.hostId !== hostReconnectSocket.id,
+      {
+        new_host_id: afterHostLoss?.hostId ?? null,
+        room_still_exists: !!afterHostLoss,
+      },
+    );
+
+    // Player reconnect — same persisted-token pattern for a non-host client.
+    const playerReconnectSocket = await connect(baseUrl);
+    const playerRejoin = await emitAck<{ ok: boolean; player?: { id: string; connected: boolean } }>(
+      playerReconnectSocket,
+      'room.join',
+      { code: created.code, name: 'GatePlayer', playerId, playerToken: joined.playerToken },
+    );
+    emit('player_reconnect', !!playerRejoin?.ok && playerRejoin.player?.id === playerId, {
+      playerId: playerRejoin?.player?.id,
+      connected: playerRejoin?.player?.connected,
+    });
+    playerReconnectSocket.close();
+
+    // Crash recovery: malformed/garbage payloads on real event names must
+    // not crash the process — the server should still answer legitimate
+    // requests on other live connections afterward.
+    const crashProbe = await connect(baseUrl);
+    let serverStillAlive = true;
+    try {
+      crashProbe.emit('room.select_song', { code: 'NOT-A-REAL-ROOM-CODE-!!!', hostToken: null, songId: 12345 as unknown as string });
+      crashProbe.emit('game.input', { code: null, input: { garbage: true } });
+      crashProbe.emit('room.join', {} as { code: string; name: string });
+      await wait(80);
+      const probeAck = await emitAck<{ code: string; hostToken?: string }>(crashProbe, 'room.create', {});
+      serverStillAlive = !!probeAck?.code;
+    } catch {
+      serverStillAlive = false;
+    }
+    emit('crash_recovery_malformed_input', serverStillAlive, { server_responded_after_garbage: serverStillAlive });
+    crashProbe.close();
+
+    // Perf telemetry — real network round-trip latency for a batch of
+    // fresh connect+join cycles against the live socket.io server (not a
+    // synthetic number), same measurement basis as networkLoadRunner.ts.
+    const PERF_SAMPLES = 12;
+    const latenciesMs: number[] = [];
+    for (let i = 0; i < PERF_SAMPLES; i++) {
+      const t0 = performance.now();
+      const perfSocket = await connect(baseUrl);
+      await emitAck(perfSocket, 'room.join_audience', { code: created.code, name: `PerfAud${i}` });
+      latenciesMs.push(performance.now() - t0);
+      perfSocket.close();
+    }
+    latenciesMs.sort((a, b) => a - b);
+    const p50 = latenciesMs[Math.floor(latenciesMs.length * 0.5)];
+    const p95 = latenciesMs[Math.floor(latenciesMs.length * 0.95) === latenciesMs.length ? latenciesMs.length - 1 : Math.floor(latenciesMs.length * 0.95)];
+    emit('perf_telemetry_join_latency', latenciesMs.every((v) => v >= 0) && latenciesMs.length === PERF_SAMPLES, {
+      samples: latenciesMs.length,
+      p50_ms: p50,
+      p95_ms: p95,
+      max_ms: latenciesMs[latenciesMs.length - 1],
+    });
   } catch (err) {
     emit('unhandled_error', false, {
       error: err instanceof Error ? err.message : String(err),
