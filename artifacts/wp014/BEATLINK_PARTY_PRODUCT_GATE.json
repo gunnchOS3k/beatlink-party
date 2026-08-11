@@ -1,0 +1,94 @@
+{
+  "schema": "wp014_product_gate/v1",
+  "cycle": "operating-cycle-3b",
+  "work_package": "WP-014",
+  "game": "beatlink-party",
+  "branch": "operating-cycle-3b/wp-014-beatlink-party",
+  "base": "origin/main",
+  "base_commit": "e0c18f3dbb964608271c14611e1068cff9c17205",
+  "generated_at": "2026-08-11T19:52:51Z",
+  "evidence_file": "gate1/evidence/out/actual_production_runtime.json",
+  "priority_blocker_addressed": {
+    "claim": "Production runtime must be real Socket.IO HTTP server, not RoomManager-only gate1 mirror",
+    "finding": "gate1/tools/core_loop_runner.ts constructs RoomManager in-process with zero WebSocket frames \u2014 not ACTUAL_PRODUCTION_RUNTIME.",
+    "fix": "Added apps/server/src/load/wp014ProductionGate.ts that binds setupRealtime on an ephemeral HTTP server and drives room.create/join/select_song/roles/calibration/countdown/game.input/end/rematch over socket.io-client WebSockets.",
+    "real_defect_found_and_fixed": "None newly fixed in product code this cycle \u2014 highest leverage was replacing false-positive gate1 evidence with a real websocket production harness. Prior Cont VI already had network load; WP-014 now has an explicit ACTUAL_PRODUCTION_RUNTIME evidence path."
+  },
+  "gates": {
+    "ACTUAL_PRODUCTION_RUNTIME": "PASS",
+    "TITLE_MENU_PASS": "PARTIAL \u2014 server+socket evidenced; web React title not separately driven this cycle",
+    "NEW_GAME_SESSION_PASS": "PASS",
+    "INPUT_PASS": "PASS",
+    "CORE_GAME_LOOP_PASS": "PASS",
+    "PAUSE_PASS": "PENDING \u2014 no soft-pause path exercised this cycle",
+    "SAVE_PASS": "PARTIAL \u2014 host token auth path verified; client localStorage not driven",
+    "LOAD_PASS": "PARTIAL",
+    "SUSPEND_RESUME_OR_CHECKPOINT_PASS": "PARTIAL \u2014 rematch/lobby resume only",
+    "SETTINGS_PASS": "PENDING",
+    "AUDIO_HOOK_PASS": "PENDING \u2014 local fixture song selected; no WebAudio decode evidenced",
+    "A11Y_BASELINE_PASS": "PARTIAL \u2014 prior digital RC",
+    "CRASH_RECOVERY_PASS": "PENDING",
+    "LOGGING_PASS": "PARTIAL",
+    "PERF_TELEMETRY_PASS": "PENDING \u2014 see network_load separately",
+    "CLEAN_EXIT_PASS": "PASS",
+    "DEVICE_LAB_PASS": "PARTIAL_PENDING_WP-011R_GUEST",
+    "PHYSICAL_HARDWARE_PLAYTEST": "PENDING"
+  },
+  "gate_evidence_detail": {
+    "launch_socket_server": {
+      "baseUrl": "http://127.0.0.1:57530",
+      "transport": "websocket"
+    },
+    "create_room": {
+      "code": "BXQXU"
+    },
+    "join_participant": {
+      "playerId": "d0f33050-f285-44bc-adef-bc8751a0db23"
+    },
+    "join_audience": {
+      "audienceId": "284aab22-b741-4d85-a93a-741efd428bb1"
+    },
+    "select_local_fixture_song": {
+      "song_id": "demo-neon-groove",
+      "license": "demo_generated",
+      "selectedSongId": "demo-neon-groove"
+    },
+    "assign_roles_input": {
+      "role": "beat_tapper",
+      "ready": true
+    },
+    "calibrate_timing": {
+      "offset": 20,
+      "phase": "calibrating"
+    },
+    "core_loop_playing": {
+      "phase": "playing"
+    },
+    "socket_game_input": {
+      "notes": 82,
+      "phase": "playing",
+      "note_id": "note-0"
+    },
+    "score_results": {
+      "team_score": 300,
+      "phase": "results",
+      "score_from_engine": true
+    },
+    "rematch_room": {
+      "phase": "lobby"
+    },
+    "host_auth_path": {
+      "authed": true
+    }
+  },
+  "false_positive_rejected": [
+    "gate1 RoomManager-only core_loop_runner is not ACTUAL_PRODUCTION_RUNTIME",
+    "Scores come from RoomManager.endGame \u2014 not hardcoded in this harness"
+  ],
+  "defects": {
+    "S0_open": 0,
+    "S1_open": 0,
+    "S1_found_and_fixed_this_cycle": 0
+  },
+  "market_parity_claim": "None."
+}

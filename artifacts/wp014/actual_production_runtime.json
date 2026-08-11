@@ -1,0 +1,120 @@
+{
+  "schema": "beatlink_actual_production_runtime/v1",
+  "game": "beatlink-party",
+  "engine": "socket.io",
+  "run_mode": "real_http_websocket_setupRealtime",
+  "commit": "e0c18f3dbb964608271c14611e1068cff9c17205",
+  "all_steps_pass": true,
+  "steps": [
+    {
+      "step": "launch_socket_server",
+      "result": "pass",
+      "detail": {
+        "baseUrl": "http://127.0.0.1:57530",
+        "transport": "websocket"
+      },
+      "ts": "2026-08-11T19:52:20.751Z"
+    },
+    {
+      "step": "create_room",
+      "result": "pass",
+      "detail": {
+        "code": "BXQXU"
+      },
+      "ts": "2026-08-11T19:52:20.765Z"
+    },
+    {
+      "step": "join_participant",
+      "result": "pass",
+      "detail": {
+        "playerId": "d0f33050-f285-44bc-adef-bc8751a0db23"
+      },
+      "ts": "2026-08-11T19:52:20.768Z"
+    },
+    {
+      "step": "join_audience",
+      "result": "pass",
+      "detail": {
+        "audienceId": "284aab22-b741-4d85-a93a-741efd428bb1"
+      },
+      "ts": "2026-08-11T19:52:20.770Z"
+    },
+    {
+      "step": "select_local_fixture_song",
+      "result": "pass",
+      "detail": {
+        "song_id": "demo-neon-groove",
+        "license": "demo_generated",
+        "selectedSongId": "demo-neon-groove"
+      },
+      "ts": "2026-08-11T19:52:20.801Z"
+    },
+    {
+      "step": "assign_roles_input",
+      "result": "pass",
+      "detail": {
+        "role": "beat_tapper",
+        "ready": true
+      },
+      "ts": "2026-08-11T19:52:20.842Z"
+    },
+    {
+      "step": "calibrate_timing",
+      "result": "pass",
+      "detail": {
+        "offset": 20,
+        "phase": "calibrating"
+      },
+      "ts": "2026-08-11T19:52:20.884Z"
+    },
+    {
+      "step": "core_loop_playing",
+      "result": "pass",
+      "detail": {
+        "phase": "playing"
+      },
+      "ts": "2026-08-11T19:52:24.385Z"
+    },
+    {
+      "step": "socket_game_input",
+      "result": "pass",
+      "detail": {
+        "notes": 82,
+        "phase": "playing",
+        "note_id": "note-0"
+      },
+      "ts": "2026-08-11T19:52:24.437Z"
+    },
+    {
+      "step": "score_results",
+      "result": "pass",
+      "detail": {
+        "team_score": 300,
+        "phase": "results",
+        "score_from_engine": true
+      },
+      "ts": "2026-08-11T19:52:24.438Z"
+    },
+    {
+      "step": "rematch_room",
+      "result": "pass",
+      "detail": {
+        "phase": "lobby"
+      },
+      "ts": "2026-08-11T19:52:24.469Z"
+    },
+    {
+      "step": "host_auth_path",
+      "result": "pass",
+      "detail": {
+        "authed": true
+      },
+      "ts": "2026-08-11T19:52:24.469Z"
+    }
+  ],
+  "generated_at": "2026-08-11T19:52:24.492Z",
+  "false_positive_rejected": [
+    "gate1 RoomManager-only core_loop_runner is not ACTUAL_PRODUCTION_RUNTIME",
+    "Scores come from RoomManager.endGame — not hardcoded in this harness"
+  ]
+}
