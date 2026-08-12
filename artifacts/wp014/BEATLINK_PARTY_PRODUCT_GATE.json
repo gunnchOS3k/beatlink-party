@@ -6,7 +6,7 @@
   "branch": "operating-cycle-3b/wp-014-beatlink-party",
   "base": "origin/main",
   "base_commit": "e0c18f3dbb964608271c14611e1068cff9c17205",
-  "generated_at": "2026-08-12T17:05:41Z",
+  "generated_at": "2026-08-12T17:15:54Z",
   "evidence_file": "gate1/evidence/out/actual_production_runtime.json",
   "priority_blocker_addressed": {
     "claim": "Production runtime must be real Socket.IO HTTP server, not RoomManager-only gate1 mirror; save/load, host loss, and crash resilience must be evidenced against that real server.",
@@ -20,11 +20,11 @@
     "NEW_GAME_SESSION_PASS": "PASS",
     "INPUT_PASS": "PASS",
     "CORE_GAME_LOOP_PASS": "PASS",
-    "PAUSE_PASS": "PENDING \u2014 no soft-pause path exercised this cycle",
+    "PAUSE_PASS": "PARTIAL \u2014 WP014-BL-PAUSE-001: no soft-pause phase/event in server or web client; not digitally executable without inventing a pause path (media-rights-neutral gap)",
     "SAVE_PASS": "PASS",
     "LOAD_PASS": "PASS",
     "SUSPEND_RESUME_OR_CHECKPOINT_PASS": "PASS \u2014 host reconnect via persisted hostToken, player reconnect via persisted playerToken, host-loss migrates hosting to a connected player",
-    "SETTINGS_PASS": "PENDING",
+    "SETTINGS_PASS": "PARTIAL \u2014 WP014-BL-SETTINGS-001: AccessibilityPanel + shared a11y helpers exist and unit-tested (tests/device_ux_runtime.test.ts, alpha_exit); in-game Settings UI not driven through ACTUAL_PRODUCTION_RUNTIME socket harness this cycle",
     "AUDIO_HOOK_PASS": "PASS \u2014 real Web Audio oscillator/gain node chain (hostAudio.ts) unit-verified via apps/web/src/lib/hostAudio.test.ts",
     "A11Y_BASELINE_PASS": "PARTIAL \u2014 prior digital RC",
     "CRASH_RECOVERY_PASS": "PASS \u2014 malformed payloads on room.select_song/game.input/room.join no longer crash the process; server still answers a legitimate request afterward",
@@ -113,13 +113,31 @@
   "false_positive_rejected": [
     "gate1 RoomManager-only core_loop_runner is not ACTUAL_PRODUCTION_RUNTIME",
     "Scores come from RoomManager.endGame \u2014 not hardcoded in this harness",
-    "Save/load claim is backed by an actual socket disconnect + fresh-socket reconnect using only the persisted token, not an in-memory reference"
+    "Save/load claim is backed by an actual socket disconnect + fresh-socket reconnect using only the persisted token, not an in-memory reference",
+    "Inventing a soft-pause socket event solely to flip PAUSE_PASS would be a false PASS",
+    "SETTINGS_PASS cannot be claimed from unit-only a11y helpers without production-runtime UI drive"
   ],
   "defects": {
     "S0_open": 0,
     "S1_open": 0,
     "S1_found_and_fixed_this_cycle": 1,
-    "S1_fixed_detail": "Unwrapped socket.io event handlers crashed the entire Node process on a single malformed client payload (null/wrong-typed fields on room.select_song, game.input, room.join, etc.) \u2014 fixed by wrapping every handler registered via socket.on in a try/catch that reports room.error to the offending client instead of taking the whole server down."
+    "S1_fixed_detail": "Unwrapped socket.io event handlers crashed the entire Node process on a single malformed client payload (null/wrong-typed fields on room.select_song, game.input, room.join, etc.) \u2014 fixed by wrapping every handler registered via socket.on in a try/catch that reports room.error to the offending client instead of taking the whole server down.",
+    "open_residuals": [
+      {
+        "id": "WP014-BL-PAUSE-001",
+        "severity": "S2",
+        "token": "PAUSE_PASS",
+        "status": "PARTIAL",
+        "summary": "No soft-pause path (room/game phase or socket event) exists to exercise digitally; would require new product behavior, not a media-rights bypass."
+      },
+      {
+        "id": "WP014-BL-SETTINGS-001",
+        "severity": "S2",
+        "token": "SETTINGS_PASS",
+        "status": "PARTIAL",
+        "summary": "Settings/a11y helpers are unit-tested; production-runtime harness does not drive the React Settings/AccessibilityPanel surface."
+      }
+    ]
   },
   "market_parity_claim": "None. Digital automated-evidence production-runtime only.",
   "device_lab": {
