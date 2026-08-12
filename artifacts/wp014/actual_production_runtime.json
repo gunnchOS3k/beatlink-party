@@ -3,41 +3,41 @@
   "game": "beatlink-party",
   "engine": "socket.io",
   "run_mode": "real_http_websocket_setupRealtime",
-  "commit": "faede104897c470d23f3dd8258a26743361c7e43",
+  "commit": "a2453eeda022e2ded5a29ef5564edc6ee3c502e2",
   "all_steps_pass": true,
   "steps": [
     {
       "step": "launch_socket_server",
       "result": "pass",
       "detail": {
-        "baseUrl": "http://127.0.0.1:59844",
+        "baseUrl": "http://127.0.0.1:51835",
         "transport": "websocket"
       },
-      "ts": "2026-08-11T20:53:58.631Z"
+      "ts": "2026-08-12T18:15:11.732Z"
     },
     {
       "step": "create_room",
       "result": "pass",
       "detail": {
-        "code": "GF78S"
+        "code": "2M6W9"
       },
-      "ts": "2026-08-11T20:53:58.644Z"
+      "ts": "2026-08-12T18:15:11.749Z"
     },
     {
       "step": "join_participant",
       "result": "pass",
       "detail": {
-        "playerId": "b9c2b5b0-ed3b-4c8a-873a-5212f8da9fc1"
+        "playerId": "11258470-e9c4-4b82-bd50-fa108f595c8f"
       },
-      "ts": "2026-08-11T20:53:58.647Z"
+      "ts": "2026-08-12T18:15:11.751Z"
     },
     {
       "step": "join_audience",
       "result": "pass",
       "detail": {
-        "audienceId": "3172d475-69c7-4869-a7c8-1b523bd659fb"
+        "audienceId": "ae83ff4c-ad46-43d2-ab09-4e488b53d980"
       },
-      "ts": "2026-08-11T20:53:58.648Z"
+      "ts": "2026-08-12T18:15:11.753Z"
     },
     {
       "step": "select_local_fixture_song",
@@ -47,7 +47,7 @@
         "license": "demo_generated",
         "selectedSongId": "demo-neon-groove"
       },
-      "ts": "2026-08-11T20:53:58.680Z"
+      "ts": "2026-08-12T18:15:11.784Z"
     },
     {
       "step": "assign_roles_input",
@@ -56,7 +56,7 @@
         "role": "beat_tapper",
         "ready": true
       },
-      "ts": "2026-08-11T20:53:58.721Z"
+      "ts": "2026-08-12T18:15:11.826Z"
     },
     {
       "step": "calibrate_timing",
@@ -65,7 +65,7 @@
         "offset": 20,
         "phase": "calibrating"
       },
-      "ts": "2026-08-11T20:53:58.762Z"
+      "ts": "2026-08-12T18:15:11.868Z"
     },
     {
       "step": "core_loop_playing",
@@ -73,7 +73,7 @@
       "detail": {
         "phase": "playing"
       },
-      "ts": "2026-08-11T20:54:02.263Z"
+      "ts": "2026-08-12T18:15:15.369Z"
     },
     {
       "step": "socket_game_input",
@@ -83,7 +83,22 @@
         "phase": "playing",
         "note_id": "note-0"
       },
-      "ts": "2026-08-11T20:54:02.315Z"
+      "ts": "2026-08-12T18:15:15.422Z"
+    },
+    {
+      "step": "host_controlled_session_pause",
+      "result": "pass",
+      "detail": {
+        "pause_ok": true,
+        "phase_paused": "paused",
+        "phase_mid_pause": "paused",
+        "non_host_denied": true,
+        "input_rejected_score_unchanged": true,
+        "resume_ok": true,
+        "phase_resumed": "playing",
+        "design": "HOST_CONTROLLED_SESSION_PAUSE"
+      },
+      "ts": "2026-08-12T18:15:15.466Z"
     },
     {
       "step": "score_results",
@@ -93,7 +108,7 @@
         "phase": "results",
         "score_from_engine": true
       },
-      "ts": "2026-08-11T20:54:02.316Z"
+      "ts": "2026-08-12T18:15:15.467Z"
     },
     {
       "step": "rematch_room",
@@ -101,7 +116,7 @@
       "detail": {
         "phase": "lobby"
       },
-      "ts": "2026-08-11T20:54:02.347Z"
+      "ts": "2026-08-12T18:15:15.498Z"
     },
     {
       "step": "host_auth_path",
@@ -109,35 +124,35 @@
       "detail": {
         "authed": true
       },
-      "ts": "2026-08-11T20:54:02.347Z"
+      "ts": "2026-08-12T18:15:15.498Z"
     },
     {
       "step": "save_load_host_reconnect",
       "result": "pass",
       "detail": {
-        "code": "GF78S",
+        "code": "2M6W9",
         "phase": "lobby",
         "players_preserved": true
       },
-      "ts": "2026-08-11T20:54:02.412Z"
+      "ts": "2026-08-12T18:15:15.564Z"
     },
     {
       "step": "host_loss_migration",
       "result": "pass",
       "detail": {
-        "new_host_id": "player-host:b9c2b5b0-ed3b-4c8a-873a-5212f8da9fc1",
+        "new_host_id": "player-host:11258470-e9c4-4b82-bd50-fa108f595c8f",
         "room_still_exists": true
       },
-      "ts": "2026-08-11T20:54:02.492Z"
+      "ts": "2026-08-12T18:15:15.646Z"
     },
     {
       "step": "player_reconnect",
       "result": "pass",
       "detail": {
-        "playerId": "b9c2b5b0-ed3b-4c8a-873a-5212f8da9fc1",
+        "playerId": "11258470-e9c4-4b82-bd50-fa108f595c8f",
         "connected": true
       },
-      "ts": "2026-08-11T20:54:02.496Z"
+      "ts": "2026-08-12T18:15:15.651Z"
     },
     {
       "step": "crash_recovery_malformed_input",
@@ -145,21 +160,21 @@
       "detail": {
         "server_responded_after_garbage": true
       },
-      "ts": "2026-08-11T20:54:02.581Z"
+      "ts": "2026-08-12T18:15:15.736Z"
     },
     {
       "step": "perf_telemetry_join_latency",
       "result": "pass",
       "detail": {
         "samples": 12,
-        "p50_ms": 2.052082999999584,
-        "p95_ms": 5.7664590000003955,
-        "max_ms": 5.7664590000003955
+        "p50_ms": 1.954791999999543,
+        "p95_ms": 3.8849589999999807,
+        "max_ms": 3.8849589999999807
       },
-      "ts": "2026-08-11T20:54:02.609Z"
+      "ts": "2026-08-12T18:15:15.763Z"
     }
   ],
-  "generated_at": "2026-08-11T20:54:02.629Z",
+  "generated_at": "2026-08-12T18:15:15.787Z",
   "false_positive_rejected": [
     "gate1 RoomManager-only core_loop_runner is not ACTUAL_PRODUCTION_RUNTIME",
     "Scores come from RoomManager.endGame — not hardcoded in this harness"

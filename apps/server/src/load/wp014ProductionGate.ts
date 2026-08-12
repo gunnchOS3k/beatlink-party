@@ -188,6 +188,59 @@ async function main() {
       note_id: note?.id ?? null,
     });
 
+
+    // HOST_CONTROLLED_SESSION_PAUSE — host pauses, non-host denied, inputs rejected, host resumes.
+    const pauseOk = await emitAck<{ ok: boolean; room?: { phase: string } }>(
+      host,
+      'room.session_pause',
+      { code: created.code, hostToken: created.hostToken },
+    );
+    // Snapshot primitives immediately — getRoom() returns a live mutable object.
+    const phaseAfterPause = pauseOk?.room?.phase ?? roomManager.getRoom(created.code)?.phase;
+    const scoreBeforePause = roomManager.getRoom(created.code)?.teamScore ?? 0;
+    // Non-host must be denied
+    const pauseDenied = await emitAck<{ ok: boolean }>(
+      player!,
+      'room.session_pause',
+      { code: created.code },
+    );
+    // Input while paused must not advance score
+    if (note && player) {
+      player.emit('game.input', {
+        code: created.code,
+        input: { playerId, type: 'tap', timestamp: Date.now(), noteId: note.id },
+      });
+      await wait(40);
+    }
+    const scoreMidPause = roomManager.getRoom(created.code)?.teamScore ?? 0;
+    const phaseMidPause = roomManager.getRoom(created.code)?.phase;
+    const resumeOk = await emitAck<{ ok: boolean; room?: { phase: string } }>(
+      host,
+      'room.session_resume',
+      { code: created.code, hostToken: created.hostToken },
+    );
+    const phaseResumed = resumeOk?.room?.phase ?? roomManager.getRoom(created.code)?.phase;
+    emit(
+      'host_controlled_session_pause',
+      !!pauseOk?.ok &&
+        phaseAfterPause === 'paused' &&
+        pauseDenied?.ok === false &&
+        scoreMidPause === scoreBeforePause &&
+        phaseMidPause === 'paused' &&
+        !!resumeOk?.ok &&
+        phaseResumed === 'playing',
+      {
+        pause_ok: !!pauseOk?.ok,
+        phase_paused: phaseAfterPause,
+        phase_mid_pause: phaseMidPause,
+        non_host_denied: pauseDenied?.ok === false,
+        input_rejected_score_unchanged: scoreMidPause === scoreBeforePause,
+        resume_ok: !!resumeOk?.ok,
+        phase_resumed: phaseResumed,
+        design: 'HOST_CONTROLLED_SESSION_PAUSE',
+      },
+    );
+
     // End early for gate (production also auto-ends on duration)
     const results = roomManager.endGame(created.code);
     emit('score_results', !!results && typeof results.teamScore === 'number', {

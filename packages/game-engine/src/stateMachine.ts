@@ -5,7 +5,8 @@ const VALID_TRANSITIONS: Record<RoomPhase, RoomPhase[]> = {
   song_select: ['calibrating', 'countdown', 'lobby', 'closed'],
   calibrating: ['countdown', 'lobby', 'closed'],
   countdown: ['playing', 'lobby', 'closed'],
-  playing: ['results', 'lobby', 'closed'],
+  playing: ['results', 'lobby', 'closed', 'paused'],
+  paused: ['playing', 'results', 'lobby', 'closed'],
   results: ['lobby', 'song_select', 'countdown', 'closed'],
   closed: [],
 };

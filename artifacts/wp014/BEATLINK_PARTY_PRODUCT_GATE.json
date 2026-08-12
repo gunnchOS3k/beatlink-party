@@ -1,12 +1,12 @@
 {
   "schema": "wp014_product_gate/v1",
   "cycle": "operating-cycle-3b",
-  "work_package": "WP-014",
+  "work_package": "WP-014R",
   "game": "beatlink-party",
   "branch": "operating-cycle-3b/wp-014-beatlink-party",
   "base": "origin/main",
   "base_commit": "e0c18f3dbb964608271c14611e1068cff9c17205",
-  "generated_at": "2026-08-12T17:15:54Z",
+  "generated_at": "2026-08-12T18:09:28Z",
   "evidence_file": "gate1/evidence/out/actual_production_runtime.json",
   "priority_blocker_addressed": {
     "claim": "Production runtime must be real Socket.IO HTTP server, not RoomManager-only gate1 mirror; save/load, host loss, and crash resilience must be evidenced against that real server.",
@@ -16,22 +16,22 @@
   },
   "gates": {
     "ACTUAL_PRODUCTION_RUNTIME": "PASS",
-    "TITLE_MENU_PASS": "PARTIAL \u2014 server+socket evidenced; web React title screen not separately driven this cycle",
+    "TITLE_MENU_PASS": "PASS \u2014 title/landing surface + create/join/audience copy evidenced; AccessibilityPanel production component rendered",
     "NEW_GAME_SESSION_PASS": "PASS",
     "INPUT_PASS": "PASS",
     "CORE_GAME_LOOP_PASS": "PASS",
-    "PAUSE_PASS": "PARTIAL \u2014 WP014-BL-PAUSE-001: no soft-pause phase/event in server or web client; not digitally executable without inventing a pause path (media-rights-neutral gap)",
+    "PAUSE_PASS": "PASS \u2014 HOST_CONTROLLED_SESSION_PAUSE (host-only pause/resume; non-host denied; inputs rejected while paused; timeline preserved)",
     "SAVE_PASS": "PASS",
     "LOAD_PASS": "PASS",
     "SUSPEND_RESUME_OR_CHECKPOINT_PASS": "PASS \u2014 host reconnect via persisted hostToken, player reconnect via persisted playerToken, host-loss migrates hosting to a connected player",
-    "SETTINGS_PASS": "PARTIAL \u2014 WP014-BL-SETTINGS-001: AccessibilityPanel + shared a11y helpers exist and unit-tested (tests/device_ux_runtime.test.ts, alpha_exit); in-game Settings UI not driven through ACTUAL_PRODUCTION_RUNTIME socket harness this cycle",
+    "SETTINGS_PASS": "PASS \u2014 AccessibilityPanel production UI + shared persistence helpers driven in wp014UiProductionGate.test.ts",
     "AUDIO_HOOK_PASS": "PASS \u2014 real Web Audio oscillator/gain node chain (hostAudio.ts) unit-verified via apps/web/src/lib/hostAudio.test.ts",
-    "A11Y_BASELINE_PASS": "PARTIAL \u2014 prior digital RC",
+    "A11Y_BASELINE_PASS": "PASS \u2014 reduce motion / high contrast / larger hit targets persist + restore defaults",
     "CRASH_RECOVERY_PASS": "PASS \u2014 malformed payloads on room.select_song/game.input/room.join no longer crash the process; server still answers a legitimate request afterward",
-    "LOGGING_PASS": "PARTIAL \u2014 handler errors now logged server-side + reported to the offending client via room.error",
+    "LOGGING_PASS": "PASS \u2014 structured JSON logs for handler_error / session_pause / session_resume",
     "PERF_TELEMETRY_PASS": "PASS \u2014 12-sample real websocket join-latency capture (p50/p95/max) in the same harness; see network_load tests for broader-scale SLOs",
     "CLEAN_EXIT_PASS": "PASS",
-    "DEVICE_LAB_PASS": "PASS",
+    "DEVICE_LAB_PASS": "PENDING_ACCEPTED_MAIN_WP011R",
     "PHYSICAL_HARDWARE_PLAYTEST": "PENDING"
   },
   "gate_evidence_detail": {
@@ -122,33 +122,33 @@
     "S1_open": 0,
     "S1_found_and_fixed_this_cycle": 1,
     "S1_fixed_detail": "Unwrapped socket.io event handlers crashed the entire Node process on a single malformed client payload (null/wrong-typed fields on room.select_song, game.input, room.join, etc.) \u2014 fixed by wrapping every handler registered via socket.on in a try/catch that reports room.error to the offending client instead of taking the whole server down.",
-    "open_residuals": [
+    "open_residuals": [],
+    "closed_this_cycle": [
       {
         "id": "WP014-BL-PAUSE-001",
-        "severity": "S2",
-        "token": "PAUSE_PASS",
-        "status": "PARTIAL",
-        "summary": "No soft-pause path (room/game phase or socket event) exists to exercise digitally; would require new product behavior, not a media-rights bypass."
+        "status": "CLOSED",
+        "resolution": "HOST_CONTROLLED_SESSION_PAUSE implemented"
       },
       {
         "id": "WP014-BL-SETTINGS-001",
-        "severity": "S2",
-        "token": "SETTINGS_PASS",
-        "status": "PARTIAL",
-        "summary": "Settings/a11y helpers are unit-tested; production-runtime harness does not drive the React Settings/AccessibilityPanel surface."
+        "status": "CLOSED",
+        "resolution": "AccessibilityPanel driven in production UI gate"
       }
     ]
   },
   "market_parity_claim": "None. Digital automated-evidence production-runtime only.",
   "device_lab": {
-    "DEVICE_LAB_PASS": "PASS",
+    "DEVICE_LAB_PASS": "PENDING_ACCEPTED_MAIN_WP011R",
     "runtime_class": "GUEST_CHROMIUM_WAYLAND",
     "guest_game_id": "beatlink-party",
     "evidence": "gunnchos-device-os@071f9b2 artifacts/wp011r/games/four_games_in_guest.json (independent-accepted FOUR_GAME on tip 9d8ce2d / commit 071f9b2) \u2014 HOST_PLAYWRIGHT_REJECTED; http.server alone rejected",
     "HOST_PLAYWRIGHT_REJECTED": true,
     "independent_accepted_tip": "9d8ce2d3b60d21f4d4d851bad9f4b17e8ac43fff",
     "independent_pass_commit": "071f9b28b2cccd0549885e5f8427af4db3c162c5",
-    "note": "Aligned to WP-011R independent-accepted FOUR_GAME guest evidence (#103@071f9b2). Pedestrian DEVICE_LAB_PASS is GUEST_GODOT4 in-guest; web titles are GUEST_CHROMIUM_WAYLAND. Physical playtest still PENDING. Not a shipping claim.",
-    "wp011r_pr": "https://github.com/gunnchOS3k/gunnchos-device-os/pull/103"
+    "note": "DEVICE_LAB_STATUS=PENDING_ACCEPTED_MAIN_WP011R while device-os #103 remains unmerged. Independent FOUR_GAME branch evidence retained as INDEPENDENT_BRANCH_EVIDENCE_OBSERVED only \u2014 not accepted-main proof. No circular DRAFT-branch acceptance.",
+    "wp011r_pr": "https://github.com/gunnchOS3k/gunnchos-device-os/pull/103",
+    "DEVICE_LAB_STATUS": "PENDING_ACCEPTED_MAIN_WP011R",
+    "INDEPENDENT_BRANCH_EVIDENCE_OBSERVED": true,
+    "circular_accepted_main_claim": false
   }
 }

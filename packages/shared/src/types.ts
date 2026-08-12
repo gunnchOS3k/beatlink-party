@@ -24,6 +24,7 @@ export type RoomPhase =
   | 'calibrating'
   | 'countdown'
   | 'playing'
+  | 'paused'
   | 'results'
   | 'closed';
 
@@ -113,6 +114,9 @@ export interface AudienceInfluenceEvent {
 export interface RoomState {
   code: string;
   phase: RoomPhase;
+  /** HOST_CONTROLLED_SESSION_PAUSE markers (playing timeline preserved). */
+  pausedAtMs?: number;
+  pauseElapsedGameMs?: number;
   hostId: string | null;
   players: Player[];
   /** Spectator seats (not counted toward player cap / ready gate). */
@@ -378,7 +382,10 @@ export type TelemetryEventName =
   | 'content_path'
   | 'rc_packaging'
   | 'rc_update'
-  | 'rc_rollback';
+  | 'rc_rollback'
+  | 'session_pause'
+  | 'session_resume'
+  | 'input_rejected_paused';
 
 /** Session telemetry — no PII (no names, tokens, or raw URLs). */
 export interface TelemetryEvent {

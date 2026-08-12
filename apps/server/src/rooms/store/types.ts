@@ -36,6 +36,8 @@ export interface RoomSnapshot {
   calibrationOffsetMs: number;
   countdown: number | null;
   gameStartTime: number | null;
+  pausedAtMs?: number;
+  pauseElapsedGameMs?: number;
   gameDurationMs: number;
   teamScore: number;
   crowdMeter: number;

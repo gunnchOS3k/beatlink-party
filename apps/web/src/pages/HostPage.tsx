@@ -672,6 +672,20 @@ export default function HostPage() {
               <DeviceRolePicker role={role} roles={roles} onChange={setRole} />
               <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{profile.hints[0]}</p>
               <AccessibilityPanel settings={settings} update={update} />
+              {(room?.phase === 'playing' || room?.phase === 'paused') && (
+                <button
+                  className="btn-secondary"
+                  type="button"
+                  onClick={() => {
+                    if (!socket || !code) return;
+                    const event =
+                      room?.phase === 'paused' ? 'room.session_resume' : 'room.session_pause';
+                    socket.emit(event, { code, hostToken }, () => undefined);
+                  }}
+                >
+                  {room?.phase === 'paused' ? 'Resume Session' : 'Pause Session (Host)'}
+                </button>
+              )}
             </div>
 
             <div className="card stack">

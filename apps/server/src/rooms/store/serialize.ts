@@ -27,6 +27,8 @@ export function serializeRoom(room: InternalRoomLive): RoomSnapshot {
     calibrationOffsetMs: room.calibrationOffsetMs,
     countdown: room.countdown,
     gameStartTime: room.gameStartTime,
+    pausedAtMs: room.pausedAtMs,
+    pauseElapsedGameMs: room.pauseElapsedGameMs,
     gameDurationMs: room.gameDurationMs,
     teamScore: room.teamScore,
     crowdMeter: room.crowdMeter,
