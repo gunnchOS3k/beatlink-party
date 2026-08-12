@@ -162,7 +162,7 @@ async function main() {
     });
     // Wait for 3s countdown ticks + start
     await wait(3500);
-    let playing = roomManager.getRoom(created.code);
+    const playing = roomManager.getRoom(created.code);
     emit('core_loop_playing', playing?.phase === 'playing', { phase: playing?.phase });
 
     const beatmap = roomManager.getBeatmap(created.code);
