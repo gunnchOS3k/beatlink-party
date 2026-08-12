@@ -957,9 +957,56 @@ export class RoomManager {
     return calibratedGameTimeMs(this.getGameTimeMs(code), room.calibrationOffsetMs || 0);
   }
 
+  
+  /**
+   * HOST_CONTROLLED_SESSION_PAUSE — only authorized host may pause/resume.
+   * While paused, gameplay inputs are rejected; room sync state is preserved.
+   */
+  pauseSession(
+    code: string,
+    hostSocketId: string,
+    hostToken: string | undefined,
+  ): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    if (!this.authorizeHost(code, hostSocketId, hostToken)) return null;
+    if (room.phase !== 'playing') return null;
+    assertTransition(room.phase, 'paused');
+    room.phase = 'paused';
+    room.pausedAtMs = Date.now();
+    room.pauseElapsedGameMs = this.getGameTimeMs(code);
+    emitTelemetry('session_pause', room.code, { host: true });
+    return this.publish(room);
+  }
+
+  resumeSession(
+    code: string,
+    hostSocketId: string,
+    hostToken: string | undefined,
+  ): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    if (!this.authorizeHost(code, hostSocketId, hostToken)) return null;
+    if (room.phase !== 'paused') return null;
+    assertTransition(room.phase, 'playing');
+    // Preserve timeline: shift gameStartTime so getGameTimeMs continues from pauseElapsedGameMs.
+    const elapsed = typeof room.pauseElapsedGameMs === 'number' ? room.pauseElapsedGameMs : 0;
+    room.gameStartTime = Date.now() - elapsed;
+    room.phase = 'playing';
+    room.pausedAtMs = undefined;
+    room.pauseElapsedGameMs = undefined;
+    emitTelemetry('session_resume', room.code, { host: true });
+    return this.publish(room);
+  }
+
   processInput(code: string, input: PlayerInputEvent): { room: RoomState; scoreEvent: ScoreEvent | null } | null {
     const room = this.getRoom(code);
-    if (!room || room.phase !== 'playing' || !room.beatmap) return null;
+    if (!room || !room.beatmap) return null;
+    if (room.phase === 'paused') {
+      emitTelemetry('input_rejected_paused', room.code, { playerId: input.playerId });
+      return { room: this.publish(room), scoreEvent: null };
+    }
+    if (room.phase !== 'playing') return null;
     const player = room.players.find((p) => p.id === input.playerId);
     if (!player) return null;
 

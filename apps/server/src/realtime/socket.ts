@@ -8,6 +8,10 @@ import type {
 import { roomManager } from '../rooms/RoomManager.js';
 import { resolveLink } from '../music/linkResolver.js';
 
+function structuredLog(event: string, fields: Record<string, unknown> = {}) {
+  console.log(JSON.stringify({ ts: new Date().toISOString(), component: 'beatlink.realtime', event, ...fields }));
+}
+
 function requireHost(
   code: string,
   socketId: string,
@@ -22,6 +26,30 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
   });
 
   io.on('connection', (socket) => {
+    // Every handler below assumes well-formed payloads (e.g. `data.code.toUpperCase()`
+    // with no null check) — a single malformed/garbage event from any client
+    // (missing/null `code`, wrong types, etc.) threw synchronously inside a
+    // socket.io event callback and crashed the *entire* Node process for
+    // every room/player, a real denial-of-service reachable by one bad
+    // client. Wrap every handler registered on this socket so a thrown
+    // error is caught, logged, and reported to the offending client only —
+    // it can no longer take the whole server down.
+    const rawOn = socket.on.bind(socket);
+    socket.on = ((event: string, handler: (...args: unknown[]) => void) => {
+      return rawOn(event, (...args: unknown[]) => {
+        try {
+          handler(...args);
+        } catch (err) {
+          structuredLog("handler_error", { socketEvent: event, message: err instanceof Error ? err.message : String(err) });
+          socket.emit('room.error', {
+            error: 'internal_error',
+            event,
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
+      });
+    }) as typeof socket.on;
+
     socket.on(
       'room.create',
       (
@@ -101,7 +129,48 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
       socket.emit('room.state', roomManager.stripInternal(room));
     });
 
+    
     socket.on(
+      'room.session_pause',
+      (
+        data: { code: string; hostToken?: string },
+        cb?: (result: { ok: boolean; error?: string; room?: unknown }) => void,
+      ) => {
+        const code = data.code.toUpperCase();
+        const room = roomManager.pauseSession(code, socket.id, data.hostToken);
+        if (!room) {
+          structuredLog('session_pause_denied', { code, socketId: socket.id });
+          cb?.({ ok: false, error: 'pause_denied' });
+          return;
+        }
+        structuredLog('session_pause', { code, phase: room.phase });
+        io.to(code).emit('room.state', room);
+        io.to(code).emit('room.session_paused', { code, phase: room.phase });
+        cb?.({ ok: true, room });
+      },
+    );
+
+    socket.on(
+      'room.session_resume',
+      (
+        data: { code: string; hostToken?: string },
+        cb?: (result: { ok: boolean; error?: string; room?: unknown }) => void,
+      ) => {
+        const code = data.code.toUpperCase();
+        const room = roomManager.resumeSession(code, socket.id, data.hostToken);
+        if (!room) {
+          structuredLog('session_resume_denied', { code, socketId: socket.id });
+          cb?.({ ok: false, error: 'resume_denied' });
+          return;
+        }
+        structuredLog('session_resume', { code, phase: room.phase });
+        io.to(code).emit('room.state', room);
+        io.to(code).emit('room.session_resumed', { code, phase: room.phase });
+        cb?.({ ok: true, room });
+      },
+    );
+
+socket.on(
       'room.join',
       (
         data: { code: string; name: string; playerId?: string; playerToken?: string },

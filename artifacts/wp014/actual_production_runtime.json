@@ -1,0 +1,182 @@
+{
+  "schema": "beatlink_actual_production_runtime/v1",
+  "game": "beatlink-party",
+  "engine": "socket.io",
+  "run_mode": "real_http_websocket_setupRealtime",
+  "commit": "a2453eeda022e2ded5a29ef5564edc6ee3c502e2",
+  "all_steps_pass": true,
+  "steps": [
+    {
+      "step": "launch_socket_server",
+      "result": "pass",
+      "detail": {
+        "baseUrl": "http://127.0.0.1:51835",
+        "transport": "websocket"
+      },
+      "ts": "2026-08-12T18:15:11.732Z"
+    },
+    {
+      "step": "create_room",
+      "result": "pass",
+      "detail": {
+        "code": "2M6W9"
+      },
+      "ts": "2026-08-12T18:15:11.749Z"
+    },
+    {
+      "step": "join_participant",
+      "result": "pass",
+      "detail": {
+        "playerId": "11258470-e9c4-4b82-bd50-fa108f595c8f"
+      },
+      "ts": "2026-08-12T18:15:11.751Z"
+    },
+    {
+      "step": "join_audience",
+      "result": "pass",
+      "detail": {
+        "audienceId": "ae83ff4c-ad46-43d2-ab09-4e488b53d980"
+      },
+      "ts": "2026-08-12T18:15:11.753Z"
+    },
+    {
+      "step": "select_local_fixture_song",
+      "result": "pass",
+      "detail": {
+        "song_id": "demo-neon-groove",
+        "license": "demo_generated",
+        "selectedSongId": "demo-neon-groove"
+      },
+      "ts": "2026-08-12T18:15:11.784Z"
+    },
+    {
+      "step": "assign_roles_input",
+      "result": "pass",
+      "detail": {
+        "role": "beat_tapper",
+        "ready": true
+      },
+      "ts": "2026-08-12T18:15:11.826Z"
+    },
+    {
+      "step": "calibrate_timing",
+      "result": "pass",
+      "detail": {
+        "offset": 20,
+        "phase": "calibrating"
+      },
+      "ts": "2026-08-12T18:15:11.868Z"
+    },
+    {
+      "step": "core_loop_playing",
+      "result": "pass",
+      "detail": {
+        "phase": "playing"
+      },
+      "ts": "2026-08-12T18:15:15.369Z"
+    },
+    {
+      "step": "socket_game_input",
+      "result": "pass",
+      "detail": {
+        "notes": 82,
+        "phase": "playing",
+        "note_id": "note-0"
+      },
+      "ts": "2026-08-12T18:15:15.422Z"
+    },
+    {
+      "step": "host_controlled_session_pause",
+      "result": "pass",
+      "detail": {
+        "pause_ok": true,
+        "phase_paused": "paused",
+        "phase_mid_pause": "paused",
+        "non_host_denied": true,
+        "input_rejected_score_unchanged": true,
+        "resume_ok": true,
+        "phase_resumed": "playing",
+        "design": "HOST_CONTROLLED_SESSION_PAUSE"
+      },
+      "ts": "2026-08-12T18:15:15.466Z"
+    },
+    {
+      "step": "score_results",
+      "result": "pass",
+      "detail": {
+        "team_score": 300,
+        "phase": "results",
+        "score_from_engine": true
+      },
+      "ts": "2026-08-12T18:15:15.467Z"
+    },
+    {
+      "step": "rematch_room",
+      "result": "pass",
+      "detail": {
+        "phase": "lobby"
+      },
+      "ts": "2026-08-12T18:15:15.498Z"
+    },
+    {
+      "step": "host_auth_path",
+      "result": "pass",
+      "detail": {
+        "authed": true
+      },
+      "ts": "2026-08-12T18:15:15.498Z"
+    },
+    {
+      "step": "save_load_host_reconnect",
+      "result": "pass",
+      "detail": {
+        "code": "2M6W9",
+        "phase": "lobby",
+        "players_preserved": true
+      },
+      "ts": "2026-08-12T18:15:15.564Z"
+    },
+    {
+      "step": "host_loss_migration",
+      "result": "pass",
+      "detail": {
+        "new_host_id": "player-host:11258470-e9c4-4b82-bd50-fa108f595c8f",
+        "room_still_exists": true
+      },
+      "ts": "2026-08-12T18:15:15.646Z"
+    },
+    {
+      "step": "player_reconnect",
+      "result": "pass",
+      "detail": {
+        "playerId": "11258470-e9c4-4b82-bd50-fa108f595c8f",
+        "connected": true
+      },
+      "ts": "2026-08-12T18:15:15.651Z"
+    },
+    {
+      "step": "crash_recovery_malformed_input",
+      "result": "pass",
+      "detail": {
+        "server_responded_after_garbage": true
+      },
+      "ts": "2026-08-12T18:15:15.736Z"
+    },
+    {
+      "step": "perf_telemetry_join_latency",
+      "result": "pass",
+      "detail": {
+        "samples": 12,
+        "p50_ms": 1.954791999999543,
+        "p95_ms": 3.8849589999999807,
+        "max_ms": 3.8849589999999807
+      },
+      "ts": "2026-08-12T18:15:15.763Z"
+    }
+  ],
+  "generated_at": "2026-08-12T18:15:15.787Z",
+  "false_positive_rejected": [
+    "gate1 RoomManager-only core_loop_runner is not ACTUAL_PRODUCTION_RUNTIME",
+    "Scores come from RoomManager.endGame — not hardcoded in this harness"
+  ]
+}
