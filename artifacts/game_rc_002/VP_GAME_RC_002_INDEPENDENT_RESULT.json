@@ -1,0 +1,158 @@
+{
+  "schema": "gunnchos.game_rc_002.independent_verifier_result.v1",
+  "work_item": "GAME-RC-002",
+  "game": "beatlink-party",
+  "verifier_role": "INDEPENDENT_VERIFIER_AGENT",
+  "did_not_implement": true,
+  "did_not_merge": true,
+  "HUMAN_PLAYTEST_VALIDATED": false,
+  "pr": {
+    "number": 20,
+    "url": "https://github.com/gunnchOS3k/beatlink-party/pull/20",
+    "draft": true,
+    "branch": "cursor/game-rc-002-playthrough-achievements",
+    "title": "GAME-RC-002: playthrough contracts + real achievement runtime",
+    "mergeable": "MERGEABLE",
+    "mergeStateStatus": "CLEAN"
+  },
+  "claimed_tip": "ff9c567da720f7c186d18a0d7b098384eef21a6b",
+  "claimed_tip_live_confirmed": true,
+  "verified_content_tip": "ff9c567da720f7c186d18a0d7b098384eef21a6b",
+  "verified_content_tip_short": "ff9c567",
+  "base_main_note": "PR base is main. Cursor does not merge.",
+  "generated_at_utc": "2026-08-13T20:56:08Z",
+  "VP_GAME_RC_002_INDEPENDENT_RESULT": "PASS",
+  "BEATLINK_20_READY_FOR_EDMUND_MERGE": true,
+  "READY_FOR_EDMUND_MERGE": true,
+  "session_reproduced": true,
+  "session_static_page_only": false,
+  "achievements": "12/12",
+  "critic": "ALPHA",
+  "defects": { "S0_open": 0, "S1_open": 0, "S2_open": 4 },
+  "challenges": {
+    "live_tip_ci": {
+      "verdict": "PASS",
+      "head_sha": "ff9c567da720f7c186d18a0d7b098384eef21a6b",
+      "checks": [
+        {
+          "name": "build-and-test",
+          "conclusion": "success",
+          "workflow": "CI",
+          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31742536939"
+        },
+        {
+          "name": "gate1-core-loop",
+          "conclusion": "success",
+          "workflow": "Gate 1 post-merge integrity",
+          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31742536931"
+        }
+      ]
+    },
+    "rc_gate_honesty": {
+      "verdict": "PASS",
+      "POLISHED_RELEASE_CANDIDATE": false,
+      "FEATURE_COMPLETE_RC": false,
+      "HUMAN_PLAYTEST_VALIDATED": false,
+      "critic_class": "ALPHA",
+      "critic_honest_iff_S2_nonzero": true,
+      "S2_open": 4,
+      "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
+      "pixels_invented": false,
+      "first_fun_without_developer": "HUMAN_PENDING"
+    },
+    "socket_io_topology_not_static_page": {
+      "verdict": "PASS",
+      "not_static_page": true,
+      "implementer_socket_test_scope": "create/join only",
+      "independent_socket_session": {
+        "create_join_audience": true,
+        "five_modes": ["BeatTap", "CallAndResponse", "KaraokePerformance", "BandRoles", "PredictionTrivia"],
+        "score_input": true,
+        "pause_resume": true,
+        "player_reconnect": true,
+        "host_migration": true,
+        "final_result": true,
+        "rematch_host_reconnect": true,
+        "achievements_from_socket_session": "11/12 (bl.comeback not produced without rank-swing score state)"
+      },
+      "roommanager_session": "create/join/audience/five modes/pause/reconnect/migration/results/rematch/leave — 12/12",
+      "socket_handlers_present": [
+        "room.create", "room.join", "room.join_audience", "room.set_role", "room.ready",
+        "room.select_song", "room.set_mode", "game.start_calibration", "game.submit_calibration",
+        "game.start_countdown", "game.input", "room.session_pause", "room.session_resume",
+        "game.rematch", "room.host_reconnect", "room.claim_host", "room.leave", "room.end",
+        "audience.influence"
+      ],
+      "host_player_audience_controls": "HostPage Pause/Rematch/End Room, PlayerPage Claim Host, AudiencePage hype/vote — no permanently dead claimed-path controls (disabled states are contextual)"
+    },
+    "achievements_12_of_12": {
+      "verdict": "PASS",
+      "catalog_count": 12,
+      "unlocked_from_roommanager_runtime": 12,
+      "unlocked_from_socket_session_without_score_injection": 11,
+      "cheat_unlock_by_id": false,
+      "forbidden_unlock_types": "none (no test/debug/cheat/always)",
+      "comeback_note": "bl.comeback is wired via recordRanks/checkComeback on processInput/endGame. Independent RoomManager run reached 12/12 by setting live player.score then processInput (game state, not unlock(id)). Short Socket.IO rounds did not naturally invert ranks. Not a cheat catalog type."
+    },
+    "media_no_drm_rip": {
+      "verdict": "PASS",
+      "rip_blocked": true,
+      "claimedRipUrl": "blocked_rip_attempt",
+      "provider_auth_without_credentials": "EXTERNAL_PENDING",
+      "local_open_catalog": true,
+      "offline_launch_songs_on_disk": 6,
+      "manifest_offline_launch_songs": 5,
+      "demo_catalog_songs": 14,
+      "copyrighted_lyrics": "OPEN / not shipped"
+    },
+    "critic_alpha": {
+      "verdict": "PASS",
+      "classification": "ALPHA",
+      "not_rc": true,
+      "S2_nonzero": true,
+      "VISUAL": "HISTORICAL_CAPTURES_ONLY — no new framebuffer; no invented pixels",
+      "first_fun_without_developer": "HUMAN_PENDING"
+    }
+  },
+  "gaps": [
+    {
+      "id": "HUMAN_PLAYTEST_VALIDATED",
+      "severity": "S2",
+      "status": "OPEN_EXPECTED",
+      "summary": "First-fun-without-developer remains HUMAN_PENDING. Correctly not claimed."
+    },
+    {
+      "id": "PUBLIC_JOIN_ORIGIN",
+      "severity": "S2",
+      "status": "OPEN",
+      "summary": "Join URLs may still be lab localhost."
+    },
+    {
+      "id": "PROVIDER_AUTH",
+      "severity": "S2",
+      "status": "OPEN_EXPECTED",
+      "summary": "Spotify/YouTube/Apple EXTERNAL_PENDING without credentials. Local/open catalog used. No DRM rip."
+    },
+    {
+      "id": "COMEBACK_NATURAL_SOCKET",
+      "severity": "S3",
+      "status": "NOTE",
+      "summary": "12/12 holds on RoomManager runtime. Socket session without rank-swing setup unlocked 11/12 (missing bl.comeback only)."
+    },
+    {
+      "id": "MANIFEST_OFFLINE_SONG_COUNT",
+      "severity": "S3",
+      "status": "NOTE",
+      "summary": "CONTENT_MANIFEST counts.offline_launch_songs=5 but offline-launch-catalog.json has 6 songs. Undercount, not a placeholder marked CLOSED."
+    }
+  ],
+  "rights_safety_confirmation": {
+    "pass": true,
+    "no_youtube_spotify_apple_rip": true,
+    "provider_auth": "EXTERNAL_PENDING",
+    "gameplay_audio": "local/open/demo catalog + metronome",
+    "lyrics": "no commercial lyrics shipped"
+  },
+  "claim_boundary": "Digital independent verification of Beat Link Party GAME-RC-002 DRAFT #20. Does not earn HUMAN_PLAYTEST_VALIDATED, licensed catalog, or public-join polish. Cursor did not implement and must not merge.",
+  "verdict_summary": "PR #20 tip ff9c567 live, CI green, RC_GATE honest (FEATURE_COMPLETE_RC/POLISHED_RC false, critic ALPHA with S2=4). Independent Socket.IO topology is a live host/player/audience server, not a static page; five modes + pause/reconnect/migration/results/rematch reproduced. 12/12 achievements on RoomManager runtime; no cheat unlock API; no DRM rip. Edmund-mergeable yes. Remaining OPEN: human first-fun, public join, provider auth."
+}
