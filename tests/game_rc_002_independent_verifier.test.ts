@@ -150,7 +150,6 @@ describe('INDEPENDENT VERIFIER GAME-RC-002 Beat Link', () => {
 
     const rt = manager.getAchievements();
     const missing = CATALOG_IDS.filter((id) => !rt.isUnlocked(id));
-    // eslint-disable-next-line no-console
     console.log(
       'INDEPENDENT_BEATLINK_ROOMMANAGER_EVIDENCE',
       JSON.stringify({
@@ -306,7 +305,6 @@ describe('INDEPENDENT VERIFIER Socket.IO topology (not a static page)', () => {
       rematchReconnect: rematchAck,
       provider: getProviderAuthStatus().authState,
     };
-    // eslint-disable-next-line no-console
     console.log('INDEPENDENT_BEATLINK_SOCKET_EVIDENCE', JSON.stringify(evidence));
 
     expect(modesPlayed).toEqual([...GAME_MODE_IDS]);
