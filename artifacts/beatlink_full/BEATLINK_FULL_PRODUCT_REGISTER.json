@@ -1,0 +1,150 @@
+{
+  "schema": "beatlink_full_product_register/v1",
+  "work_item": "GAME-successor-beatlink-full",
+  "game": "beatlink-party",
+  "finite_packet": true,
+  "not_all_four_games": true,
+  "accepted_main_base": "4b3970c9bc327ba7a1cec43ff7a905d91cd3070b",
+  "accepted_main_verified_live": true,
+  "generated_at": "2026-08-12T22:50:00Z",
+  "source_commit_base": "4b3970c9bc327ba7a1cec43ff7a905d91cd3070b",
+  "FULL_GAME_CONTENT_COMPLETE": false,
+  "claim": "BEATLINK_FULL_PRODUCT_DEPTH_PARTIAL — digitally executable mode/runtime gaps closed (CallAndResponse window scoring, PredictionTrivia lock path, host capacity copy); HUMAN_POLISH pending; commercial music rights not claimed",
+  "HUMAN_POLISH": "HUMAN_PENDING",
+  "fun": "HUMAN_PENDING",
+  "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
+  "counts": {
+    "modes": 5,
+    "band_roles": 3,
+    "demo_songs": 14,
+    "max_performers": 8
+  },
+  "features": {
+    "beat_tap": {
+      "status": "PASS_RUNTIME",
+      "evidence": "packages/game-engine/src/modes/beatTap.ts + RoomManager.processInput tap path + tests/modes.test.ts"
+    },
+    "call_and_response": {
+      "status": "PASS_RUNTIME",
+      "gap_closed": "responseMatched was vocal-only and ignored section call/response windows; now uses isCallAndResponseWindow on beatmap sections for tap + vocal",
+      "evidence": "packages/game-engine/src/modeRuntime.ts + RoomManager.processInput + tests/game_successor_modes.test.ts"
+    },
+    "karaoke": {
+      "status": "PASS_RUNTIME",
+      "no_recording_default": true,
+      "copyrighted_lyrics": false,
+      "evidence": "packages/game-engine/src/karaokeMic.ts + karaokePerformance.ts + tests/karaoke_digital.test.ts"
+    },
+    "band_roles": {
+      "status": "PASS_RUNTIME",
+      "roles": ["beat_tapper", "vocalist", "hype_captain"],
+      "evidence": "packages/game-engine/src/modes/bandRoles.ts + RoomManager role scoring"
+    },
+    "prediction_trivia": {
+      "status": "PASS_RUNTIME",
+      "gap_closed": "engine scored predictionCorrect only via unit meta; live socket/RoomManager now accepts prediction_lock before section start",
+      "evidence": "PlayerInputEvent.prediction_lock + RoomManager.processInput + PlayerPage choice UI + tests/game_successor_modes.test.ts"
+    },
+    "audience_impact": {
+      "status": "PASS_RUNTIME",
+      "mechanics": ["hype", "vote", "crowd_meter_ceiling", "rate_limit", "sandbox"],
+      "evidence": "RoomManager.processAudienceInfluence + tests/audience_host.test.ts + tests/wave_g_lifecycle.test.ts"
+    },
+    "room_lifecycle": {
+      "status": "PASS_RUNTIME",
+      "phases": ["lobby", "song_select", "calibrating", "countdown", "playing", "paused", "results", "closed"],
+      "evidence": "RoomManager + tests/rooms.test.ts + tests/wave_g_lifecycle.test.ts"
+    },
+    "host_player_audience": {
+      "status": "PASS_RUNTIME",
+      "seats": ["host", "player", "audience"],
+      "evidence": "apps/web HostPage/PlayerPage/AudiencePage + RoomManager join/audience"
+    },
+    "phone_first": {
+      "status": "PASS_DIGITAL",
+      "evidence": "apps/web/index.html viewport + PlayerPage large tap/hype targets + pixel-final/01c-landing.png"
+    },
+    "score": {
+      "status": "PASS_RUNTIME",
+      "evidence": "packages/game-engine/src/scoring.ts + scoreForMode + tests/scoring.test.ts"
+    },
+    "latency_calibration": {
+      "status": "PASS_RUNTIME",
+      "evidence": "game.start_calibration / submitCalibration + packages/game-engine/src/calibration.ts + wp014 production gate"
+    },
+    "reconnect": {
+      "status": "PASS_RUNTIME",
+      "paths": ["hostToken", "playerToken"],
+      "evidence": "RoomManager host/player reconnect + artifacts/wp014/BEATLINK_PARTY_PRODUCT_GATE.json"
+    },
+    "host_migration": {
+      "status": "PASS_RUNTIME",
+      "evidence": "RoomManager successor host on host drop + tests/wave_g_lifecycle.test.ts"
+    },
+    "session_pause": {
+      "status": "PASS_RUNTIME",
+      "design": "HOST_CONTROLLED_SESSION_PAUSE",
+      "evidence": "RoomManager.pauseSession/resumeSession + wp014 PAUSE_PASS"
+    },
+    "settings_a11y": {
+      "status": "PASS_RUNTIME",
+      "features": ["reduceMotion", "highContrast", "largerHitTargets", "captions", "colorBlindSafe", "screenReaderHints"],
+      "evidence": "AccessibilityPanel + shared privacy/a11y + mode a11y profiles"
+    },
+    "telemetry": {
+      "status": "PASS_RUNTIME",
+      "pii": "roomCode hashed; display names redacted when privacy.redactDisplayNames",
+      "evidence": "packages/shared/src/telemetry.ts + emitTelemetry on score/pause/privacy/audience"
+    },
+    "moderation_privacy": {
+      "status": "PASS_RUNTIME",
+      "features": ["audience mute", "sandbox", "name redaction", "mic no-record default"],
+      "evidence": "RoomManager.setAudienceMuted + privacy.ts + liveMicPipeline"
+    },
+    "results_rematch": {
+      "status": "PASS_RUNTIME",
+      "evidence": "RoomManager.endGame/rematch + buildModeResultsBoard + wp014 rematch_room"
+    },
+    "provider_media_rights": {
+      "status": "PASS_DIGITAL",
+      "playback_adaptation": "PLAYABLE_APPROVED catalog/metronome vs METADATA_ONLY platform links vs EXTERNAL commercial lyrics null",
+      "evidence": "packages/game-engine/src/media.ts + providers.ts + rights.ts + docs/MUSIC_COMPLIANCE.md + tests/rights.test.ts"
+    }
+  },
+  "rights_safety": {
+    "rip_download_decrypt_forbidden": true,
+    "youtube_spotify_apple_audio_cached": false,
+    "platform_links": "metadata / official-embed descriptors only",
+    "lyrics": "mock + public-domain only; commercial providers EXTERNAL and return null",
+    "karaoke_recording_default": "off",
+    "analysis_eligible_on_platform_metadata": false,
+    "notes": [
+      "No YouTube/Spotify/Apple Music rip, download, or decrypt path added this packet.",
+      "Provider-aware adaptation: catalog → procedural metronome; unmatched platform URL → METADATA_ONLY; commercial lyrics adapter refuses fetch.",
+      "Demo catalog remains demo_generated / legal-local fixtures."
+    ]
+  },
+  "gaps_closed_this_packet": [
+    "call_and_response_section_window_scoring",
+    "prediction_trivia_live_prediction_lock_input",
+    "host_lobby_capacity_copy_MAX_PERFORMERS",
+    "phone_prediction_and_call_response_ui"
+  ],
+  "explicit_non_claims": [
+    "No commercial music license / official platform SDK playback",
+    "No copyrighted lyric display",
+    "No HUMAN_POLISH / physical playtest / device-lab merge claim",
+    "FULL_GAME_CONTENT_COMPLETE remains false",
+    "Cursor never merges"
+  ],
+  "defects": {
+    "S0_open": 0,
+    "S1_open": 0,
+    "S1_found_and_fixed_this_cycle": 1,
+    "S1_fixed_detail": "PredictionTrivia and CallAndResponse scoring existed in the engine registry but were not executable on the live RoomManager input path (prediction had no input type; C&R match ignored section windows).",
+    "S2_fixed_this_cycle": "Host lobby player cap copy said 0/6 while MAX_PERFORMERS is 8 (pixel-final/02-host-lobby.png)."
+  },
+  "tip_sha": "474b994d761fe3c54c05f0edb783f5addcaf8b4c",
+  "tip_short": "474b994",
+  "source_commit_tip": "474b994d761fe3c54c05f0edb783f5addcaf8b4c"
+}

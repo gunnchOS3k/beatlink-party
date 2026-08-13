@@ -12,10 +12,13 @@ import type {
 import { ROLES } from '@beatlink/shared';
 import {
   buildKaraokePromptState,
+  buildPredictionChoices,
   buildTimelineSync,
   calibratedGameTimeMs,
   canSubmitVocalPhrase,
   describeCombo,
+  isCallAndResponseWindow,
+  nextPredictionSection,
 } from '@beatlink/game-engine';
 import { useJoinRoom, useRoomEvents, useSocket } from '../lib/socket';
 import {
@@ -213,6 +216,10 @@ export default function PlayerPage() {
     sendInput(`hype_${type}`, { hypeType: type });
   }
 
+  function handlePrediction(sectionId: string, predictionChoice: string) {
+    sendInput('prediction_lock', { sectionId, predictionChoice });
+  }
+
   if (!joined) {
     return (
       <div className="page">
@@ -328,6 +335,47 @@ export default function PlayerPage() {
         )}
 
         <div className={`feedback ${feedbackClass}`}>{feedback}</div>
+
+        {room.gameMode === 'CallAndResponse' && beatmap && (
+          <p style={{ textAlign: 'center', marginBottom: '0.75rem' }}>
+            {isCallAndResponseWindow(beatmap.sections, gameTimeMs).phase === 'call'
+              ? 'Listen — call phase'
+              : isCallAndResponseWindow(beatmap.sections, gameTimeMs).phase === 'response'
+                ? 'Echo now — response window'
+                : 'Wait for the next call'}
+          </p>
+        )}
+
+        {room.gameMode === 'PredictionTrivia' && beatmap && (
+          <div className="card stack" style={{ marginBottom: '1rem', textAlign: 'center' }}>
+            <p className="label">Predict the next section</p>
+            {(() => {
+              const target = nextPredictionSection(beatmap.sections, gameTimeMs);
+              if (!target) {
+                return <p style={{ color: 'var(--muted)' }}>No upcoming section to lock.</p>;
+              }
+              const choices = buildPredictionChoices(beatmap, room.difficulty, target);
+              return (
+                <>
+                  <p>
+                    Lock before <strong>{target.label}</strong> starts
+                  </p>
+                  <div className="role-grid">
+                    {choices.map((choice) => (
+                      <button
+                        key={choice}
+                        className="btn-secondary btn-large"
+                        onClick={() => handlePrediction(target.id, choice)}
+                      >
+                        {choice}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
 
         {player.role === 'beat_tapper' && (
           <button className="tap-button" onClick={handleTap}>

@@ -1,0 +1,72 @@
+{
+  "schema": "gunnchos.experience_review.v1",
+  "product": "beatlink-party",
+  "generated_utc": "2026-08-12T22:50:00Z",
+  "EXPERIENCE_REVIEW_COUNCIL": "ACTIVE",
+  "AI_HEURISTIC_REVIEW_ONLY": true,
+  "HUMAN_E6_NOT_EARNED_BY_AI_REVIEW": true,
+  "HUMAN_POLISH": "HUMAN_PENDING",
+  "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
+  "visual_inspect": {
+    "status": "HISTORICAL_CAPTURES_ONLY",
+    "reason": "No live framebuffer this finite GAME successor packet. Critic used existing pixel-final captures only; no invented pixels.",
+    "paths": [
+      "docs/product-quality/evidence/pixel-final/01c-landing.png",
+      "docs/product-quality/evidence/pixel-final/02-host-lobby.png"
+    ]
+  },
+  "roles": {
+    "ER1_senior_product_ux": {
+      "mode": "AI_HEURISTIC",
+      "visual_status": "HISTORICAL_CAPTURES_ONLY",
+      "findings": [
+        {
+          "id": "BLP-ER1-01",
+          "severity": "S1",
+          "status": "REMEDIATED_DIGITAL",
+          "finding": "Prediction Trivia and Call & Response are now playable from the phone controller, not engine-only score tables."
+        },
+        {
+          "id": "BLP-ER1-02",
+          "severity": "S2",
+          "status": "REMEDIATED_DIGITAL",
+          "finding": "Host lobby player-cap copy aligned to MAX_PERFORMERS (8)."
+        },
+        {
+          "id": "BLP-ER1-03",
+          "severity": "S3",
+          "status": "OPEN",
+          "finding": "Human polish of party cadence / host stage feel not claimed."
+        }
+      ]
+    },
+    "ER2_student_engagement": {
+      "mode": "AI_HEURISTIC",
+      "applicable": true,
+      "findings": [
+        {
+          "id": "BLP-ER2-01",
+          "severity": "S2",
+          "status": "OPEN",
+          "finding": "Landing how-to lists roles (Beat Tapper / Vocalist / Hype) but not the five first-class modes — students may miss Call & Response / Trivia."
+        },
+        {
+          "id": "BLP-ER2-02",
+          "severity": "S3",
+          "status": "OPEN",
+          "finding": "Student/party fun validation HUMAN_PENDING."
+        }
+      ]
+    },
+    "ER3_game_critic": {
+      "mode": "AI_HEURISTIC",
+      "applicable": true,
+      "classification": "ALPHA",
+      "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
+      "pointer": "artifacts/experience_review/beatlink-party/GAME_CRITIC_REVIEW.json"
+    }
+  },
+  "summary": "Beat Link Party full-product digital depth packet: CallAndResponse windows, PredictionTrivia locks, host cap copy closed digitally. Critic class ALPHA. HUMAN_POLISH pending. Historical pixels inspected; live framebuffer unavailable.",
+  "tip_sha": "474b994d761fe3c54c05f0edb783f5addcaf8b4c",
+  "tip_short": "474b994"
+}
