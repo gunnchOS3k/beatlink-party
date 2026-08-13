@@ -1,0 +1,41 @@
+{
+  "schema": "gunnchos.game_rc.rc_gate/v1",
+  "game": "beatlink-party",
+  "packet": "GAME-RC-002",
+  "generated_at": "2026-08-13T20:20:00Z",
+  "claims": {
+    "POLISHED_RELEASE_CANDIDATE": false,
+    "FEATURE_COMPLETE_RC": false,
+    "HUMAN_PLAYTEST_VALIDATED": false,
+    "DIGITAL_PLAYTHROUGH_EXECUTABLE": true,
+    "ACHIEVEMENT_SUBSYSTEM": true
+  },
+  "critic_class": "ALPHA",
+  "critic_class_rationale": "Digital five-mode party session is executable on live RoomManager plus a Socket.IO host/player topology (not a static page). S0/S1 for this packet's digital scope are 0. S2 remains: human first-fun-in-minutes, public join origin, licensed catalog. VISUAL is HISTORICAL_CAPTURES_ONLY from prior packets — this packet does not invent pixels. Critic stays ALPHA. POLISHED_RELEASE_CANDIDATE and FEATURE_COMPLETE_RC are not claimed.",
+  "defects": {
+    "S0_open": 0,
+    "S1_open": 0,
+    "S2_open": 4,
+    "S2_items": [
+      "HUMAN_PLAYTEST_VALIDATED=false",
+      "Join origin may be lab localhost (not polished public join)",
+      "Provider auth EXTERNAL_PENDING without credentials",
+      "First fun moment for a new group remains a human critic question"
+    ]
+  },
+  "visual": {
+    "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
+    "reason": "No new live framebuffer this packet. Prior pixel-final landing/host-lobby captures exist; this packet does not invent visual critique."
+  },
+  "playthrough": {
+    "status": "DIGITAL_EXECUTABLE",
+    "contract": "release/PLAYTHROUGH_CONTRACT.json"
+  },
+  "achievements": {
+    "catalog": "release/ACHIEVEMENTS.json",
+    "count": 12,
+    "tested_count": 12,
+    "notes": "Isolated AchievementRuntime tests plus RoomManager session execution. No cheat unlock API."
+  },
+  "notes": "Cursor does not merge. Local/open catalog media only — no DRM bypass. Critic may remain ALPHA while S2 remains."
+}

@@ -478,6 +478,14 @@ export default function PlayerPage() {
         <p style={{ textAlign: 'center', color: 'var(--muted)' }}>
           Waiting for host to start next round...
         </p>
+        {room?.achievementSummary && (
+          <div className="card">
+            <h3>
+              Achievements {room.achievementSummary.unlocked}/{room.achievementSummary.total} (
+              {Math.round(room.achievementSummary.percent)}%)
+            </h3>
+          </div>
+        )}
       </div>
     );
   }

@@ -17,6 +17,8 @@ export default defineConfig({
       '@beatlink/shared': path.resolve(__dirname, 'packages/shared/src'),
       '@beatlink/game-engine': path.resolve(__dirname, 'packages/game-engine/src'),
       '@beatlink/device-ux': path.resolve(__dirname, 'device_ux/src'),
+      'socket.io': path.resolve(__dirname, 'apps/server/node_modules/socket.io'),
+      'socket.io-client': path.resolve(__dirname, 'apps/server/node_modules/socket.io-client'),
     },
   },
 });

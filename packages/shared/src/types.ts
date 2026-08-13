@@ -154,6 +154,23 @@ export interface RoomState {
   capacityProfile: CapacityProfile;
   createdAt: number;
   expiresAt: number;
+  /** GAME-RC-002 achievement browser snapshot (host process, offline). */
+  achievementSummary?: {
+    unlocked: number;
+    total: number;
+    percent: number;
+    entries: Array<{
+      id: string;
+      title: string;
+      description: string;
+      hidden: boolean;
+      unlocked: boolean;
+      unlocked_at: string;
+      percent: number;
+      current: number;
+      target: number;
+    }>;
+  };
 }
 
 export interface RoomPrivacySettings {
@@ -188,6 +205,8 @@ export interface ProviderAuthStatus {
   spotify: boolean;
   youtube: boolean;
   apple_music: boolean;
+  /** EXTERNAL_PENDING when no official provider credentials are configured. */
+  authState: 'EXTERNAL_PENDING' | 'CREDENTIALS_PRESENT';
 }
 
 export type CatalogLicense =

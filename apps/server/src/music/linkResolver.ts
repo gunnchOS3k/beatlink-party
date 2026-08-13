@@ -10,10 +10,14 @@ const APPLE_MUSIC_REGEX =
 const OEMBED_TIMEOUT_MS = 3500;
 
 export function getProviderAuthStatus(): ProviderAuthStatus {
+  const spotify = Boolean(process.env.SPOTIFY_CLIENT_ID);
+  const youtube = Boolean(process.env.YOUTUBE_API_KEY || process.env.YOUTUBE_CLIENT_ID);
+  const apple_music = Boolean(process.env.APPLE_MUSIC_DEVELOPER_TOKEN);
   return {
-    spotify: Boolean(process.env.SPOTIFY_CLIENT_ID),
-    youtube: Boolean(process.env.YOUTUBE_API_KEY || process.env.YOUTUBE_CLIENT_ID),
-    apple_music: Boolean(process.env.APPLE_MUSIC_DEVELOPER_TOKEN),
+    spotify,
+    youtube,
+    apple_music,
+    authState: spotify || youtube || apple_music ? 'CREDENTIALS_PRESENT' : 'EXTERNAL_PENDING',
   };
 }
 

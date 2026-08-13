@@ -93,12 +93,13 @@ export default function LandingPage() {
           <li>Players join at <strong>/join</strong> with the room code.</li>
           <li>Audience can spectate and send moderated hype/votes (rate-limited).</li>
           <li>Pick a role: Beat Tapper, Vocalist, or Hype Captain.</li>
-          <li>Host selects an approved demo song and starts the round.</li>
+          <li>Host selects a local/open catalog song (or approved demo) and starts the round.</li>
           <li>Perform from your phone — score awards at the end!</li>
         </ol>
         <div className="compliance-banner">
-          Music compliance: pasted YouTube/Spotify/Apple links are metadata-only. No audio is
-          downloaded. Use approved demo songs for gameplay.
+          Music compliance: pasted YouTube/Spotify/Apple links are metadata-only. Official provider
+          playback is EXTERNAL_PENDING without credentials. No audio is downloaded or DRM-bypassed.
+          Use owned/open/local catalog songs for gameplay.
         </div>
         <DeviceRolePicker role={role} roles={roles} onChange={setRole} />
         <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{profile.hints.join(' · ')}</p>

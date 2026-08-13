@@ -1,0 +1,102 @@
+{
+  "schema": "gunnchos.game_rc.achievements/v1",
+  "game": "beatlink-party",
+  "catalog_version": 1,
+  "save_version": 1,
+  "offline": true,
+  "duplicate_prevention": true,
+  "notes": "Unlocks fire from real RoomManager create/join/calibrate/mode/audience/pause/migration/results paths. No test-only unlock type. No DRM bypass.",
+  "achievements": [
+    {
+      "id": "bl.first_party",
+      "title": "First Party",
+      "description": "Host a party room.",
+      "hidden": false,
+      "unlock": { "type": "event_count", "event": "party_started", "count": 1 }
+    },
+    {
+      "id": "bl.beat_tap",
+      "title": "Beat Tap",
+      "description": "Play a Beat Tap round.",
+      "hidden": false,
+      "unlock": { "type": "flag", "flag": "mode:BeatTap" }
+    },
+    {
+      "id": "bl.call_and_response",
+      "title": "Call and Response",
+      "description": "Play a Call and Response round.",
+      "hidden": false,
+      "unlock": { "type": "flag", "flag": "mode:CallAndResponse" }
+    },
+    {
+      "id": "bl.karaoke",
+      "title": "Karaoke Night",
+      "description": "Play a Karaoke Performance round.",
+      "hidden": false,
+      "unlock": { "type": "flag", "flag": "mode:KaraokePerformance" }
+    },
+    {
+      "id": "bl.band_cooperation",
+      "title": "Band Cooperation",
+      "description": "Start Band Roles with two different player roles.",
+      "hidden": false,
+      "unlock": { "type": "flag", "flag": "band_cooperation" }
+    },
+    {
+      "id": "bl.prediction",
+      "title": "Prediction Lock",
+      "description": "Play a Prediction/Trivia round.",
+      "hidden": false,
+      "unlock": { "type": "flag", "flag": "mode:PredictionTrivia" }
+    },
+    {
+      "id": "bl.audience",
+      "title": "Crowd Work",
+      "description": "Accept a live audience hype or vote.",
+      "hidden": false,
+      "unlock": { "type": "event_count", "event": "audience_influence", "count": 1 }
+    },
+    {
+      "id": "bl.host_recovery",
+      "title": "Host Continuity",
+      "description": "Recover the party after host disconnect/migration.",
+      "hidden": false,
+      "unlock": { "type": "event_count", "event": "host_migrated", "count": 1 }
+    },
+    {
+      "id": "bl.comeback",
+      "title": "Comeback",
+      "description": "Finish a round in first after having been last.",
+      "hidden": false,
+      "unlock": { "type": "event_count", "event": "comeback", "count": 1 }
+    },
+    {
+      "id": "bl.five_mode",
+      "title": "Five-Mode Session",
+      "description": "Play all five modes in one party session.",
+      "hidden": false,
+      "unlock": { "type": "flag", "flag": "five_mode_session" }
+    },
+    {
+      "id": "bl.pause_and_breathe",
+      "title": "Pause and Breathe",
+      "description": "Host-pause a live round and resume it.",
+      "hidden": false,
+      "unlock": { "type": "event_count", "event": "pause_resume", "count": 1 }
+    },
+    {
+      "id": "bl.hidden_full_house",
+      "title": "Full House",
+      "description": "Five-mode session plus audience influence and host recovery.",
+      "hidden": true,
+      "unlock": {
+        "type": "all",
+        "conditions": [
+          { "type": "flag", "flag": "five_mode_session" },
+          { "type": "event_count", "event": "audience_influence", "count": 1 },
+          { "type": "event_count", "event": "host_migrated", "count": 1 }
+        ]
+      }
+    }
+  ]
+}
