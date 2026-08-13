@@ -2,11 +2,11 @@
   "schema": "gunnchos.game_rc_002.independent_verifier_result.v1",
   "work_item": "GAME-RC-002",
   "game": "beatlink-party",
-  "verifier_role": "STREAM_C_STAGE_C0_REPAIR_AND_REVERIFY",
+  "verifier_role": "INDEPENDENT_VERIFIER_AGENT",
   "stream": "PRODUCT-USE-RC-001 / STAGE C0",
-  "did_not_implement": false,
+  "did_not_implement": true,
   "did_not_merge": true,
-  "note": "Successor repair on #20: removed unused eslint-disable (lint --max-warnings 0) and aligned CONTENT_MANIFEST offline_launch_songs=6. Fresh independent re-verify on repair tip; Cursor does not merge.",
+  "note": "Independent STAGE C0 re-verify of claimed tip f0b599c. Prior VP stamp at f0b599c still cited tip/CI for 4c14dc5 and set did_not_implement=false — treated as stale. Lint/manifest repair holds; Cursor does not merge; GAME-RC-003 not started.",
   "HUMAN_PLAYTEST_VALIDATED": false,
   "pr": {
     "number": 20,
@@ -17,12 +17,13 @@
     "mergeable": "MERGEABLE",
     "mergeStateStatus": "CLEAN"
   },
-  "claimed_tip": "4c14dc5520e853cc4015a326c4420139537565f5",
+  "claimed_tip": "f0b599c7eac1e86bd2f8189d4a18b5dd98aba476",
   "claimed_tip_live_confirmed": true,
-  "verified_content_tip": "4c14dc5520e853cc4015a326c4420139537565f5",
-  "verified_content_tip_short": "4c14dc5",
-  "base_main_note": "PR base is main. Cursor does not merge. FOUR_GAME_ACCEPTED_MAIN_RC stays false until Edmund merges #20.",
-  "generated_at_utc": "2026-08-13T21:53:11Z",
+  "verified_content_tip": "f0b599c7eac1e86bd2f8189d4a18b5dd98aba476",
+  "verified_content_tip_short": "f0b599c",
+  "repair_content_tip": "4c14dc5520e853cc4015a326c4420139537565f5",
+  "base_main_note": "PR base is main. Cursor does not merge. FOUR_GAME_ACCEPTED_MAIN_RC stays false until Edmund merges #20. FEATURE_COMPLETE_RC/POLISHED_RELEASE_CANDIDATE/HUMAN_PLAYTEST_VALIDATED stay false. Critic remains ALPHA.",
+  "generated_at_utc": "2026-08-13T22:05:03Z",
   "VP_GAME_RC_002_INDEPENDENT_RESULT": "PASS",
   "BEATLINK_20_READY_FOR_EDMUND_MERGE": true,
   "READY_FOR_EDMUND_MERGE": true,
@@ -33,26 +34,72 @@
   "defects": {
     "S0_open": 0,
     "S1_open": 0,
-    "S2_open": 3
+    "S2_open": 4
   },
   "challenges": {
     "live_tip_ci": {
       "verdict": "PASS",
-      "head_sha": "4c14dc5520e853cc4015a326c4420139537565f5",
+      "head_sha": "f0b599c7eac1e86bd2f8189d4a18b5dd98aba476",
       "checks": [
         {
           "name": "build-and-test",
           "conclusion": "success",
           "workflow": "CI",
-          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31747325798/job/94604885901"
+          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31747654691/job/94605939625"
         },
         {
           "name": "gate1-core-loop",
           "conclusion": "success",
           "workflow": "Gate 1 post-merge integrity",
-          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31747325919/job/94604886646"
+          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31747654700/job/94605939437"
         }
-      ]
+      ],
+      "note": "Required checks green on claimed tip f0b599c (not only on prior repair tip 4c14dc5)."
+    },
+    "local_reproduce": {
+      "verdict": "PASS",
+      "lint_max_warnings_0": true,
+      "typecheck": true,
+      "test": "24 files / 127 tests passed",
+      "build": true,
+      "game_rc_002_tests": "tests/game_rc_002_session.test.ts + tests/game_rc_002_independent_verifier.test.ts passed",
+      "validate_game_rc_contracts": "GAME_RC_CONTRACTS_OK"
+    },
+    "lint_and_eslint_disable": {
+      "verdict": "PASS",
+      "unused_eslint_disable_gone": true,
+      "eslint_disable_remaining_in_verifier_files": 0,
+      "lint_weakened": false,
+      "lint_script": "eslint . --ext .ts,.tsx --max-warnings 0",
+      "note": "Unused no-console eslint-disable removed in 4c14dc5. no-console was never an enabled rule; max-warnings 0 unchanged."
+    },
+    "verifier_files": {
+      "verdict": "PASS_WITH_OPEN",
+      "tests_path_present_and_run_by_default_vitest": true,
+      "tests_path": "tests/game_rc_002_independent_verifier.test.ts",
+      "artifacts_path_present": true,
+      "artifacts_path": "artifacts/game_rc_002/independent_verifier_session.test.ts",
+      "artifacts_in_default_vitest_include": false,
+      "artifacts_forced_run": "FAIL — asserts typeof proto.unlock === 'undefined' but private unlock(def) exists on prototype; tests/ copy correctly checks unlockById/forceUnlock/unlockAchievement",
+      "open": "artifacts verifier is skipped by default and drifts from the CI-run tests/ copy."
+    },
+    "offline_launch_songs": {
+      "verdict": "PASS",
+      "catalog_songs": 6,
+      "manifest_offline_launch_songs": 6,
+      "aligned": true,
+      "prior_undercount_on_0b73cb3": 5
+    },
+    "prior_vp_freshness": {
+      "verdict": "FAIL_THEN_REPAIRED",
+      "stale_vp_at_f0b599c": true,
+      "stale_details": [
+        "claimed_tip/verified_content_tip still 4c14dc5 while commit tip was f0b599c",
+        "CI URLs pointed at 4c14dc5 runs, not f0b599c runs",
+        "did_not_implement set false on a verify commit",
+        "S2_open stamped 3 while release/RC_GATE.json still lists S2_open 4"
+      ],
+      "this_stamp": "Fresh independent VP superseding stale f0b599c VP body."
     },
     "rc_gate_honesty": {
       "verdict": "PASS",
@@ -61,7 +108,7 @@
       "HUMAN_PLAYTEST_VALIDATED": false,
       "critic_class": "ALPHA",
       "critic_honest_iff_S2_nonzero": true,
-      "S2_open": 3,
+      "S2_open": 4,
       "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
       "pixels_invented": false,
       "first_fun_without_developer": "HUMAN_PENDING"
@@ -86,7 +133,7 @@
         "rematch_host_reconnect": true,
         "achievements_from_socket_session": "11/12 (bl.comeback not produced without rank-swing score state)"
       },
-      "roommanager_session": "create/join/audience/five modes/pause/reconnect/migration/results/rematch/leave \u2014 12/12"
+      "roommanager_session": "create/join/audience/five modes/pause/reconnect/migration/results/rematch/leave — 12/12"
     },
     "achievements_12_of_12": {
       "verdict": "PASS",
@@ -112,7 +159,7 @@
       "classification": "ALPHA",
       "not_rc": true,
       "S2_nonzero": true,
-      "VISUAL": "HISTORICAL_CAPTURES_ONLY \u2014 no new framebuffer; no invented pixels",
+      "VISUAL": "HISTORICAL_CAPTURES_ONLY — no new framebuffer; no invented pixels",
       "first_fun_without_developer": "HUMAN_PENDING"
     }
   },
@@ -136,6 +183,18 @@
       "summary": "Spotify/YouTube/Apple EXTERNAL_PENDING without credentials. Local/open catalog used. No DRM rip."
     },
     {
+      "id": "FIRST_FUN_HUMAN_CRITIC",
+      "severity": "S2",
+      "status": "OPEN_EXPECTED",
+      "summary": "RC_GATE lists first-fun for a new group as a separate human critic question (S2_open=4)."
+    },
+    {
+      "id": "ARTIFACTS_VERIFIER_ORPHAN",
+      "severity": "S3",
+      "status": "OPEN",
+      "summary": "artifacts/game_rc_002/independent_verifier_session.test.ts is outside default vitest include and fails when forced (private unlock() assertion drift). CI-run tests/ copy passes."
+    },
+    {
       "id": "COMEBACK_NATURAL_SOCKET",
       "severity": "S3",
       "status": "NOTE",
@@ -149,6 +208,6 @@
     "gameplay_audio": "local/open/demo catalog + metronome",
     "lyrics": "no commercial lyrics shipped"
   },
-  "claim_boundary": "Digital independent verification of Beat Link Party GAME-RC-002 DRAFT #20 after CI lint/manifest repair. Does not earn HUMAN_PLAYTEST_VALIDATED, licensed catalog, or public-join polish. Cursor must not merge.",
-  "verdict_summary": "PR #20 tip 4c14dc5 live, CI green (lint/typecheck/test/build), offline song count aligned 6/6, RC_GATE honest (FEATURE_COMPLETE_RC/POLISHED_RC false, critic ALPHA with S2=3). Independent Socket.IO topology + RoomManager 12/12 reproduced. Edmund-mergeable yes. Remaining OPEN: human first-fun, public join, provider auth."
+  "claim_boundary": "Digital independent verification of Beat Link Party GAME-RC-002 DRAFT #20 tip f0b599c after lint/manifest repair. Does not earn HUMAN_PLAYTEST_VALIDATED, licensed catalog, or public-join polish. Does not start GAME-RC-003. Cursor must not merge.",
+  "verdict_summary": "PASS. Tip f0b599c live; build-and-test + gate1-core-loop green on THIS tip; local lint/typecheck/test/build + GAME-RC-002 reproduced; unused eslint-disable gone; lint not weakened; offline songs 6/6; RoomManager 12/12 + Socket session holds; provider EXTERNAL_PENDING / no DRM rip; critic ALPHA with honesty tokens false. Prior VP body at f0b599c was stale (4c14dc5 CI/tip, did_not_implement=false) — superseded by this stamp. OPEN: human first-fun, public join, provider auth, artifacts verifier orphan."
 }
