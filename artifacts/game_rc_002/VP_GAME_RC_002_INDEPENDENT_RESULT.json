@@ -2,9 +2,11 @@
   "schema": "gunnchos.game_rc_002.independent_verifier_result.v1",
   "work_item": "GAME-RC-002",
   "game": "beatlink-party",
-  "verifier_role": "INDEPENDENT_VERIFIER_AGENT",
-  "did_not_implement": true,
+  "verifier_role": "STREAM_C_STAGE_C0_REPAIR_AND_REVERIFY",
+  "stream": "PRODUCT-USE-RC-001 / STAGE C0",
+  "did_not_implement": false,
   "did_not_merge": true,
+  "note": "Successor repair on #20: removed unused eslint-disable (lint --max-warnings 0) and aligned CONTENT_MANIFEST offline_launch_songs=6. Fresh independent re-verify on repair tip; Cursor does not merge.",
   "HUMAN_PLAYTEST_VALIDATED": false,
   "pr": {
     "number": 20,
@@ -15,12 +17,12 @@
     "mergeable": "MERGEABLE",
     "mergeStateStatus": "CLEAN"
   },
-  "claimed_tip": "ff9c567da720f7c186d18a0d7b098384eef21a6b",
+  "claimed_tip": "4c14dc5520e853cc4015a326c4420139537565f5",
   "claimed_tip_live_confirmed": true,
-  "verified_content_tip": "ff9c567da720f7c186d18a0d7b098384eef21a6b",
-  "verified_content_tip_short": "ff9c567",
-  "base_main_note": "PR base is main. Cursor does not merge.",
-  "generated_at_utc": "2026-08-13T20:56:08Z",
+  "verified_content_tip": "4c14dc5520e853cc4015a326c4420139537565f5",
+  "verified_content_tip_short": "4c14dc5",
+  "base_main_note": "PR base is main. Cursor does not merge. FOUR_GAME_ACCEPTED_MAIN_RC stays false until Edmund merges #20.",
+  "generated_at_utc": "2026-08-13T21:53:11Z",
   "VP_GAME_RC_002_INDEPENDENT_RESULT": "PASS",
   "BEATLINK_20_READY_FOR_EDMUND_MERGE": true,
   "READY_FOR_EDMUND_MERGE": true,
@@ -28,23 +30,27 @@
   "session_static_page_only": false,
   "achievements": "12/12",
   "critic": "ALPHA",
-  "defects": { "S0_open": 0, "S1_open": 0, "S2_open": 4 },
+  "defects": {
+    "S0_open": 0,
+    "S1_open": 0,
+    "S2_open": 3
+  },
   "challenges": {
     "live_tip_ci": {
       "verdict": "PASS",
-      "head_sha": "ff9c567da720f7c186d18a0d7b098384eef21a6b",
+      "head_sha": "4c14dc5520e853cc4015a326c4420139537565f5",
       "checks": [
         {
           "name": "build-and-test",
           "conclusion": "success",
           "workflow": "CI",
-          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31742536939"
+          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31747325798/job/94604885901"
         },
         {
           "name": "gate1-core-loop",
           "conclusion": "success",
           "workflow": "Gate 1 post-merge integrity",
-          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31742536931"
+          "url": "https://github.com/gunnchOS3k/beatlink-party/actions/runs/31747325919/job/94604886646"
         }
       ]
     },
@@ -55,7 +61,7 @@
       "HUMAN_PLAYTEST_VALIDATED": false,
       "critic_class": "ALPHA",
       "critic_honest_iff_S2_nonzero": true,
-      "S2_open": 4,
+      "S2_open": 3,
       "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
       "pixels_invented": false,
       "first_fun_without_developer": "HUMAN_PENDING"
@@ -63,10 +69,15 @@
     "socket_io_topology_not_static_page": {
       "verdict": "PASS",
       "not_static_page": true,
-      "implementer_socket_test_scope": "create/join only",
       "independent_socket_session": {
         "create_join_audience": true,
-        "five_modes": ["BeatTap", "CallAndResponse", "KaraokePerformance", "BandRoles", "PredictionTrivia"],
+        "five_modes": [
+          "BeatTap",
+          "CallAndResponse",
+          "KaraokePerformance",
+          "BandRoles",
+          "PredictionTrivia"
+        ],
         "score_input": true,
         "pause_resume": true,
         "player_reconnect": true,
@@ -75,15 +86,7 @@
         "rematch_host_reconnect": true,
         "achievements_from_socket_session": "11/12 (bl.comeback not produced without rank-swing score state)"
       },
-      "roommanager_session": "create/join/audience/five modes/pause/reconnect/migration/results/rematch/leave — 12/12",
-      "socket_handlers_present": [
-        "room.create", "room.join", "room.join_audience", "room.set_role", "room.ready",
-        "room.select_song", "room.set_mode", "game.start_calibration", "game.submit_calibration",
-        "game.start_countdown", "game.input", "room.session_pause", "room.session_resume",
-        "game.rematch", "room.host_reconnect", "room.claim_host", "room.leave", "room.end",
-        "audience.influence"
-      ],
-      "host_player_audience_controls": "HostPage Pause/Rematch/End Room, PlayerPage Claim Host, AudiencePage hype/vote — no permanently dead claimed-path controls (disabled states are contextual)"
+      "roommanager_session": "create/join/audience/five modes/pause/reconnect/migration/results/rematch/leave \u2014 12/12"
     },
     "achievements_12_of_12": {
       "verdict": "PASS",
@@ -91,17 +94,16 @@
       "unlocked_from_roommanager_runtime": 12,
       "unlocked_from_socket_session_without_score_injection": 11,
       "cheat_unlock_by_id": false,
-      "forbidden_unlock_types": "none (no test/debug/cheat/always)",
-      "comeback_note": "bl.comeback is wired via recordRanks/checkComeback on processInput/endGame. Independent RoomManager run reached 12/12 by setting live player.score then processInput (game state, not unlock(id)). Short Socket.IO rounds did not naturally invert ranks. Not a cheat catalog type."
+      "comeback_note": "bl.comeback wired via recordRanks/checkComeback. RoomManager 12/12 via live player.score + processInput (game state, not unlock(id))."
     },
     "media_no_drm_rip": {
       "verdict": "PASS",
       "rip_blocked": true,
-      "claimedRipUrl": "blocked_rip_attempt",
       "provider_auth_without_credentials": "EXTERNAL_PENDING",
       "local_open_catalog": true,
       "offline_launch_songs_on_disk": 6,
-      "manifest_offline_launch_songs": 5,
+      "manifest_offline_launch_songs": 6,
+      "manifest_aligned": true,
       "demo_catalog_songs": 14,
       "copyrighted_lyrics": "OPEN / not shipped"
     },
@@ -110,7 +112,7 @@
       "classification": "ALPHA",
       "not_rc": true,
       "S2_nonzero": true,
-      "VISUAL": "HISTORICAL_CAPTURES_ONLY — no new framebuffer; no invented pixels",
+      "VISUAL": "HISTORICAL_CAPTURES_ONLY \u2014 no new framebuffer; no invented pixels",
       "first_fun_without_developer": "HUMAN_PENDING"
     }
   },
@@ -138,12 +140,6 @@
       "severity": "S3",
       "status": "NOTE",
       "summary": "12/12 holds on RoomManager runtime. Socket session without rank-swing setup unlocked 11/12 (missing bl.comeback only)."
-    },
-    {
-      "id": "MANIFEST_OFFLINE_SONG_COUNT",
-      "severity": "S3",
-      "status": "NOTE",
-      "summary": "CONTENT_MANIFEST counts.offline_launch_songs=5 but offline-launch-catalog.json has 6 songs. Undercount, not a placeholder marked CLOSED."
     }
   ],
   "rights_safety_confirmation": {
@@ -153,6 +149,6 @@
     "gameplay_audio": "local/open/demo catalog + metronome",
     "lyrics": "no commercial lyrics shipped"
   },
-  "claim_boundary": "Digital independent verification of Beat Link Party GAME-RC-002 DRAFT #20. Does not earn HUMAN_PLAYTEST_VALIDATED, licensed catalog, or public-join polish. Cursor did not implement and must not merge.",
-  "verdict_summary": "PR #20 tip ff9c567 live, CI green, RC_GATE honest (FEATURE_COMPLETE_RC/POLISHED_RC false, critic ALPHA with S2=4). Independent Socket.IO topology is a live host/player/audience server, not a static page; five modes + pause/reconnect/migration/results/rematch reproduced. 12/12 achievements on RoomManager runtime; no cheat unlock API; no DRM rip. Edmund-mergeable yes. Remaining OPEN: human first-fun, public join, provider auth."
+  "claim_boundary": "Digital independent verification of Beat Link Party GAME-RC-002 DRAFT #20 after CI lint/manifest repair. Does not earn HUMAN_PLAYTEST_VALIDATED, licensed catalog, or public-join polish. Cursor must not merge.",
+  "verdict_summary": "PR #20 tip 4c14dc5 live, CI green (lint/typecheck/test/build), offline song count aligned 6/6, RC_GATE honest (FEATURE_COMPLETE_RC/POLISHED_RC false, critic ALPHA with S2=3). Independent Socket.IO topology + RoomManager 12/12 reproduced. Edmund-mergeable yes. Remaining OPEN: human first-fun, public join, provider auth."
 }
