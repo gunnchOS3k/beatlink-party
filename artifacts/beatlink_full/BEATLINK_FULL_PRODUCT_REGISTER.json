@@ -144,7 +144,7 @@
     "S1_fixed_detail": "PredictionTrivia and CallAndResponse scoring existed in the engine registry but were not executable on the live RoomManager input path (prediction had no input type; C&R match ignored section windows).",
     "S2_fixed_this_cycle": "Host lobby player cap copy said 0/6 while MAX_PERFORMERS is 8 (pixel-final/02-host-lobby.png)."
   },
-  "tip_sha": "PENDING_STAMP",
-  "tip_short": "PENDING_STAMP",
-  "source_commit_tip": "PENDING_STAMP"
+  "tip_sha": "474b994d761fe3c54c05f0edb783f5addcaf8b4c",
+  "tip_short": "474b994",
+  "source_commit_tip": "474b994d761fe3c54c05f0edb783f5addcaf8b4c"
 }
