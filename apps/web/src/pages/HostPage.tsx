@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import type {
+  Beatmap,
   DifficultyId,
   GameModeId,
   GameResults,
@@ -9,7 +10,7 @@ import type {
   RoomState,
   SongCatalogEntry,
 } from '@beatlink/shared';
-import { GAME_MODE_IDS, ROLES } from '@beatlink/shared';
+import { GAME_MODE_IDS, MAX_PERFORMERS, ROLES } from '@beatlink/shared';
 import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
 import { startCalibrationClicks, startHostMetronome, resumeAudioContext } from '../lib/hostAudio';
 import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
@@ -19,7 +20,12 @@ import {
   useAccessibility,
   useDeviceRole,
 } from '../lib/deviceSettings';
-import { getGameMode, resolveMediaDescriptor } from '@beatlink/game-engine';
+import {
+  getGameMode,
+  isCallAndResponseWindow,
+  nextPredictionSection,
+  resolveMediaDescriptor,
+} from '@beatlink/game-engine';
 
 function statusBadgeClass(status: LinkResolveResult['playbackStatus']): string {
   if (status === 'PLAYABLE_APPROVED' || status === 'PLAYABLE_AUTHORIZED_PLATFORM') {
@@ -327,6 +333,7 @@ export default function HostPage() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [songsError, setSongsError] = useState<string | null>(null);
   const [beatmapBpm, setBeatmapBpm] = useState(120);
+  const [beatmap, setBeatmap] = useState<Beatmap | null>(null);
   const [difficulty, setDifficulty] = useState<DifficultyId>('casual');
   const [playMode, setPlayMode] = useState<GameModeId>('BeatTap');
   const [hostToken, setHostToken] = useState<string>('');
@@ -384,10 +391,11 @@ export default function HostPage() {
         if (r.pastedLinkUrl) setLinkUrl(r.pastedLinkUrl);
       },
       onCountdown: (r: RoomState) => setRoom(r),
-      onStarted: (r: RoomState, beatmap: { bpm?: number } | null) => {
+      onStarted: (r: RoomState, nextBeatmap: Beatmap | null) => {
         setRoom(r);
         setResults(null);
-        if (beatmap?.bpm) setBeatmapBpm(beatmap.bpm);
+        if (nextBeatmap) setBeatmap(nextBeatmap);
+        if (nextBeatmap?.bpm) setBeatmapBpm(nextBeatmap.bpm);
       },
       onScore: (r: RoomState) => setRoom(r),
       onEnded: (r: RoomState, res: GameResults) => {
@@ -608,7 +616,7 @@ export default function HostPage() {
 
           <div className="grid-2">
             <div className="card stack">
-              <h3>Players ({room?.players.length ?? 0}/6)</h3>
+              <h3>Players ({room?.players.length ?? 0}/{MAX_PERFORMERS})</h3>
               {(room?.players ?? []).map((p) => (
                 <div key={p.id} className="player-card" style={{ borderColor: p.color }}>
                   <div className="player-dot" style={{ background: p.color }} />
@@ -819,6 +827,15 @@ export default function HostPage() {
           <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>LIVE</h2>
           <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '0.75rem' }}>
             Media: {mediaDescriptor.kind} — {mediaDescriptor.message}
+          </p>
+          <p style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+            {activeMode.label}
+            {room.gameMode === 'CallAndResponse' && beatmap
+              ? ` · ${isCallAndResponseWindow(beatmap.sections, gameTimeMs).phase}`
+              : ''}
+            {room.gameMode === 'PredictionTrivia' && beatmap
+              ? ` · next: ${nextPredictionSection(beatmap.sections, gameTimeMs)?.label ?? '—'}`
+              : ''}
           </p>
           <div className="beat-lane">
             {Array.from({ length: 16 }).map((_, i) => (

@@ -58,7 +58,9 @@ export type InputType =
   | 'hype_cheer'
   | 'hype_lights'
   | 'hype_boost'
-  | 'hype_combo_save';
+  | 'hype_combo_save'
+  /** PredictionTrivia — lock a section/label choice before the section starts. */
+  | 'prediction_lock';
 
 /** Device UX roles from field-kit G2-C6 matrix (+ optional docked). */
 export type DeviceRoleId =
@@ -331,6 +333,10 @@ export interface PlayerInputEvent {
   noteId?: string;
   promptId?: string;
   hypeType?: 'cheer' | 'lights' | 'boost' | 'combo_save';
+  /** PredictionTrivia — beatmap section id being predicted. */
+  sectionId?: string;
+  /** PredictionTrivia — chosen section id or label (case-insensitive match). */
+  predictionChoice?: string;
 }
 
 export interface ScoreEvent {

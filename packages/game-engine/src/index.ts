@@ -10,6 +10,7 @@ export * from './karaokeDsp.js';
 export * from './liveMicPipeline.js';
 export * from './media.js';
 export * from './modes/index.js';
+export * from './modeRuntime.js';
 export * from './rights.js';
 export * from './audioAnalysis.js';
 export * from './joinQr.js';

@@ -51,7 +51,10 @@ import {
   findNearestHypeEvent,
   findNearestNote,
   isGameModeId,
+  nextPredictionSection,
+  predictionChoiceCorrect,
   recomputeTeamScores,
+  responseMatchedForCallAndResponse,
   scoreBeatTap,
   scoreForMode,
   scoreHypeAction,
@@ -1035,7 +1038,16 @@ export class RoomManager {
           grade: tap.grade,
           basePoints: tap.points,
           streak: tap.streak,
-          meta: { role: player.role },
+          meta: {
+            role: player.role,
+            responseMatched:
+              room.gameMode === 'CallAndResponse' &&
+              responseMatchedForCallAndResponse(
+                room.beatmap.sections,
+                gameTimeMs,
+                tap.grade,
+              ),
+          },
         });
         const result = {
           ...tap,
@@ -1086,7 +1098,13 @@ export class RoomManager {
           meta: {
             role: player.role,
             noRecording: true,
-            responseMatched: room.gameMode === 'CallAndResponse' && vocal.grade !== 'miss',
+            responseMatched:
+              room.gameMode === 'CallAndResponse' &&
+              responseMatchedForCallAndResponse(
+                room.beatmap.sections,
+                gameTimeMs,
+                vocal.grade,
+              ),
           },
         });
         const result = {
@@ -1107,6 +1125,87 @@ export class RoomManager {
           combo: result.combo,
           message: result.message,
         };
+      }
+    } else if (
+      room.gameMode === 'PredictionTrivia' &&
+      input.type === 'prediction_lock'
+    ) {
+      const target =
+        (input.sectionId
+          ? room.beatmap.sections.find((s) => s.id === input.sectionId)
+          : null) ?? nextPredictionSection(room.beatmap.sections, gameTimeMs);
+      const targetKey = target ? `${player.id}:pred:${target.id}` : null;
+      if (target && targetKey && !room.scoredTargets.has(targetKey)) {
+        if (gameTimeMs >= target.startMs) {
+          emitTelemetry('score', room.code, {
+            grade: 'miss',
+            points: 0,
+            combo: player.combo,
+            reason: 'prediction_late',
+          });
+          room.scoredTargets.add(targetKey);
+          const modeScore = scoreForMode({
+            modeId: 'PredictionTrivia',
+            difficulty: room.difficulty,
+            grade: 'miss',
+            basePoints: 0,
+            streak: 0,
+            meta: { predictionCorrect: false, late: true },
+          });
+          const result = {
+            grade: 'miss' as const,
+            points: modeScore.points,
+            streak: 0,
+            combo: 1,
+            accuracy: 0,
+            message: modeScore.message,
+            crowdBoost: modeScore.crowdBoost,
+          };
+          Object.assign(player, updatePlayerStats(player, result));
+          room.teamScore += result.points;
+          room.teamScores = recomputeTeamScores(room.players);
+          room.crowdMeter = Math.min(100, Math.max(0, room.crowdMeter + result.crowdBoost));
+          scoreEvent = {
+            playerId: player.id,
+            grade: result.grade,
+            points: result.points,
+            streak: result.streak,
+            combo: result.combo,
+            message: result.message,
+          };
+        } else {
+          room.scoredTargets.add(targetKey);
+          const correct = predictionChoiceCorrect(target, input.predictionChoice);
+          const modeScore = scoreForMode({
+            modeId: 'PredictionTrivia',
+            difficulty: room.difficulty,
+            grade: correct ? 'perfect' : 'miss',
+            basePoints: 0,
+            streak: player.streak,
+            meta: { predictionCorrect: correct, sectionId: target.id },
+          });
+          const result = {
+            grade: (correct ? 'perfect' : 'miss') as 'perfect' | 'miss',
+            points: modeScore.points,
+            streak: correct ? player.streak + 1 : 0,
+            combo: correct ? player.combo : 1,
+            accuracy: correct ? 100 : 0,
+            message: modeScore.message,
+            crowdBoost: modeScore.crowdBoost,
+          };
+          Object.assign(player, updatePlayerStats(player, result));
+          room.teamScore += result.points;
+          room.teamScores = recomputeTeamScores(room.players);
+          room.crowdMeter = Math.min(100, Math.max(0, room.crowdMeter + result.crowdBoost));
+          scoreEvent = {
+            playerId: player.id,
+            grade: result.grade,
+            points: result.points,
+            streak: result.streak,
+            combo: result.combo,
+            message: result.message,
+          };
+        }
       }
     } else if (player.role === 'hype_captain' && input.type.startsWith('hype_')) {
       const lastHype = room.hypeCooldowns.get(player.id) ?? 0;

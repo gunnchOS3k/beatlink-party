@@ -1,0 +1,68 @@
+{
+  "schema": "experience_review_game_critic/v1",
+  "subject": "beatlink-party",
+  "work_item": "GAME-successor-beatlink-full",
+  "generated_at": "2026-08-12T22:50:00Z",
+  "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
+  "live_framebuffer": "UNAVAILABLE",
+  "historical_pixels_inspected": [
+    "docs/product-quality/evidence/pixel-final/01c-landing.png",
+    "docs/product-quality/evidence/pixel-final/02-host-lobby.png"
+  ],
+  "classification": "ALPHA",
+  "classification_rationale": [
+    "Five modes + room lifecycle/reconnect/pause/audience exist with digital runtime evidence after this packet",
+    "Historical phone landing and host-lobby captures show a coherent party-join fantasy (big-screen host, phone play, approved demo song)",
+    "Host lobby capture still showed Players (0/6) against ADR MAX_PERFORMERS=8 — copy gap, now remapped digitally; not a ship-ready content pass",
+    "No live framebuffer this packet; HUMAN_POLISH and fun remain HUMAN_PENDING",
+    "Commercial catalog / licensed lyrics not present — rights-safe demo scope only"
+  ],
+  "not_rc": true,
+  "likely_not_beta_polished": true,
+  "evidence_based": true,
+  "no_invented_visual_critique": true,
+  "findings": [
+    {
+      "severity": "S0",
+      "id": "none",
+      "summary": "No S0 crash/blocker newly evidenced in this digital pass."
+    },
+    {
+      "severity": "S1",
+      "id": "CRIT-S1-MODE-RUNTIME-NOT-WIRED",
+      "status": "REMEDIATED_DIGITAL",
+      "summary": "CallAndResponse/PredictionTrivia were registry-scored only; live RoomManager now applies section windows and prediction_lock.",
+      "evidence": "apps/server/src/rooms/RoomManager.ts + tests/game_successor_modes.test.ts"
+    },
+    {
+      "severity": "S2",
+      "id": "CRIT-S2-HOST-CAP-COPY",
+      "status": "REMEDIATED_DIGITAL",
+      "summary": "pixel-final/02-host-lobby.png shows Players (0/6); code used a hardcoded /6 while MAX_PERFORMERS is 8. Host lobby now binds MAX_PERFORMERS.",
+      "evidence": "docs/product-quality/evidence/pixel-final/02-host-lobby.png + apps/web/src/pages/HostPage.tsx"
+    },
+    {
+      "severity": "S2",
+      "id": "CRIT-S2-JOIN-LOCALHOST",
+      "status": "OPEN",
+      "summary": "Historical host lobby capture prints Players join at https://localhost/join — fine for lab, not a polished public join surface.",
+      "evidence": "docs/product-quality/evidence/pixel-final/02-host-lobby.png"
+    },
+    {
+      "severity": "S3",
+      "id": "CRIT-S3-HUMAN-POLISH",
+      "status": "OPEN",
+      "summary": "HUMAN_POLISH pending — AI cannot earn human fun/party-feel signoff."
+    }
+  ],
+  "scores_heuristic": {
+    "systems_depth": 0.84,
+    "presentation": 0.48,
+    "mode_completeness": 0.78,
+    "rights_honesty": 0.92,
+    "ship_readiness": 0.52
+  },
+  "verdict": "ALPHA — digitally deep phone-party loop with five modes now runtime-wired; not polished beta/RC without human polish + licensed catalog.",
+  "tip_sha": "PENDING_STAMP",
+  "tip_short": "PENDING_STAMP"
+}
