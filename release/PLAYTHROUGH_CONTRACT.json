@@ -1,0 +1,50 @@
+{
+  "schema": "gunnchos.game_rc.playthrough_contract/v1",
+  "game": "beatlink-party",
+  "contract_version": 1,
+  "playthrough_id": "bl.party_session_five_mode.v1",
+  "digitally_executable": true,
+  "human_playtest_validated": false,
+  "notes": "Complete party session: first launch, create/join room, audience, host/player roles, media/song setup, latency calibration, Beat Tap, Call and Response, Karaoke, Band Roles, Prediction/Trivia, audience influence, score, round transitions, pause/resume, disconnect/reconnect, host migration, final results/awards, achievements, rematch, new session, leave. Verifier topology is live Socket.IO server + clients, not a static page. Local/open catalog media when provider credentials are absent (EXTERNAL_PENDING).",
+  "pause_resume": {
+    "required": true,
+    "status": "CLOSED",
+    "evidence": "RoomManager.pauseSession/resumeSession (HOST_CONTROLLED_SESSION_PAUSE); AchievementRuntime event pause_resume; GAME-RC-002 session test."
+  },
+  "ending": {
+    "id": "results_awards_rematch_or_leave",
+    "status": "CLOSED",
+    "description": "endGame publishes scores and awards. Host may rematch (new round, same seats), create a new room, or end/leave. No dead controls on Host/Player/Audience/Landing for this session path."
+  },
+  "steps": [
+    { "id": "first_launch", "scene": "apps/web/src/pages/LandingPage.tsx", "required": true, "status": "CLOSED" },
+    { "id": "create_room", "scene": "apps/server/src/rooms/RoomManager.ts#createRoom", "required": true, "status": "CLOSED" },
+    { "id": "join_room", "scene": "RoomManager.joinRoom + JoinPage", "required": true, "status": "CLOSED" },
+    { "id": "audience", "scene": "RoomManager.joinAudience + AudiencePage", "required": true, "status": "CLOSED" },
+    { "id": "host_player_roles", "scene": "RoomManager.setRole + HostPage/PlayerPage", "required": true, "status": "CLOSED" },
+    { "id": "media_song_setup", "scene": "RoomManager.selectSong + offline-launch-catalog", "required": true, "status": "CLOSED", "notes": "Owned/open/local catalog. Provider auth EXTERNAL_PENDING without credentials. No DRM bypass." },
+    { "id": "latency_calibration", "scene": "RoomManager.startCalibration/submitCalibration", "required": true, "status": "CLOSED" },
+    { "id": "mode_beat_tap", "scene": "RoomManager.setGameMode BeatTap", "required": true, "status": "CLOSED" },
+    { "id": "mode_call_and_response", "scene": "RoomManager.setGameMode CallAndResponse", "required": true, "status": "CLOSED" },
+    { "id": "mode_karaoke", "scene": "RoomManager.setGameMode KaraokePerformance", "required": true, "status": "CLOSED" },
+    { "id": "mode_band_roles", "scene": "RoomManager.setGameMode BandRoles", "required": true, "status": "CLOSED" },
+    { "id": "mode_prediction", "scene": "RoomManager.setGameMode PredictionTrivia", "required": true, "status": "CLOSED" },
+    { "id": "audience_influence", "scene": "RoomManager.processAudienceInfluence", "required": true, "status": "CLOSED" },
+    { "id": "score", "scene": "RoomManager.processInput + scoring.ts", "required": true, "status": "CLOSED" },
+    { "id": "round_transitions", "scene": "RoomManager.rematch/nextRound", "required": true, "status": "CLOSED" },
+    { "id": "pause_resume", "scene": "RoomManager.pauseSession/resumeSession", "required": true, "status": "CLOSED" },
+    { "id": "disconnect_reconnect", "scene": "RoomManager.leaveRoom + reconnectPlayer", "required": true, "status": "CLOSED" },
+    { "id": "host_migration", "scene": "RoomManager.migrateHostOnDisconnect", "required": true, "status": "CLOSED" },
+    { "id": "final_results_awards", "scene": "RoomManager.endGame + computeAwards", "required": true, "status": "CLOSED" },
+    { "id": "achievements", "scene": "packages/game-engine/src/achievementRuntime.ts", "required": true, "status": "CLOSED" },
+    { "id": "rematch", "scene": "RoomManager.rematch + HostPage Rematch button", "required": true, "status": "CLOSED" },
+    { "id": "new_session", "scene": "RoomManager.createRoom after shutdown", "required": true, "status": "CLOSED" },
+    { "id": "leave", "scene": "RoomManager.leaveRoom/endRoom + HostPage End Room", "required": true, "status": "CLOSED" }
+  ],
+  "open_placeholders": [
+    { "id": "HUMAN_PLAYTEST_VALIDATED", "severity": "S2", "summary": "No human playtest this packet. First-fun-in-minutes remains a human critic question." },
+    { "id": "PROVIDER_AUTH", "severity": "S2", "summary": "Official Spotify/YouTube/Apple playback is EXTERNAL_PENDING without credentials. Local/open catalog is used." },
+    { "id": "PUBLIC_JOIN_ORIGIN", "severity": "S2", "summary": "Join URLs may still show lab localhost; not a polished public join surface." },
+    { "id": "LICENSED_CATALOG", "severity": "S2", "summary": "Commercial licensed catalog / copyrighted lyrics not present." }
+  ]
+}

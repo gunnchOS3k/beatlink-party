@@ -1,0 +1,59 @@
+{
+  "schema": "gunnchos.game_rc.content_manifest/v1",
+  "game": "beatlink-party",
+  "manifest_version": 1,
+  "generated_at": "2026-08-13T20:20:00Z",
+  "counts": {
+    "modes": 5,
+    "band_roles": 3,
+    "offline_launch_songs": 6,
+    "demo_catalog_songs": 14,
+    "achievements": 12,
+    "max_performers": 8
+  },
+  "modes": [
+    { "id": "BeatTap", "status": "CLOSED" },
+    { "id": "CallAndResponse", "status": "CLOSED" },
+    { "id": "KaraokePerformance", "status": "CLOSED" },
+    { "id": "BandRoles", "status": "CLOSED" },
+    { "id": "PredictionTrivia", "status": "CLOSED" },
+    { "id": "achievements_browser", "status": "CLOSED" },
+    { "id": "provider_spotify_youtube_apple", "status": "OPEN", "notes": "EXTERNAL_PENDING without credentials. No rip/DRM bypass." }
+  ],
+  "items": [
+    { "id": "landing_host_join_audience", "kind": "screen", "status": "CLOSED" },
+    { "id": "host_lobby", "kind": "screen", "status": "CLOSED" },
+    { "id": "player_phone", "kind": "screen", "status": "CLOSED" },
+    { "id": "audience_seat", "kind": "screen", "status": "CLOSED" },
+    { "id": "results_awards", "kind": "screen", "status": "CLOSED" },
+    { "id": "launch-pd-tap-grid", "kind": "song", "status": "CLOSED", "notes": "Public-domain / original offline launch catalog." },
+    { "id": "launch-orig-call-mirror", "kind": "song", "status": "CLOSED" },
+    { "id": "launch-cc-karaoke-warm", "kind": "song", "status": "CLOSED" },
+    { "id": "launch-creator-band-stomp", "kind": "song", "status": "CLOSED" },
+    { "id": "launch-pd-predict-pulse", "kind": "song", "status": "CLOSED" },
+    { "id": "launch-cc-multi-party", "kind": "song", "status": "CLOSED" },
+    { "id": "demo-neon-groove", "kind": "song", "status": "CLOSED", "notes": "Approved demo_generated fixture — not a commercial license." },
+    { "id": "beat_tapper", "kind": "role", "status": "CLOSED" },
+    { "id": "vocalist", "kind": "role", "status": "CLOSED" },
+    { "id": "hype_captain", "kind": "role", "status": "CLOSED" },
+    { "id": "latency_calibration", "kind": "system", "status": "CLOSED" },
+    { "id": "host_migration", "kind": "system", "status": "CLOSED" },
+    { "id": "session_pause", "kind": "system", "status": "CLOSED" },
+    { "id": "achievements", "kind": "achievements", "status": "CLOSED" },
+    { "id": "provider_official_sdk", "kind": "media", "status": "OPEN", "notes": "EXTERNAL_PENDING. Local/open catalog used when credentials are absent." },
+    { "id": "copyrighted_lyrics", "kind": "media", "status": "OPEN", "notes": "Not shipped. Karaoke uses no-recording prompts." }
+  ],
+  "open_placeholders": [
+    { "id": "provider_official_sdk", "summary": "Spotify/YouTube/Apple remain EXTERNAL_PENDING without env credentials." },
+    { "id": "copyrighted_lyrics", "summary": "No commercial lyric display." },
+    { "id": "public_join_origin", "summary": "Lab localhost join URLs are not a polished public surface." },
+    { "id": "human_party_feel", "summary": "First-fun-in-minutes for a new group is HUMAN_PENDING." }
+  ],
+  "not_claimed": [
+    "Commercial music license",
+    "DRM bypass / ripped streams",
+    "POLISHED_RELEASE_CANDIDATE",
+    "FEATURE_COMPLETE_RC",
+    "HUMAN_PLAYTEST_VALIDATED"
+  ]
+}

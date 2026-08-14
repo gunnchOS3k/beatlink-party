@@ -1,4 +1,7 @@
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type {
   AudienceInfluenceEvent,
   AudienceInfluenceType,
@@ -62,6 +65,9 @@ import {
   updatePlayerStats,
   winningTeam,
   type CalibrationSample,
+  AchievementRuntime,
+  parseAchievementCatalog,
+  memoryPersist,
 } from '@beatlink/game-engine';
 import { getBeatmapForSong } from '../beatmaps/store.js';
 import {
@@ -73,6 +79,15 @@ import {
 
 const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
 const MAX_PLAYERS = MAX_PERFORMERS;
+
+function loadDefaultAchievements(): AchievementRuntime {
+  const catalogPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../../../release/ACHIEVEMENTS.json',
+  );
+  const raw = JSON.parse(readFileSync(catalogPath, 'utf8')) as unknown;
+  return new AchievementRuntime(parseAchievementCatalog(raw), memoryPersist());
+}
 
 interface InternalRoom extends RoomState {
   beatmap: Beatmap | null;
@@ -95,9 +110,16 @@ export class RoomManager {
   private socketToPlayer = new Map<string, string>();
   private socketToAudience = new Map<string, string>();
   private socketToHostRoom = new Map<string, string>();
+  private achievements: AchievementRuntime;
+  private sessionModes = new Map<string, Set<GameModeId>>();
+  private rankFloor = new Map<string, Map<string, number>>();
 
-  constructor(store: RoomStore = new InMemoryRoomStore()) {
+  constructor(
+    store: RoomStore = new InMemoryRoomStore(),
+    achievements?: AchievementRuntime,
+  ) {
     this.store = store;
+    this.achievements = achievements ?? loadDefaultAchievements();
     for (const [code, snapshot] of this.store.entries()) {
       this.rooms.set(code.toUpperCase(), deserializeRoom(snapshot) as InternalRoom);
     }
@@ -136,6 +158,8 @@ export class RoomManager {
     const key = code.toUpperCase();
     this.rooms.delete(key);
     this.store.delete(key);
+    this.sessionModes.delete(key);
+    this.rankFloor.delete(key);
   }
 
   createRoom(
@@ -193,12 +217,19 @@ export class RoomManager {
     };
     this.commit(room);
     this.socketToHostRoom.set(hostSocketId, code);
+    this.sessionModes.set(code, new Set());
+    this.rankFloor.set(code, new Map());
+    this.achievements.reportEvent('party_started', 1);
     emitTelemetry('room_created', code, {
       rematchRound: 0,
       gameMode: room.gameMode,
       capacityProfile: room.capacityProfile,
     });
     return { ...this.stripInternal(room), hostToken: room.hostToken };
+  }
+
+  getAchievements(): AchievementRuntime {
+    return this.achievements;
   }
 
   getRoom(code: string): InternalRoom | null {
@@ -239,9 +270,19 @@ export class RoomManager {
     void _scoredTargets;
     void _publicOrigin;
     void _calibrationSamples;
-    if (!room.privacy.redactDisplayNames) return state;
-    return {
+    const summary = this.achievements.summary();
+    const withAchievements: RoomState = {
       ...state,
+      achievementSummary: {
+        unlocked: summary.unlocked,
+        total: summary.total,
+        percent: summary.percent,
+        entries: summary.entries,
+      },
+    };
+    if (!room.privacy.redactDisplayNames) return withAchievements;
+    return {
+      ...withAchievements,
       players: room.players.map((p, i) => publicPlayerView(p, room.privacy, i)),
     };
   }
@@ -435,6 +476,7 @@ export class RoomManager {
       // Temporary host claim for continuity — full auth still requires hostToken.
       room.hostId = `player-host:${successor.id}`;
       emitTelemetry('host_migrated', room.code, { rematchRound: room.rematchRound });
+      this.achievements.reportEvent('host_migrated', 1);
       return {
         room: this.publish(room),
         previousHostId,
@@ -445,6 +487,7 @@ export class RoomManager {
 
     room.hostId = null;
     emitTelemetry('host_migrated', room.code, { rematchRound: room.rematchRound });
+    this.achievements.reportEvent('host_migrated', 1);
     return {
       room: this.publish(room),
       previousHostId,
@@ -635,6 +678,7 @@ export class RoomManager {
       crowdDelta,
       atMs: now,
     };
+    if (accepted) this.achievements.reportEvent('audience_influence', 1);
     emitTelemetry('audience_influence', room.code, {
       accepted,
       type,
@@ -932,6 +976,7 @@ export class RoomManager {
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
+    this.rankFloor.set(room.code, new Map());
     return this.publish(room);
   }
 
@@ -944,6 +989,7 @@ export class RoomManager {
       room.phase = 'playing';
       room.countdown = null;
       room.gameStartTime = Date.now();
+      this.noteModeRound(room);
     }
     return this.publish(room);
   }
@@ -999,6 +1045,7 @@ export class RoomManager {
     room.pausedAtMs = undefined;
     room.pauseElapsedGameMs = undefined;
     emitTelemetry('session_resume', room.code, { host: true });
+    this.achievements.reportEvent('pause_resume', 1);
     return this.publish(room);
   }
 
@@ -1242,6 +1289,7 @@ export class RoomManager {
       room.phase = 'results';
     }
 
+    this.recordRanks(room);
     return { room: this.publish(room), scoreEvent };
   }
 
@@ -1251,6 +1299,7 @@ export class RoomManager {
     room.phase = 'results';
     room.teamScores = recomputeTeamScores(room.players);
     const awards = computeAwards(room.players);
+    this.checkComeback(room);
     this.commit(room);
     return {
       teamScore: room.teamScore,
@@ -1321,6 +1370,39 @@ export class RoomManager {
   /** @deprecated Prefer rematch() — keeps seats; still supported for host UI. */
   replay(code: string): RoomState | null {
     return this.rematch(code);
+  }
+
+  private noteModeRound(room: InternalRoom): void {
+    this.achievements.setFlag(`mode:${room.gameMode}`);
+    const modes = this.sessionModes.get(room.code) ?? new Set<GameModeId>();
+    modes.add(room.gameMode);
+    this.sessionModes.set(room.code, modes);
+    if (modes.size >= 5) this.achievements.setFlag('five_mode_session');
+    if (room.gameMode === 'BandRoles') {
+      const roles = new Set(room.players.map((p) => p.role).filter(Boolean));
+      if (roles.size >= 2) this.achievements.setFlag('band_cooperation');
+    }
+  }
+
+  private recordRanks(room: InternalRoom): void {
+    if (room.players.length < 2) return;
+    const floors = this.rankFloor.get(room.code) ?? new Map<string, number>();
+    const sorted = [...room.players].sort((a, b) => b.score - a.score);
+    sorted.forEach((player, idx) => {
+      const rank = idx + 1;
+      const prev = floors.get(player.id) ?? 0;
+      if (rank > prev) floors.set(player.id, rank);
+    });
+    this.rankFloor.set(room.code, floors);
+  }
+
+  private checkComeback(room: InternalRoom): void {
+    if (room.players.length < 2) return;
+    const sorted = [...room.players].sort((a, b) => b.score - a.score);
+    const leader = sorted[0];
+    if (!leader) return;
+    const worst = this.rankFloor.get(room.code)?.get(leader.id) ?? 1;
+    if (worst >= room.players.length) this.achievements.reportEvent('comeback', 1);
   }
 
   getBeatmap(code: string): Beatmap | null {

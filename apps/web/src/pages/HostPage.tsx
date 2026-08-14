@@ -187,11 +187,16 @@ function ConnectProviderCta({
       <h4>Connect Provider</h4>
       <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
         Status:{' '}
-        <strong>{configured ? 'Credentials present on server' : 'Credentials missing'}</strong>
+        <strong>
+          {configured
+            ? 'CREDENTIALS_PRESENT'
+            : (providers?.authState ?? 'EXTERNAL_PENDING')}
+        </strong>
       </p>
       {!configured ? (
         <p style={{ fontSize: '0.9rem' }}>
-          Remaining <strong>METADATA_ONLY</strong>. Set provider env vars (
+          Provider auth is <strong>EXTERNAL_PENDING</strong>. Use owned/open/local catalog songs.
+          Remaining <strong>METADATA_ONLY</strong> for platform links. Set provider env vars (
           <code>SPOTIFY_CLIENT_ID</code>, <code>YOUTUBE_API_KEY</code>, or{' '}
           <code>APPLE_MUSIC_DEVELOPER_TOKEN</code>) and restart the server. BeatLink never downloads
           or rips platform audio.
@@ -697,6 +702,25 @@ export default function HostPage() {
             </div>
 
             <div className="card stack">
+              <h3>
+                Achievements ({room?.achievementSummary?.unlocked ?? 0}/
+                {room?.achievementSummary?.total ?? 0} ·{' '}
+                {Math.round(room?.achievementSummary?.percent ?? 0)}%)
+              </h3>
+              {(room?.achievementSummary?.entries ?? []).map((entry) => (
+                <div key={entry.id} style={{ fontSize: '0.85rem' }}>
+                  <strong>{entry.title}</strong>
+                  <div style={{ color: 'var(--muted)' }}>
+                    {entry.description} · {Math.round(entry.percent)}%
+                  </div>
+                </div>
+              ))}
+              {(room?.achievementSummary?.entries.length ?? 0) === 0 && (
+                <p style={{ color: 'var(--muted)' }}>Party achievements appear as you play.</p>
+              )}
+            </div>
+
+            <div className="card stack">
               <h3>Select Song</h3>
               <div className="song-list">
                 {songs.map((s) => (
@@ -921,6 +945,9 @@ export default function HostPage() {
           <button className="btn-secondary btn-large" onClick={endRoom} type="button">
             End Room
           </button>
+          <Link className="btn-secondary btn-large" to="/">
+            New Session
+          </Link>
         </div>
       )}
     </div>
