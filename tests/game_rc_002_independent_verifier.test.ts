@@ -35,6 +35,8 @@ const CATALOG_IDS = [
   'bl.five_mode',
   'bl.pause_and_breathe',
   'bl.hidden_full_house',
+  'bl.first_minutes',
+  'bl.reconnect',
 ];
 
 function emitAck<T>(socket: Socket, event: string, payload: unknown, timeoutMs = 4000): Promise<T> {
@@ -79,7 +81,7 @@ describe('INDEPENDENT VERIFIER GAME-RC-002 Beat Link', () => {
     const catalog = parseAchievementCatalog(
       JSON.parse(readFileSync(resolve(ROOT, 'release/ACHIEVEMENTS.json'), 'utf8')),
     );
-    expect(catalog.achievements).toHaveLength(12);
+    expect(catalog.achievements).toHaveLength(14);
     for (const item of catalog.achievements) {
       expect(['test', 'debug', 'cheat', 'always']).not.toContain(item.unlock?.type);
     }
@@ -93,7 +95,7 @@ describe('INDEPENDENT VERIFIER GAME-RC-002 Beat Link', () => {
     expect(getProviderAuthStatus().authState).toBe('EXTERNAL_PENDING');
   });
 
-  it('unlocks 12/12 from live RoomManager session (not catalog setFlag-only)', () => {
+  it('unlocks 14/14 from live RoomManager session (not catalog setFlag-only)', () => {
     const manager = new RoomManager();
     const created = manager.createRoom('iv-host');
     const code = created.code;
@@ -160,7 +162,7 @@ describe('INDEPENDENT VERIFIER GAME-RC-002 Beat Link', () => {
       }),
     );
     expect(missing, `missing ${missing.join(',')}`).toEqual([]);
-    expect(rt.unlockedCount()).toBe(12);
+    expect(rt.unlockedCount()).toBe(14);
     expect(manager.shutdownRoom(code, { hostToken: migrated?.hostToken ?? hostToken })?.phase).toBe(
       'closed',
     );

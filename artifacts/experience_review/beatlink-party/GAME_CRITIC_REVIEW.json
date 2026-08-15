@@ -1,21 +1,21 @@
 {
   "schema": "experience_review_game_critic/v1",
   "subject": "beatlink-party",
-  "work_item": "GAME-successor-beatlink-full",
-  "generated_at": "2026-08-12T22:50:00Z",
+  "work_item": "GAME-RC-004",
+  "generated_at": "2026-08-15T00:00:00Z",
   "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
   "live_framebuffer": "UNAVAILABLE",
   "historical_pixels_inspected": [
     "docs/product-quality/evidence/pixel-final/01c-landing.png",
     "docs/product-quality/evidence/pixel-final/02-host-lobby.png"
   ],
-  "classification": "ALPHA",
+  "classification": "BETA",
   "classification_rationale": [
-    "Five modes + room lifecycle/reconnect/pause/audience exist with digital runtime evidence after this packet",
-    "Historical phone landing and host-lobby captures show a coherent party-join fantasy (big-screen host, phone play, approved demo song)",
-    "Host lobby capture still showed Players (0/6) against ADR MAX_PERFORMERS=8 — copy gap, now remapped digitally; not a ship-ready content pass",
-    "No live framebuffer this packet; HUMAN_POLISH and fun remain HUMAN_PENDING",
-    "Commercial catalog / licensed lyrics not present — rights-safe demo scope only"
+    "GAME-RC-004 densifies party UX with first-minutes onboarding, pacing, A/V feedback, reconnect achievement, Socket.IO topology",
+    "Five modes + room lifecycle/reconnect/pause/audience remain runtime-backed",
+    "Historical phone landing and host-lobby captures retained; heavy capture deferred under Product-Use QEMU rule",
+    "Human first-fun-in-minutes without developer remains S2/HUMAN_PENDING",
+    "Commercial catalog / licensed lyrics not present — rights-safe local/open catalog; provider EXTERNAL_PENDING"
   ],
   "not_rc": true,
   "likely_not_beta_polished": true,
@@ -29,24 +29,29 @@
     },
     {
       "severity": "S1",
-      "id": "CRIT-S1-MODE-RUNTIME-NOT-WIRED",
-      "status": "REMEDIATED_DIGITAL",
-      "summary": "CallAndResponse/PredictionTrivia were registry-scored only; live RoomManager now applies section windows and prediction_lock.",
-      "evidence": "apps/server/src/rooms/RoomManager.ts + tests/game_successor_modes.test.ts"
+      "id": "none",
+      "summary": "No S1 digital blocker newly evidenced for party UX density scope."
     },
     {
       "severity": "S2",
-      "id": "CRIT-S2-HOST-CAP-COPY",
-      "status": "REMEDIATED_DIGITAL",
-      "summary": "pixel-final/02-host-lobby.png shows Players (0/6); code used a hardcoded /6 while MAX_PERFORMERS is 8. Host lobby now binds MAX_PERFORMERS.",
-      "evidence": "docs/product-quality/evidence/pixel-final/02-host-lobby.png + apps/web/src/pages/HostPage.tsx"
+      "id": "CRIT-S2-FIRST-FUN-MINUTES",
+      "status": "OPEN",
+      "summary": "Digital first-minutes path engineered. Human critic must still judge whether a new group has fun in a few minutes without a developer.",
+      "evidence": "packages/game-engine/src/partyOnboarding.ts + LandingPage + RC_GATE S2"
     },
     {
       "severity": "S2",
       "id": "CRIT-S2-JOIN-LOCALHOST",
       "status": "OPEN",
-      "summary": "Historical host lobby capture prints Players join at https://localhost/join — fine for lab, not a polished public join surface.",
+      "summary": "Join URLs may still be lab localhost — not a polished public join surface.",
       "evidence": "docs/product-quality/evidence/pixel-final/02-host-lobby.png"
+    },
+    {
+      "severity": "S2",
+      "id": "CRIT-S2-PROVIDER-EXTERNAL",
+      "status": "OPEN",
+      "summary": "Provider auth EXTERNAL_PENDING without credentials. Local/open catalog only. No DRM rip.",
+      "evidence": "apps/server/src/music/linkResolver.ts"
     },
     {
       "severity": "S3",
@@ -56,13 +61,13 @@
     }
   ],
   "scores_heuristic": {
-    "systems_depth": 0.84,
-    "presentation": 0.48,
-    "mode_completeness": 0.78,
+    "systems_depth": 0.88,
+    "presentation": 0.5,
+    "mode_completeness": 0.84,
     "rights_honesty": 0.92,
-    "ship_readiness": 0.52
+    "ship_readiness": 0.56
   },
-  "verdict": "ALPHA — digitally deep phone-party loop with five modes now runtime-wired; not polished beta/RC without human polish + licensed catalog.",
-  "tip_sha": "474b994d761fe3c54c05f0edb783f5addcaf8b4c",
-  "tip_short": "474b994"
+  "verdict": "BETA — densified digital phone-party UX with five modes and Socket.IO topology; not polished RC without human first-fun + public join + licensed catalog.",
+  "tip_sha": "6910d2a1b16eee5e8368a293193f4826bc107c02",
+  "tip_short": "6910d2a"
 }

@@ -97,6 +97,26 @@
           { "type": "event_count", "event": "host_migrated", "count": 1 }
         ]
       }
+    },
+    {
+      "id": "bl.first_minutes",
+      "title": "First Minutes",
+      "description": "Complete calibration and a Beat Tap round in one party session.",
+      "hidden": false,
+      "unlock": {
+        "type": "all",
+        "conditions": [
+          { "type": "flag", "flag": "mode:BeatTap" },
+          { "type": "flag", "flag": "calibrated" }
+        ]
+      }
+    },
+    {
+      "id": "bl.reconnect",
+      "title": "Back Online",
+      "description": "Reconnect a player after a disconnect during a live party.",
+      "hidden": false,
+      "unlock": { "type": "event_count", "event": "player_reconnected", "count": 1 }
     }
   ]
 }

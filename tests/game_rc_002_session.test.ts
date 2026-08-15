@@ -56,10 +56,10 @@ describe('GAME-RC-002 Beat Link contracts + achievement runtime', () => {
     expect(out).toContain('GAME_RC_CONTRACTS_OK');
   });
 
-  it('unlocks all 12 catalog entries from real conditions', () => {
+  it('unlocks all 14 catalog entries from real conditions', () => {
     const persist = memoryPersist();
     const rt = new AchievementRuntime(catalog, persist);
-    expect(rt.catalogCount()).toBe(12);
+    expect(rt.catalogCount()).toBe(14);
     expect(rt.completionPercent()).toBe(0);
     const hidden = rt.browserEntries().find((e) => e.id === 'bl.hidden_full_house');
     expect(hidden?.title).toBe('???');
@@ -80,10 +80,14 @@ describe('GAME-RC-002 Beat Link contracts + achievement runtime', () => {
     rt.reportEvent('comeback', 1);
     rt.setFlag('five_mode_session');
     rt.reportEvent('pause_resume', 1);
+    rt.setFlag('calibrated');
+    expect(rt.isUnlocked('bl.first_minutes')).toBe(true);
+    rt.reportEvent('player_reconnected', 1);
+    expect(rt.isUnlocked('bl.reconnect')).toBe(true);
     expect(rt.isUnlocked('bl.hidden_full_house')).toBe(true);
-    expect(rt.unlockedCount()).toBe(12);
+    expect(rt.unlockedCount()).toBe(14);
     expect(rt.completionPercent()).toBe(100);
-    expect(rt.drainNotifications().length).toBeGreaterThanOrEqual(12);
+    expect(rt.drainNotifications().length).toBeGreaterThanOrEqual(14);
 
     const rt2 = new AchievementRuntime(catalog, persist);
     expect(rt2.isUnlocked('bl.first_party')).toBe(true);
@@ -99,7 +103,7 @@ describe('GAME-RC-002 Beat Link contracts + achievement runtime', () => {
     expect(gate.claims.POLISHED_RELEASE_CANDIDATE).toBe(false);
     expect(gate.claims.FEATURE_COMPLETE_RC).toBe(false);
     expect(gate.claims.HUMAN_PLAYTEST_VALIDATED).toBe(false);
-    expect(gate.critic_class).toBe('ALPHA');
+    expect(gate.critic_class).toBe('BETA');
     expect(gate.defects.S0_open).toBe(0);
     expect(gate.defects.S1_open).toBe(0);
     delete process.env.SPOTIFY_CLIENT_ID;
@@ -181,7 +185,9 @@ describe('GAME-RC-002 complete party session on RoomManager', () => {
     expect(results?.awards.length).toBeGreaterThan(0);
     expect(manager.getAchievements().isUnlocked('bl.comeback')).toBe(true);
     expect(manager.getAchievements().isUnlocked('bl.hidden_full_house')).toBe(true);
-    expect(manager.getAchievements().unlockedCount()).toBe(12);
+    expect(manager.getAchievements().isUnlocked('bl.first_minutes')).toBe(true);
+    expect(manager.getAchievements().isUnlocked('bl.reconnect')).toBe(true);
+    expect(manager.getAchievements().unlockedCount()).toBe(14);
 
     expect(manager.rematch(code)?.phase).toBe('lobby');
     const closed = manager.shutdownRoom(code, { hostToken });
@@ -189,7 +195,7 @@ describe('GAME-RC-002 complete party session on RoomManager', () => {
 
     const next = manager.createRoom('host-new');
     expect(next.code).not.toBe(code);
-    expect(next.achievementSummary?.total).toBe(12);
+    expect(next.achievementSummary?.total).toBe(14);
   });
 });
 

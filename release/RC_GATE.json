@@ -1,8 +1,8 @@
 {
   "schema": "gunnchos.game_rc.rc_gate/v1",
   "game": "beatlink-party",
-  "packet": "GAME-RC-002",
-  "generated_at": "2026-08-13T20:20:00Z",
+  "packet": "GAME-RC-004",
+  "generated_at": "2026-08-15T00:00:00Z",
   "claims": {
     "POLISHED_RELEASE_CANDIDATE": false,
     "FEATURE_COMPLETE_RC": false,
@@ -10,22 +10,22 @@
     "DIGITAL_PLAYTHROUGH_EXECUTABLE": true,
     "ACHIEVEMENT_SUBSYSTEM": true
   },
-  "critic_class": "ALPHA",
-  "critic_class_rationale": "Digital five-mode party session is executable on live RoomManager plus a Socket.IO host/player topology (not a static page). S0/S1 for this packet's digital scope are 0. S2 remains: human first-fun-in-minutes, public join origin, licensed catalog. VISUAL is HISTORICAL_CAPTURES_ONLY from prior packets — this packet does not invent pixels. Critic stays ALPHA. POLISHED_RELEASE_CANDIDATE and FEATURE_COMPLETE_RC are not claimed.",
+  "critic_class": "BETA",
+  "critic_class_rationale": "GAME-RC-004 densifies party UX: first-minutes onboarding, pacing transitions, A/V feedback hooks, a11y retained, Socket.IO topology (not static page), local/open media with provider EXTERNAL_PENDING. Digital S0/S1=0 for this packet. S2 remains: human first-fun-in-minutes, public join origin, licensed catalog. VISUAL is HISTORICAL_CAPTURES_ONLY + harness (heavy capture deferred). Critic may stay BETA while S2 remains. POLISHED_RELEASE_CANDIDATE and FEATURE_COMPLETE_RC are not claimed.",
   "defects": {
     "S0_open": 0,
     "S1_open": 0,
     "S2_open": 4,
     "S2_items": [
-      "HUMAN_PLAYTEST_VALIDATED=false",
+      "HUMAN_PLAYTEST_VALIDATED=false — first fun in a few minutes without developer remains HUMAN_PENDING",
       "Join origin may be lab localhost (not polished public join)",
       "Provider auth EXTERNAL_PENDING without credentials",
-      "First fun moment for a new group remains a human critic question"
+      "VISUAL heavy capture DEFERRED (historical landing/host only)"
     ]
   },
   "visual": {
     "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
-    "reason": "No new live framebuffer this packet. Prior pixel-final landing/host-lobby captures exist; this packet does not invent visual critique."
+    "reason": "Harness + prior pixel-final landing/host captures. No new live framebuffer this packet. Product-Use QEMU resource rule defers heavy capture. Do not invent visual critique."
   },
   "playthrough": {
     "status": "DIGITAL_EXECUTABLE",
@@ -33,9 +33,9 @@
   },
   "achievements": {
     "catalog": "release/ACHIEVEMENTS.json",
-    "count": 12,
-    "tested_count": 12,
-    "notes": "Isolated AchievementRuntime tests plus RoomManager session execution. No cheat unlock API."
+    "count": 14,
+    "tested_count": 14,
+    "notes": "14 catalog entries including first-minutes + reconnect. Unlocks from RoomManager. No cheat unlock API."
   },
-  "notes": "Cursor does not merge. Local/open catalog media only — no DRM bypass. Critic may remain ALPHA while S2 remains."
+  "notes": "Cursor does not merge. Local/open catalog media only — no DRM bypass. Predecessor GAME-RC-002 #20 on main. Real Socket.IO topology."
 }

@@ -1,0 +1,57 @@
+{
+  "schema": "gunnchos.game_rc.platform_matrix/v1",
+  "game": "beatlink-party",
+  "packet": "GAME-RC-004",
+  "generated_at": "2026-08-15T00:00:00Z",
+  "PLATFORM_PUBLISHED": false,
+  "CONSOLE_CERTIFIED": false,
+  "targets": [
+    {
+      "id": "web",
+      "status": "BUILDABLE",
+      "notes": "Vite web client + Socket.IO server monorepo."
+    },
+    {
+      "id": "android",
+      "status": "BUILDABLE",
+      "notes": "Capacitor Android under apps/web (com.gunnchos.beatlinkparty). Large export batches DEFERRED while Product-Use QEMU active."
+    },
+    {
+      "id": "ios",
+      "status": "NOT_STARTED",
+      "notes": "No iOS Capacitor project claimed this packet."
+    },
+    {
+      "id": "linux_desktop",
+      "status": "NOT_STARTED",
+      "notes": "Web-first phone-party; no native desktop packaging claim."
+    },
+    {
+      "id": "windows_desktop",
+      "status": "NOT_STARTED",
+      "notes": "Web-first."
+    },
+    {
+      "id": "macos_desktop",
+      "status": "NOT_STARTED",
+      "notes": "Web-first."
+    },
+    {
+      "id": "steam",
+      "status": "EXTERNAL_ACCOUNT_PENDING",
+      "notes": "No Steamworks integration claimed."
+    },
+    {
+      "id": "consoles",
+      "status": "EXTERNAL_PENDING",
+      "notes": "No console certification path claimed."
+    }
+  ],
+  "deferred_heavy_work": [
+    "large Android/iOS export batches",
+    "repeated video capture of five-mode session",
+    "additional QEMU device soaks",
+    "heavy multiplayer load simulations beyond unit harness"
+  ],
+  "notes": "Foundation matrix only. PLATFORM_PUBLISHED=false. Real Socket.IO topology required — not a static page."
+}

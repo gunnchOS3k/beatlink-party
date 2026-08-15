@@ -68,6 +68,8 @@ import {
   AchievementRuntime,
   parseAchievementCatalog,
   memoryPersist,
+  pulsePartyPace,
+  presentAvFeedback,
 } from '@beatlink/game-engine';
 import { getBeatmapForSong } from '../beatmaps/store.js';
 import {
@@ -220,6 +222,8 @@ export class RoomManager {
     this.sessionModes.set(code, new Set());
     this.rankFloor.set(code, new Map());
     this.achievements.reportEvent('party_started', 1);
+    pulsePartyPace('lobby_ready', `room ${code}`);
+    presentAvFeedback('join_chime', 'Party room created');
     emitTelemetry('room_created', code, {
       rematchRound: 0,
       gameMode: room.gameMode,
@@ -424,6 +428,9 @@ export class RoomManager {
     player.connected = true;
     this.socketToPlayer.set(socketId, player.id);
     this.playerToRoom.set(player.id, room.code);
+    this.achievements.reportEvent('player_reconnected', 1);
+    pulsePartyPace('disconnect_reconnect', playerId);
+    presentAvFeedback('disconnect_warn', 'Player reconnected');
     return player;
   }
 
@@ -477,6 +484,8 @@ export class RoomManager {
       room.hostId = `player-host:${successor.id}`;
       emitTelemetry('host_migrated', room.code, { rematchRound: room.rematchRound });
       this.achievements.reportEvent('host_migrated', 1);
+      pulsePartyPace('host_migrated', successor.id);
+      presentAvFeedback('host_migrated', 'Host continuity recovered');
       return {
         room: this.publish(room),
         previousHostId,
@@ -488,6 +497,8 @@ export class RoomManager {
     room.hostId = null;
     emitTelemetry('host_migrated', room.code, { rematchRound: room.rematchRound });
     this.achievements.reportEvent('host_migrated', 1);
+    pulsePartyPace('host_migrated', 'no-successor');
+    presentAvFeedback('host_migrated', 'Host disconnected — awaiting claim');
     return {
       room: this.publish(room),
       previousHostId,
@@ -679,6 +690,10 @@ export class RoomManager {
       atMs: now,
     };
     if (accepted) this.achievements.reportEvent('audience_influence', 1);
+    if (accepted) {
+      pulsePartyPace('audience_pulse', type);
+      presentAvFeedback('audience_hype', `Audience ${type}`);
+    }
     emitTelemetry('audience_influence', room.code, {
       accepted,
       type,
@@ -886,6 +901,8 @@ export class RoomManager {
     assertTransition(room.phase, 'calibrating');
     room.phase = 'calibrating';
     room.calibrationSamples = [];
+    pulsePartyPace('calibration_start', code);
+    presentAvFeedback('calibration_tick', 'Latency calibration started');
     return this.publish(room);
   }
 
@@ -943,6 +960,7 @@ export class RoomManager {
         offsetMs: clamped,
       };
     }
+    this.achievements.setFlag('calibrated');
     return this.publish(room);
   }
 
@@ -1025,6 +1043,7 @@ export class RoomManager {
     room.pausedAtMs = Date.now();
     room.pauseElapsedGameMs = this.getGameTimeMs(code);
     emitTelemetry('session_pause', room.code, { host: true });
+    pulsePartyPace('pause', code);
     return this.publish(room);
   }
 
@@ -1046,6 +1065,7 @@ export class RoomManager {
     room.pauseElapsedGameMs = undefined;
     emitTelemetry('session_resume', room.code, { host: true });
     this.achievements.reportEvent('pause_resume', 1);
+    pulsePartyPace('resume', code);
     return this.publish(room);
   }
 
@@ -1301,6 +1321,8 @@ export class RoomManager {
     const awards = computeAwards(room.players);
     this.checkComeback(room);
     this.commit(room);
+    pulsePartyPace('results', `room ${code}`);
+    presentAvFeedback('results_sting', 'Round results ready');
     return {
       teamScore: room.teamScore,
       crowdMeter: room.crowdMeter,
@@ -1325,6 +1347,8 @@ export class RoomManager {
     if (!room || (room.phase !== 'results' && room.phase !== 'lobby')) return null;
     room.rematchRound += 1;
     room.phase = 'lobby';
+    pulsePartyPace('rematch', `round ${room.rematchRound}`);
+    presentAvFeedback('rematch_ready', 'Rematch lobby ready');
     room.countdown = null;
     room.gameStartTime = null;
     room.pastedLinkUrl = null;
