@@ -87,6 +87,17 @@ export default function LandingPage() {
         </div>
       </div>
       <div className="card stack" style={{ maxWidth: 700, margin: '2rem auto' }}>
+        <h3>First minutes</h3>
+        <ol style={{ paddingLeft: '1.25rem', color: 'var(--muted)', lineHeight: 1.8 }}>
+          <li>Host creates a room on the big screen.</li>
+          <li>Players join with the code; audience can spectate.</li>
+          <li>Pick a role, choose a local/open catalog song (no DRM rip).</li>
+          <li>Calibrate once, then play Beat Tap for the first fun loop.</li>
+          <li>See scores, rematch, or leave — Socket.IO topology, not a static page.</li>
+        </ol>
+        <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
+          Guided first-minutes path is digital. Human first-fun-in-minutes remains HUMAN_PENDING.
+        </p>
         <h3>How to play</h3>
         <ol style={{ paddingLeft: '1.25rem', color: 'var(--muted)', lineHeight: 1.8 }}>
           <li>Host creates a room and displays the code on a TV or laptop.</li>

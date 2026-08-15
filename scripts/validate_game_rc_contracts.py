@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate GAME-RC-002 release contracts without claiming polish."""
+"""Validate GAME-RC release contracts without claiming polish."""
 from __future__ import annotations
 
 import json
@@ -30,6 +30,8 @@ def main() -> int:
         "CONTENT_MANIFEST.json",
         "ACHIEVEMENTS.json",
         "RC_GATE.json",
+        "PLATFORM_MATRIX.json",
+        "VISUAL_PACK_HARNESS.json",
     ):
         if not (RELEASE / name).is_file():
             errors.append(f"missing {name}")
@@ -41,11 +43,15 @@ def main() -> int:
     content = load("CONTENT_MANIFEST.json")
     ach = load("ACHIEVEMENTS.json")
     gate = load("RC_GATE.json")
+    platform = load("PLATFORM_MATRIX.json")
+    visual = load("VISUAL_PACK_HARNESS.json")
 
     require(play, ["schema", "game", "steps", "pause_resume", "ending", "open_placeholders"], "playthrough", errors)
     require(content, ["schema", "game", "counts", "modes", "items", "open_placeholders"], "content", errors)
     require(ach, ["schema", "game", "catalog_version", "offline", "duplicate_prevention", "achievements"], "achievements", errors)
     require(gate, ["schema", "game", "claims", "critic_class", "defects", "visual"], "rc_gate", errors)
+    require(platform, ["schema", "game", "targets", "PLATFORM_PUBLISHED"], "platform", errors)
+    require(visual, ["schema", "game", "status", "VISUAL_MODEL_REVIEW", "deferred_heavy_work"], "visual_harness", errors)
 
     if play.get("game") != GAME or ach.get("game") != GAME:
         errors.append("game id mismatch")
@@ -85,6 +91,12 @@ def main() -> int:
         errors.append("visual review missing")
     if int(gate.get("achievements", {}).get("count", 0)) != len(ach.get("achievements", [])):
         errors.append("RC_GATE achievement count mismatch")
+    if gate.get("packet") != "GAME-RC-004":
+        errors.append("RC_GATE packet must be GAME-RC-004")
+    if platform.get("PLATFORM_PUBLISHED") is not False:
+        errors.append("PLATFORM_PUBLISHED must be false")
+    if visual.get("VISUAL_MODEL_REVIEW") not in {"HISTORICAL_CAPTURES_ONLY", "UNAVAILABLE"}:
+        errors.append("visual harness review invalid")
 
     open_modes = [m["id"] for m in content.get("modes", []) if m.get("status") == "OPEN"]
     print(f"GAME_RC_CONTRACTS_OK game={ach.get('game')} achievements={len(ach.get('achievements', []))} open_modes={open_modes}")
