@@ -1,115 +1,109 @@
-# BeatLink Party
+# beatlink-party
 
-**BeatLink Party** is a browser-based rhythm and karaoke party game. One host runs the main stage on a TV, laptop, or projector; players join from their phones with a room code. No app download required.
+Browser-based rhythm/karaoke **party** game — host on a big screen, players join by room code from phones (no app store install).
 
-> **Demo GIF placeholder** — Record a session with host + 2 phone browsers to add here.
+> **Current release/state:** `INTEGRATED` MVP — compliance-safe demo catalog; link paste is metadata-only (no audio rip).
 
-> **Screenshot placeholder** — Host lobby with room code and player list.
+Ecosystem portal: [gunnchos-research-portal](https://github.com/gunnchOS3k/gunnchos-research-portal) · Product charter: [gunnchOS3k_PRODUCT_CHARTER.md](https://github.com/gunnchOS3k/gunnchos-7gc-ai-ran-field-kit/blob/main/program/charter/gunnchOS3k_PRODUCT_CHARTER.md)
 
-## MVP Features
+## What is this?
 
-- Host web app: create room, lobby, song selection, link paste, gameplay, results
-- Player web app: join by code, role selection, phone controller, results
-- Real-time multiplayer via Socket.IO
-- Three roles: **Beat Tapper**, **Vocalist**, **Hype Captain**
-- Approved demo catalog (3 royalty-free generated tracks)
-- Beatmap JSON schema with generated demo beatmaps
-- Link resolver for YouTube / Spotify / Apple Music (**metadata only** — no audio ripping)
-- Scoring engine with timing grades and end-of-round awards
-- Compliance-safe fallback messaging for unplayable links
+pnpm monorepo: React host/player UI, Express+Socket.IO server, shared game engine, demo songs/beatmaps.
 
-## Legal / Compliance Note
+## Why does it exist?
 
-This MVP **does not download, rip, or cache** audio from YouTube, Spotify, or Apple Music. Pasted links are used for identification and eligibility status only. Gameplay uses the internal approved demo catalog or future user-owned uploads. See [docs/MUSIC_COMPLIANCE.md](docs/MUSIC_COMPLIANCE.md).
+Social music play for gunnchOS3k gatherings without claiming licensed streaming playback.
 
-## Tech Stack
+## Where does it fit?
 
-| Layer | Technology |
-|-------|------------|
-| Monorepo | pnpm workspaces |
-| Host / Player UI | React 18 + Vite |
-| Server | Express + Socket.IO |
-| Shared types | TypeScript + Zod |
-| Game logic | `@beatlink/game-engine` package |
-| Tests | Vitest |
-| CI | GitHub Actions |
+Product Charter **layer 9**. Lab packaging optional; repo ≠ Lab production runtime PASS.
 
-## Local Setup
+## What is real today?
 
-**Requirements:** Node.js 20+, pnpm 9+
+- Host/player flows with Socket.IO
+- Approved royalty-free demo catalog
+- Vitest coverage for rooms/scoring/state
+
+## What is simulated / modelled?
+
+- Demo beatmaps / generated tracks
+- Link resolver eligibility messaging without audio download
+
+## What is physical / external pending?
+
+- Broader music catalog under compliant licenses
+- Device Lab production-runtime earn where applicable
+
+## Try / inspect in 5 minutes
 
 ```bash
-git clone https://github.com/gunnchOS3k/beatlink-party.git
-cd beatlink-party
-cp .env.example .env
+# Node 20+, pnpm 9+
 pnpm install
-```
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Run web + server concurrently |
-| `pnpm dev:web` | Vite dev server (port 5173) |
-| `pnpm dev:server` | API + WebSocket server (port 3001) |
-| `pnpm build` | Build all packages |
-| `pnpm test` | Run Vitest test suite |
-| `pnpm test:network-load` | Real Socket.IO localhost load (8×25/50/100/300) |
-| `pnpm compose:redis` | Start Redis via docker compose (durable rooms) |
-| `pnpm lint` | ESLint |
-| `pnpm typecheck` | TypeScript check all packages |
-
-Set `REDIS_URL=redis://127.0.0.1:6379` (and optionally `BEATLINK_ROOM_STORE=redis`) for durable room snapshots. Unit tests keep the in-memory store.
-
-## How to Run Host + Player
-
-1. Start the stack: `pnpm dev`
-2. **Host:** open [http://localhost:5173](http://localhost:5173) → **Create Room**
-3. Note the room code on the host screen
-4. **Players:** open [http://localhost:5173/join](http://localhost:5173/join) on phones (same Wi‑Fi) or new browser tabs
-5. Enter code + name, pick a role, tap **Ready**
-6. Host selects a demo song → **Start Countdown**
-7. Play the round; view results and **Replay**
-
-For local phone testing, use your machine's LAN IP instead of `localhost` (e.g. `http://192.168.1.x:5173/join`).
-
-## Testing
-
-```bash
+pnpm dev
+# Host http://localhost:5173 → Create Room; players /join with code
 pnpm test
 ```
 
-Tests cover room creation, player join, link resolver, beatmap validation, scoring, and state transitions.
+## Architecture
 
-## Repo Structure
+`apps/web`, `apps/server`, `packages/shared`, `packages/game-engine`, `content/`.
 
-```text
-beatlink-party/
-  apps/
-    web/          # React host + player UI
-    server/       # Express API + Socket.IO
-  packages/
-    shared/       # Types, constants, beatmap schema
-    game-engine/  # Scoring, timing, awards, state machine
-  content/
-    songs/        # Approved demo catalog
-    beatmaps/     # Demo beatmap JSON files
-  docs/           # GDD, PRD, compliance, API spec
-  tests/          # Vitest integration tests
-  .github/workflows/ci.yml
+## Repo map
+
+| Path | Role |
+|---|---|
+| `apps/web` | Host + player UI |
+| `apps/server` | API + Socket.IO |
+| `packages/shared` | Types/schema |
+| `packages/game-engine` | Scoring/state |
+| `content/` | Demo songs/beatmaps |
+| `docs/` | GDD/PRD/compliance |
+
+## Interfaces
+
+HTTP + Socket.IO; optional Redis durable rooms. Music links = metadata only.
+
+## Tests
+
+```bash
+pnpm test
+pnpm typecheck
 ```
 
-## Roadmap
+## Evidence
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for phased delivery beyond MVP.
+CI + Vitest; compliance note in [docs/MUSIC_COMPLIANCE.md](docs/MUSIC_COMPLIANCE.md).
 
-## Contributing
+## Known gaps
 
-1. Fork the repo
-2. Create a feature branch
-3. Run `pnpm test` and `pnpm lint` before opening a PR
-4. Do **not** add features that download third-party platform audio without proper licensing
+Licensed catalog expansion; polish; Lab runtime tokens.
 
-## License
+## Beginner path
 
-MIT — Demo music is generated placeholder content for development only. Commercial release requires proper music and lyric licensing.
+One TV host + phones = party — use demo songs first.
+
+## Intern path
+
+Add a test around scoring grades; keep compliance docs intact.
+
+## Expert path
+
+Room store durability + compliance firewall for links.
+
+## Contribution path
+
+UI/engine/tests. Never add audio ripping.
+
+## Current release / state
+
+**INTEGRATED** MVP. `game_repo_not_lab_runtime_proof`.
+
+## Claim boundary
+
+No commercial 6G · no audio rip from streaming links · Cursor DRAFT-only.
+
+---
+
+## Retained detail (post–Cycle 3A front door)
+
+Full prior README: [docs/history/README_PRE_WP012.md](docs/history/README_PRE_WP012.md).
