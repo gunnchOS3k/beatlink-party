@@ -1,0 +1,23 @@
+{
+  "serial": "27211JEGR06194",
+  "model": "Pixel 6a",
+  "android_version": "17",
+  "git_sha": "8e57b202a03f569663724900b5be6c6fe8de1108",
+  "package_id": "com.gunnchos.beatlinkparty",
+  "human_qa": "HUMAN_QA_PENDING",
+  "timestamp_utc": "2026-08-18T21:33:28Z",
+  "apk": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/apps/web/android/app/build/outputs/apk/debug/app-debug.apk",
+  "apk_sha256": "3a8dfc2ef8e10a63859e29fda304854bb87931296fbe96e91604d16256973e7f",
+  "install": "PASS",
+  "launch": "PASS",
+  "pixel_6a_ready": "PASS",
+  "first_launch": "PASS",
+  "smoke": "PASS",
+  "back": "PASS",
+  "pause_resume": "PASS",
+  "orientation": "PASS",
+  "touch": "PASS",
+  "reconnect": "PASS",
+  "uninstall_reinstall": "PASS",
+  "note": "Digital install/launch smoke only. Not RF, not playtest quality."
+}
