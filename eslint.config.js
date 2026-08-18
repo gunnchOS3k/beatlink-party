@@ -117,5 +117,5 @@ export default tseslint.config(
       ],
     },
   },
-  { ignores: ['**/dist/**', '**/node_modules/**', '**/*.js', '**/content/**'] },
+  { ignores: ['**/dist/**', '**/node_modules/**', '**/*.js', '**/content/**', 'tests/e2e/**', 'playwright.config.ts'] },
 );
