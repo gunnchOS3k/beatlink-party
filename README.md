@@ -2,9 +2,12 @@
 
 **BeatLink Party** is a browser-based rhythm and karaoke party game. One host runs the main stage on a TV, laptop, or projector; players join from their phones with a room code. No app download required.
 
-> **Demo GIF placeholder** — Record a session with host + 2 phone browsers to add here.
-
-> **Screenshot placeholder** — Host lobby with room code and player list.
+Identity: [docs/PRODUCT_IDENTITY.md](docs/PRODUCT_IDENTITY.md) (`com.gunnchos.beatlinkparty`).  
+UML: [docs/uml/README.md](docs/uml/README.md).  
+Pixel 6a: [docs/PIXEL_6A_ACCEPTANCE.md](docs/PIXEL_6A_ACCEPTANCE.md) — **BLOCKED / unauthorized**.  
+Human playtest: [docs/HUMAN_PLAYTEST_PACKET.md](docs/HUMAN_PLAYTEST_PACKET.md) — `HUMAN_QA_PENDING`.  
+Music policy: [docs/MUSIC_COMPLIANCE.md](docs/MUSIC_COMPLIANCE.md) — no ripping.  
+Workload notes (not a telecom thesis claim): [docs/research/6G_WORKLOAD_RELEVANCE.md](docs/research/6G_WORKLOAD_RELEVANCE.md).
 
 ## MVP Features
 
@@ -112,4 +115,4 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for phased delivery beyond MVP.
 
 ## License
 
-MIT — Demo music is generated placeholder content for development only. Commercial release requires proper music and lyric licensing.
+MIT — see [LICENSE](LICENSE). Demo music is generated placeholder content for development only. Commercial release requires proper music and lyric licensing.
