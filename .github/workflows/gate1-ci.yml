@@ -63,6 +63,24 @@ jobs:
       - name: Gate1 core-loop tests
         run: pnpm vitest run tests/gate1_core_loop.test.ts
 
+      - name: Wave001 cross-device contract (RoomManager + scoring probes)
+        run: |
+          set -euo pipefail
+          pip install 'jsonschema>=4.20'
+          pnpm vitest run tests/cross_device_contract.test.ts
+          test -f gate1/evidence/out/cross_device_contract.json
+          python3 - <<'PY'
+          import json
+          from jsonschema import Draft202012Validator
+          from pathlib import Path
+          doc = json.loads(Path("gate1/evidence/out/cross_device_contract.json").read_text())
+          schema = json.loads(Path("gate1/contracts/cross_device_game_contract.v1.schema.json").read_text())
+          Draft202012Validator(schema).validate(doc)
+          assert doc["game_id"] == "beatlink-party"
+          assert doc["probes"]["multiplayer"]["status"] == "pass"
+          print("WAVE001_CROSS_DEVICE_CONTRACT_OK")
+          PY
+
       - name: Gate1 suite smoke (vitest only; lint/typecheck tracked separately)
         run: pnpm vitest run
         env:
