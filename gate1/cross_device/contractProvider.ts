@@ -123,8 +123,7 @@ function probeDeterministic(): CrossDeviceGameContract['probes']['deterministic_
 function probeSaveRoundtrip(): CrossDeviceGameContract['probes']['save_roundtrip'] {
   const store = new Map<string, string>();
   const before = globalThis.localStorage;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).localStorage = {
+  (globalThis as { localStorage: Storage }).localStorage = {
     getItem: (k: string) => store.get(k) ?? null,
     setItem: (k: string, v: string) => store.set(k, v),
     removeItem: (k: string) => store.delete(k),
