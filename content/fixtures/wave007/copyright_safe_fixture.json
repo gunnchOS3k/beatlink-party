@@ -1,0 +1,13 @@
+{
+  "id": "wave007-copyright-safe-fixture",
+  "title": "Wave007 Procedural Click Track",
+  "artist": "BeatLink",
+  "license": "demo_generated",
+  "sourceKind": "synthetic",
+  "bpm": 120,
+  "durationMs": 45000,
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "commercialMedia": false,
+  "notes": "Procedural metronome only — no commercial audio binaries."
+}

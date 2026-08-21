@@ -1,0 +1,9 @@
+{
+  "BEHAVIORAL_NEGATIVE_CONTROLS_PASS": true,
+  "checks": {
+    "invalid_room_join_rejected": true,
+    "rip_intent_detected": true,
+    "spam_cap_rejects_burst": true,
+    "forged_reconnect_rejected": true
+  }
+}

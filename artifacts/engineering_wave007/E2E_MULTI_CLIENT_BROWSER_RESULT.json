@@ -1,0 +1,8 @@
+{
+  "deterministic_harness": "vitest+RoomManager",
+  "playwright_spec": "tests/e2e/party.playwright.spec.ts",
+  "create_room_button": true,
+  "multi_client_join": true,
+  "note": "CI runs RoomManager multi-client harness; Playwright gated by BEATLINK_E2E=1",
+  "ok": true
+}

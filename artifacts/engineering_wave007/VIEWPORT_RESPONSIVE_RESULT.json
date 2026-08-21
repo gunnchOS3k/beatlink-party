@@ -1,0 +1,8 @@
+{
+  "landing_create_room": true,
+  "join_form": true,
+  "performer_controls": true,
+  "audience_controls": true,
+  "css_responsive": "apps/web/src/styles/global.css",
+  "ok": true
+}

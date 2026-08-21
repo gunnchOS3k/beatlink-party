@@ -205,8 +205,21 @@ export default function PlayerPage() {
     sendInput('tap', { noteId: note?.id });
   }
 
+  function handleSwipe() {
+    if (!beatmap) return;
+    const note =
+      beatmap.notes.find((n) => n.type === 'swipe' && Math.abs(n.timeMs - gameTimeMs) < 200) ??
+      beatmap.notes.find((n) => Math.abs(n.timeMs - gameTimeMs) < 200);
+    sendInput('swipe', { noteId: note?.id });
+  }
+
   function handleVocal() {
     sendInput('vocal_phrase', { promptId: currentPrompt?.id });
+  }
+
+  function handleVocalFallbackTap() {
+    // Mic-denied / accessibility fallback — tap while prompt is active.
+    sendInput('vocal_fallback_tap', { promptId: currentPrompt?.id });
   }
 
   function handleHype(type: 'cheer' | 'lights' | 'boost' | 'combo_save') {
@@ -378,9 +391,18 @@ export default function PlayerPage() {
         )}
 
         {player.role === 'beat_tapper' && (
-          <button className="tap-button" onClick={handleTap}>
-            TAP
-          </button>
+          <div className="stack" style={{ alignItems: 'center', width: '100%' }}>
+            <button className="tap-button" onClick={handleTap} data-testid="performer-tap">
+              TAP
+            </button>
+            <button
+              className="btn-secondary btn-large"
+              onClick={handleSwipe}
+              data-testid="performer-swipe"
+            >
+              SWIPE
+            </button>
+          </div>
         )}
 
         {player.role === 'vocalist' && (
@@ -407,9 +429,18 @@ export default function PlayerPage() {
             <button
               className="btn-primary btn-large"
               onClick={handleVocal}
+              data-testid="performer-vocal"
               disabled={karaokeState ? !canSubmitVocalPhrase(karaokeState) : !currentPrompt}
             >
               Perform Phrase
+            </button>
+            <button
+              className="btn-secondary"
+              onClick={handleVocalFallbackTap}
+              data-testid="performer-vocal-fallback"
+              disabled={karaokeState ? !canSubmitVocalPhrase(karaokeState) : !currentPrompt}
+            >
+              Tap fallback (no mic)
             </button>
             <p style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center' }}>
               Mic optional — tap when the prompt is active. No audio is stored.

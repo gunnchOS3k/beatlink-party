@@ -72,6 +72,7 @@ export default function LandingPage() {
             className="btn-primary btn-large"
             onClick={handleCreate}
             disabled={!backendReady || creating}
+            data-testid="create-room"
           >
             {creating ? 'Creating room…' : 'Create Room (Host)'}
           </button>

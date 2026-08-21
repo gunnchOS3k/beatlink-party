@@ -1,0 +1,139 @@
+{
+  "schema": "gunnchos.engineering_wave007.requirement_results.v1",
+  "target_requirements": 10,
+  "requirements": {
+    "GAME-BEATLINK-001": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_001",
+      "evidence": {
+        "CREATE_ROOM_REACHES_LOBBY": true,
+        "room_code_pattern_ok": true,
+        "product_state": "LOBBY",
+        "host_token_issued": true,
+        "ui_button": "Create Room (Host)",
+        "e2e_path": "tests/e2e/party.playwright.spec.ts"
+      }
+    },
+    "GAME-BEATLINK-002": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_002",
+      "evidence": {
+        "MULTI_CLIENT_JOIN": true,
+        "player_count": 2,
+        "audience_count": 1,
+        "join_paths": [
+          "/join",
+          "/play/:code",
+          "/audience/:code"
+        ]
+      }
+    },
+    "GAME-BEATLINK-003": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_003",
+      "evidence": {
+        "SONG_SOURCE_LAWFUL": true,
+        "COPYRIGHT_SAFE_FIXTURE": true,
+        "fixture_kind": "procedural_fixture",
+        "linkIsNotRipPermission": true,
+        "ripAllowed": false,
+        "downloadAllowed": false
+      }
+    },
+    "GAME-BEATLINK-004": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_004",
+      "evidence": {
+        "ACTIVE_AND_AUDIENCE_ROLES": true,
+        "performer_role": "vocalist",
+        "audience_seat_distinct": true,
+        "seat_kinds": [
+          "player",
+          "audience"
+        ]
+      }
+    },
+    "GAME-BEATLINK-005": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_005",
+      "evidence": {
+        "DEVICE_TIMING_PROFILE": true,
+        "PROFILES_AFFECT_SCORING_WINDOWS": true,
+        "per_player_offset_ms": 50,
+        "late_vs_early_delta_ms": -140
+      }
+    },
+    "GAME-BEATLINK-006": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_006",
+      "evidence": {
+        "AUTHORITATIVE_ROUND_CLOCK": true,
+        "TAP_INPUT": true,
+        "SWIPE_INPUT": true,
+        "VOCAL_FALLBACK_TYPE": "vocal_fallback_tap",
+        "product_states": [
+          "HOME",
+          "LOBBY",
+          "SONG_SELECT",
+          "CALIBRATING",
+          "COUNTDOWN",
+          "PLAYING",
+          "PAUSED",
+          "RESULTS",
+          "REMATCH",
+          "ERROR"
+        ],
+        "server_scored": true
+      }
+    },
+    "GAME-BEATLINK-007": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_007",
+      "evidence": {
+        "AUDIENCE_INFLUENCE_ENGINE": true,
+        "SPAM_CAPS": true,
+        "accepted": 1,
+        "rejected": 11,
+        "unit_burst": {
+          "accepted": 1,
+          "rejected": 19
+        }
+      }
+    },
+    "GAME-BEATLINK-008": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_008",
+      "evidence": {
+        "SCORING_LEDGER_REPLAY": true,
+        "INDIVIDUAL_AND_TEAM_OUTCOMES": true,
+        "unit_replay_match": true,
+        "endgame_ledger_checksum": "9f097f2a7e49062e0781ff0df678126cac2b8597f01ae4b610d6a3ba304f1630",
+        "replay_checksum": "3694fb9eda3394e328ab5905f7fe1438037daabd3e5e1053ea19c7fc2e97fa6b"
+      }
+    },
+    "GAME-BEATLINK-009": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_009",
+      "evidence": {
+        "SESSION_RESUME_A_B_C": true,
+        "forged_token_rejected": true,
+        "rematch": true,
+        "rematch_round": 1,
+        "process_a": "disconnect",
+        "process_b": "reconnect",
+        "process_c": "reconnect_again"
+      }
+    },
+    "GAME-BEATLINK-010": {
+      "classification": "IMPLEMENTED_AND_VALIDATED",
+      "evaluator": "evaluate_game_beatlink_010",
+      "evidence": {
+        "LINK_IS_NOT_RIP_PERMISSION": true,
+        "rip_intent_blocked": true,
+        "resolver_no_download_url": true,
+        "source_ripAllowed": false,
+        "source_downloadAllowed": false
+      }
+    }
+  }
+}

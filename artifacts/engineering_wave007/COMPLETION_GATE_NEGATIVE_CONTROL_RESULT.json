@@ -1,0 +1,6 @@
+{
+  "BROKEN_EVALUATOR_GATE_RESULT": "REJECTED",
+  "COMPLETE_GATE_REQUIRES_10_OF_10": true,
+  "unconditional_true_alone_insufficient": true,
+  "ok": true
+}

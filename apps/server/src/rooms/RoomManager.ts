@@ -22,11 +22,6 @@ import type {
 import {
   PLAYER_COLORS,
   AUDIENCE_COLORS,
-  AUDIENCE_INFLUENCE_COOLDOWN_MS,
-  AUDIENCE_INFLUENCE_MAX_PER_ROUND,
-  AUDIENCE_INFLUENCE_MAX_DELTA,
-  AUDIENCE_CROWD_METER_FLOOR,
-  AUDIENCE_CROWD_METER_CEILING,
   DEFAULT_CAPACITY_PROFILE,
   DEFAULT_DIFFICULTY,
   DEFAULT_GAME_MODE,
@@ -70,6 +65,12 @@ import {
   memoryPersist,
   pulsePartyPace,
   presentAvFeedback,
+  AudienceInfluenceEngine,
+  ScoringLedger,
+  applyDeviceTimingProfile,
+  buildDeviceTimingProfile,
+  createDefaultDeviceTimingProfile,
+  type DeviceTimingProfile,
 } from '@beatlink/game-engine';
 import { getBeatmapForSong } from '../beatmaps/store.js';
 import {
@@ -101,6 +102,12 @@ interface InternalRoom extends RoomState {
   /** Public web origin used when minting join QR payloads. */
   publicOrigin: string;
   calibrationSamples: CalibrationSample[];
+  /** Wave007 per-player device timing profiles (authoritative scoring). */
+  deviceTimingProfiles: Map<string, DeviceTimingProfile>;
+  /** Wave007 append-only scoring ledger for outcome replay. */
+  scoringLedger: ScoringLedger;
+  /** Last audience energy multiplier applied this round. */
+  audienceEnergyMultiplier: number;
 }
 
 export class RoomManager {
@@ -115,6 +122,7 @@ export class RoomManager {
   private achievements: AchievementRuntime;
   private sessionModes = new Map<string, Set<GameModeId>>();
   private rankFloor = new Map<string, Map<string, number>>();
+  private audienceEngine = new AudienceInfluenceEngine();
 
   constructor(
     store: RoomStore = new InMemoryRoomStore(),
@@ -216,6 +224,9 @@ export class RoomManager {
       scoredTargets: new Set(),
       publicOrigin,
       calibrationSamples: [],
+      deviceTimingProfiles: new Map(),
+      scoringLedger: new ScoringLedger(),
+      audienceEnergyMultiplier: 1,
     };
     this.commit(room);
     this.socketToHostRoom.set(hostSocketId, code);
@@ -243,8 +254,11 @@ export class RoomManager {
       const snapshot = this.store.get(key);
       if (snapshot) {
         room = deserializeRoom(snapshot) as InternalRoom;
+        this.ensureWave007Internals(room);
         this.rooms.set(key, room);
       }
+    } else {
+      this.ensureWave007Internals(room);
     }
     if (!room) return null;
     if (Date.now() > room.expiresAt) {
@@ -252,6 +266,27 @@ export class RoomManager {
       return null;
     }
     return room;
+  }
+
+  /** Ensure Wave007 maps/ledger exist after Redis/memory hydrate. */
+  private ensureWave007Internals(room: InternalRoom): void {
+    if (!room.deviceTimingProfiles) {
+      room.deviceTimingProfiles = new Map();
+    }
+    if (!room.scoringLedger) {
+      room.scoringLedger = new ScoringLedger();
+    }
+    if (typeof room.audienceEnergyMultiplier !== 'number') {
+      room.audienceEnergyMultiplier = 1;
+    }
+    for (const p of room.players) {
+      if (!room.deviceTimingProfiles.has(p.id)) {
+        room.deviceTimingProfiles.set(
+          p.id,
+          createDefaultDeviceTimingProfile(`device:${p.id}`, p.id),
+        );
+      }
+    }
   }
 
   stripInternal(room: InternalRoom): RoomState {
@@ -264,6 +299,9 @@ export class RoomManager {
       scoredTargets: _scoredTargets,
       publicOrigin: _publicOrigin,
       calibrationSamples: _calibrationSamples,
+      deviceTimingProfiles: _deviceTimingProfiles,
+      scoringLedger: _scoringLedger,
+      audienceEnergyMultiplier: _audienceEnergyMultiplier,
       ...state
     } = room;
     void _beatmap;
@@ -274,6 +312,9 @@ export class RoomManager {
     void _scoredTargets;
     void _publicOrigin;
     void _calibrationSamples;
+    void _deviceTimingProfiles;
+    void _scoringLedger;
+    void _audienceEnergyMultiplier;
     const summary = this.achievements.summary();
     const withAchievements: RoomState = {
       ...state,
@@ -362,8 +403,13 @@ export class RoomManager {
       combo: 1,
       teamId: 'solo',
       color: PLAYER_COLORS[room.players.length % PLAYER_COLORS.length],
+      deviceTiming: null,
     };
     room.players.push(player);
+    room.deviceTimingProfiles.set(
+      player.id,
+      createDefaultDeviceTimingProfile(`device:${player.id}`, player.id),
+    );
     const playerToken = randomUUID();
     room.playerTokens.set(player.id, playerToken);
     this.playerToRoom.set(player.id, room.code);
@@ -625,7 +671,7 @@ export class RoomManager {
   }
 
   /**
-   * Moderated audience influence with anti-grief rate limits.
+   * Moderated audience influence with anti-grief rate limits (AudienceInfluenceEngine).
    * Sandboxed members get accepted=false (no crowd effect).
    */
   processAudienceInfluence(
@@ -640,66 +686,44 @@ export class RoomManager {
     if (!member || !member.connected) return null;
 
     const now = Date.now();
-    let accepted = true;
-    let reason: string | undefined;
-    let crowdDelta = 0;
-
-    if (member.muted) {
-      accepted = false;
-      reason = 'muted';
-    } else if (member.sandboxed) {
-      accepted = false;
-      reason = 'sandboxed';
-    } else if (
-      member.lastInfluenceAt != null &&
-      now - member.lastInfluenceAt < AUDIENCE_INFLUENCE_COOLDOWN_MS
-    ) {
-      accepted = false;
-      reason = 'rate_limited';
-    } else if (member.influenceCount >= AUDIENCE_INFLUENCE_MAX_PER_ROUND) {
-      accepted = false;
-      reason = 'round_cap';
-    } else if (room.phase !== 'playing' && room.phase !== 'countdown' && room.phase !== 'results') {
-      accepted = false;
-      reason = 'phase_blocked';
-    }
-
-    if (accepted) {
-      member.lastInfluenceAt = now;
-      member.influenceCount += 1;
-      const rawDelta = type === 'hype' ? 2 : 1;
-      crowdDelta = Math.min(AUDIENCE_INFLUENCE_MAX_DELTA, Math.max(0, rawDelta));
-      const proposed = room.crowdMeter + crowdDelta;
-      if (proposed > AUDIENCE_CROWD_METER_CEILING) {
-        crowdDelta = Math.max(0, AUDIENCE_CROWD_METER_CEILING - room.crowdMeter);
-      }
-      // Soft floor only blocks further decreases (audience path is non-negative today).
-      if (room.crowdMeter + crowdDelta < AUDIENCE_CROWD_METER_FLOOR && crowdDelta < 0) {
-        crowdDelta = Math.min(0, AUDIENCE_CROWD_METER_FLOOR - room.crowdMeter);
-      }
-      room.crowdMeter = Math.min(100, Math.max(0, room.crowdMeter + crowdDelta));
-    }
-
-    const event: AudienceInfluenceEvent = {
-      audienceId,
+    const decision = this.audienceEngine.evaluate(
+      member,
       type,
-      choice: choice?.slice(0, 32),
-      accepted,
-      reason,
-      crowdDelta,
-      atMs: now,
-    };
-    if (accepted) this.achievements.reportEvent('audience_influence', 1);
-    if (accepted) {
+      { phase: room.phase, crowdMeter: room.crowdMeter, nowMs: now },
+      choice,
+    );
+
+    if (decision.accepted) {
+      const applied = this.audienceEngine.apply(member, decision, room.crowdMeter);
+      Object.assign(member, applied.member);
+      room.crowdMeter = applied.crowdMeter;
+      room.audienceEnergyMultiplier = Math.min(
+        1.25,
+        room.audienceEnergyMultiplier * decision.energyMultiplier,
+      );
+      room.scoringLedger.append({
+        kind: 'audience_influence',
+        atMs: now,
+        crowdDelta: decision.crowdDelta,
+        meta: {
+          type,
+          awardHint: decision.awardHint,
+          energyMultiplier: room.audienceEnergyMultiplier,
+        },
+      });
+    }
+
+    if (decision.accepted) this.achievements.reportEvent('audience_influence', 1);
+    if (decision.accepted) {
       pulsePartyPace('audience_pulse', type);
       presentAvFeedback('audience_hype', `Audience ${type}`);
     }
     emitTelemetry('audience_influence', room.code, {
-      accepted,
+      accepted: decision.accepted,
       type,
-      reason: reason ?? null,
+      reason: decision.reason ?? null,
     });
-    return { room: this.publish(room), event };
+    return { room: this.publish(room), event: decision.event };
   }
 
   leaveRoom(socketId: string): RoomState | null {
@@ -960,8 +984,85 @@ export class RoomManager {
         offsetMs: clamped,
       };
     }
+    // Propagate host room offset as baseline for seats that have not yet calibrated.
+    for (const p of room.players) {
+      const existing = room.deviceTimingProfiles.get(p.id);
+      if (!existing || !existing.accepted) {
+        const profile = createDefaultDeviceTimingProfile(
+          existing?.deviceId ?? `device:${p.id}`,
+          p.id,
+        );
+        profile.offsetMs = clamped;
+        profile.calibratedAtMs = Date.now();
+        profile.accepted = true;
+        profile.sampleCount = room.calibrationSamples.length;
+        room.deviceTimingProfiles.set(p.id, profile);
+        p.deviceTiming = {
+          deviceId: profile.deviceId,
+          offsetMs: profile.offsetMs,
+          sampleCount: profile.sampleCount,
+          confidence: profile.confidence,
+          accepted: profile.accepted,
+          calibratedAtMs: profile.calibratedAtMs,
+        };
+      }
+    }
     this.achievements.setFlag('calibrated');
     return this.publish(room);
+  }
+
+  /**
+   * Per-player DeviceTimingProfile calibration — affects authoritative scoring windows.
+   */
+  submitPlayerDeviceCalibration(
+    code: string,
+    playerId: string,
+    samples: CalibrationSample[],
+    deviceId?: string,
+  ): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    const player = room.players.find((p) => p.id === playerId);
+    if (!player) return null;
+    const profile = buildDeviceTimingProfile({
+      deviceId: deviceId ?? `device:${playerId}`,
+      playerId,
+      samples,
+    });
+    room.deviceTimingProfiles.set(playerId, profile);
+    player.deviceTiming = {
+      deviceId: profile.deviceId,
+      offsetMs: profile.offsetMs,
+      sampleCount: profile.sampleCount,
+      confidence: profile.confidence,
+      accepted: profile.accepted,
+      calibratedAtMs: profile.calibratedAtMs,
+    };
+    emitTelemetry('calibration_submitted', room.code, {
+      accepted: profile.accepted,
+      confidence: profile.confidence,
+      sampleCount: profile.sampleCount,
+      playerScoped: true,
+    });
+    return this.publish(room);
+  }
+
+  getDeviceTimingProfile(code: string, playerId: string): DeviceTimingProfile | null {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    return room.deviceTimingProfiles.get(playerId) ?? null;
+  }
+
+  getScoringLedgerSnapshot(code: string) {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    return room.scoringLedger.snapshot();
+  }
+
+  deriveLedgerOutcomes(code: string) {
+    const room = this.getRoom(code);
+    if (!room) return null;
+    return room.scoringLedger.deriveOutcomes(50);
   }
 
   startCountdown(code: string): RoomState | null {
@@ -994,6 +1095,13 @@ export class RoomManager {
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
+    room.audienceEnergyMultiplier = 1;
+    room.scoringLedger.clear();
+    room.scoringLedger.append({
+      kind: 'round_start',
+      atMs: Date.now(),
+      meta: { rematchRound: room.rematchRound, gameMode: room.gameMode },
+    });
     this.rankFloor.set(room.code, new Map());
     return this.publish(room);
   }
@@ -1081,18 +1189,36 @@ export class RoomManager {
     if (!player) return null;
 
     const rawGameTimeMs = this.getGameTimeMs(code);
-    const gameTimeMs = calibratedGameTimeMs(rawGameTimeMs, room.calibrationOffsetMs || 0);
+    const profile = room.deviceTimingProfiles.get(player.id) ?? null;
+    const gameTimeMs = applyDeviceTimingProfile(
+      rawGameTimeMs,
+      profile,
+      room.calibrationOffsetMs || 0,
+    );
     let scoreEvent: ScoreEvent | null = null;
 
-    if (player.role === 'beat_tapper' && input.type === 'tap') {
+    if (
+      player.role === 'beat_tapper' &&
+      (input.type === 'tap' || input.type === 'swipe' || input.type === 'hold')
+    ) {
+      const noteType = input.type === 'swipe' ? 'swipe' : input.type === 'hold' ? 'hold' : 'tap';
       const note =
         (input.noteId
           ? room.beatmap.notes.find((n) => n.id === input.noteId)
           : null) ??
         findNearestNote(room.beatmap.notes, gameTimeMs, 150, 'beat_tapper');
+      const noteMatches =
+        !note ||
+        note.type === noteType ||
+        (noteType === 'tap' && note.type === 'tap') ||
+        (noteType === 'swipe' && note.type === 'swipe') ||
+        (noteType === 'hold' && note.type === 'hold') ||
+        // Fallback: allow tap input on swipe/hold notes when chart has no matching type nearby.
+        (noteType === 'tap' && (note.type === 'swipe' || note.type === 'hold'));
       const targetKey = note ? `${player.id}:note:${note.id}` : null;
       if (
         note &&
+        noteMatches &&
         targetKey &&
         !room.scoredTargets.has(targetKey) &&
         Math.abs(note.timeMs - gameTimeMs) < 200
@@ -1116,10 +1242,14 @@ export class RoomManager {
               ),
           },
         });
+        const energyBoost = Math.round(modeScore.points * (room.audienceEnergyMultiplier - 1));
         const result = {
           ...tap,
-          points: modeScore.points,
-          message: modeScore.message,
+          points: modeScore.points + energyBoost,
+          message:
+            input.type === 'swipe'
+              ? `Swipe ${modeScore.message}`
+              : modeScore.message,
           crowdBoost: modeScore.crowdBoost,
         };
         Object.assign(player, updatePlayerStats(player, result));
@@ -1134,8 +1264,23 @@ export class RoomManager {
           combo: result.combo,
           message: result.message,
         };
+        room.scoringLedger.append({
+          kind: 'score',
+          atMs: Date.now(),
+          playerId: player.id,
+          teamId: player.teamId,
+          points: result.points,
+          grade: result.grade,
+          meta: {
+            inputType: input.type,
+            offsetMs: profile?.offsetMs ?? room.calibrationOffsetMs,
+          },
+        });
       }
-    } else if (player.role === 'vocalist' && input.type === 'vocal_phrase') {
+    } else if (
+      player.role === 'vocalist' &&
+      (input.type === 'vocal_phrase' || input.type === 'vocal_fallback_tap')
+    ) {
       const prompt =
         (input.promptId
           ? room.beatmap.vocalPrompts.find((v) => v.id === input.promptId)
@@ -1192,6 +1337,18 @@ export class RoomManager {
           combo: result.combo,
           message: result.message,
         };
+        room.scoringLedger.append({
+          kind: 'score',
+          atMs: Date.now(),
+          playerId: player.id,
+          teamId: player.teamId,
+          points: result.points,
+          grade: result.grade,
+          meta: {
+            inputType: input.type,
+            fallback: input.type === 'vocal_fallback_tap',
+          },
+        });
       }
     } else if (
       room.gameMode === 'PredictionTrivia' &&
@@ -1320,6 +1477,16 @@ export class RoomManager {
     room.teamScores = recomputeTeamScores(room.players);
     const awards = computeAwards(room.players);
     this.checkComeback(room);
+    const ledgerOutcomes = room.scoringLedger.deriveOutcomes(50);
+    room.scoringLedger.append({
+      kind: 'round_end',
+      atMs: Date.now(),
+      meta: {
+        teamScore: room.teamScore,
+        crowdMeter: room.crowdMeter,
+        ledgerChecksum: ledgerOutcomes.checksum,
+      },
+    });
     this.commit(room);
     pulsePartyPace('results', `room ${code}`);
     presentAvFeedback('results_sting', 'Round results ready');
@@ -1338,6 +1505,8 @@ export class RoomManager {
         maxStreak: p.maxStreak,
       })),
       awards,
+      ledgerChecksum: ledgerOutcomes.checksum,
+      ledgerDerivedTeamScores: ledgerOutcomes.teamScores,
     };
   }
 
@@ -1374,6 +1543,18 @@ export class RoomManager {
     room.crowdMeter = 50;
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
+    room.audienceEnergyMultiplier = 1;
+    room.scoringLedger.clear();
+    room.scoringLedger.append({
+      kind: 'rematch',
+      atMs: Date.now(),
+      meta: { rematchRound: room.rematchRound },
+    });
+    for (const p of room.players) {
+      const profile = createDefaultDeviceTimingProfile(`device:${p.id}`, p.id);
+      room.deviceTimingProfiles.set(p.id, profile);
+      p.deviceTiming = null;
+    }
     room.joinQr = buildRoomJoinQrPayload({
       code: room.code,
       origin: room.publicOrigin,
