@@ -1,6 +1,6 @@
 {
   "OUTCOME_HASH_CONSISTENT_ACROSS_CLIENTS": true,
-  "host_ledger_checksum": "fe8475c132d37d3e",
-  "performer_ledger_checksum": "fe8475c132d37d3e",
+  "host_ledger_checksum": "01234b4bc27b55d7",
+  "performer_ledger_checksum": "01234b4bc27b55d7",
   "ok": true
 }
