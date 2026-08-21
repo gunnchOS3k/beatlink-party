@@ -284,6 +284,9 @@ socket.on(
           audienceId: string;
           type: AudienceInfluenceType;
           choice?: string;
+          event_id?: string;
+          idempotency_key?: string;
+          round_id?: string;
         },
         cb?: (result: { ok: boolean; error?: string; event?: unknown; room?: unknown }) => void,
       ) => {
@@ -297,6 +300,11 @@ socket.on(
           data.audienceId,
           data.type,
           data.choice,
+          {
+            event_id: data.event_id,
+            idempotency_key: data.idempotency_key,
+            round_id: data.round_id,
+          },
         );
         if (!result) {
           cb?.({ ok: false, error: 'Influence rejected' });
@@ -415,12 +423,38 @@ socket.on(
     });
 
     socket.on(
-      'game.submit_calibration',
-      (data: { code: string; offsetMs: number; hostToken?: string }) => {
+      'game.submit_player_device_calibration',
+      (data: {
+        code: string;
+        playerId: string;
+        samples: Array<{ expectedMs: number; tappedMs: number }>;
+        deviceId?: string;
+      }) => {
+        const code = data.code.toUpperCase();
+        if (!roomManager.ownsPlayer(code, socket.id, data.playerId)) return;
+        const room = roomManager.submitPlayerDeviceCalibration(
+          code,
+          data.playerId,
+          data.samples ?? [],
+          data.deviceId,
+        );
+        if (room) io.to(code).emit('room.state', room);
+      },
+    );
+
+    socket.on(
+      'game.force_end',
+      (data: { code: string; hostToken?: string }) => {
         const code = data.code.toUpperCase();
         if (!requireHost(code, socket.id, data.hostToken)) return;
-        const room = roomManager.submitCalibration(code, data.offsetMs);
-        if (room) io.to(code).emit('room.state', room);
+        const results = roomManager.endGame(code);
+        const finalRoom = roomManager.getRoom(code);
+        if (results && finalRoom) {
+          io.to(code).emit('game.ended', {
+            room: roomManager.stripInternal(finalRoom),
+            results,
+          });
+        }
       },
     );
 

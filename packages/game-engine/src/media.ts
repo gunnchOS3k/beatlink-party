@@ -78,11 +78,9 @@ export class AuthorizedCatalogEmbedProvider implements MediaProvider {
     }
 
     if (link) {
-      const authorized =
-        link.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM' ||
-        link.playbackStatus === 'METADATA_ONLY';
+      const authorizedPlayback = link.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM';
       return {
-        kind: authorized ? 'authorized_embed' : 'metadata_only',
+        kind: authorizedPlayback ? 'authorized_embed' : 'metadata_only',
         songId: link.matchedCatalogId,
         title: link.title ?? entry?.title ?? 'Linked track',
         artist: link.artist ?? entry?.artist ?? null,

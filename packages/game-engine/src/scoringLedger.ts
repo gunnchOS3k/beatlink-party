@@ -1,5 +1,5 @@
 /**
- * Append-only scoring ledger with deterministic replay — Wave007 GAME-BEATLINK-008.
+ * Append-only scoring ledger with deterministic replay + event identity — Wave007 GAME-BEATLINK-008/L.
  * Outcomes (individual + team) are derived from the ledger, not client-asserted totals.
  */
 
@@ -10,12 +10,20 @@ export type LedgerEventKind =
   | 'score'
   | 'audience_influence'
   | 'round_end'
-  | 'rematch';
+  | 'rematch'
+  | 'rejected';
 
 export interface ScoringLedgerEvent {
   seq: number;
   kind: LedgerEventKind;
   atMs: number;
+  event_id?: string;
+  round_id?: string;
+  idempotency_key?: string;
+  payload_hash?: string;
+  accepted?: boolean;
+  rejection_reason?: string | null;
+  score_delta?: number;
   playerId?: string;
   teamId?: TeamId;
   points?: number;
@@ -31,6 +39,21 @@ export interface LedgerDerivedOutcomes {
   checksum: string;
 }
 
+export interface AppendInputEventArgs {
+  kind: 'score' | 'audience_influence';
+  atMs: number;
+  round_id: string;
+  event_id: string;
+  idempotency_key: string;
+  playerId?: string;
+  teamId?: TeamId;
+  points?: number;
+  grade?: TimingGrade;
+  crowdDelta?: number;
+  payload: Record<string, unknown>;
+  meta?: Record<string, string | number | boolean | null>;
+}
+
 /** Portable FNV-1a 64-bit hex — browser+node safe (identity checksum, not a crypto claim). */
 export function portableChecksum(payload: string): string {
   let hash = 0xcbf29ce484222325n;
@@ -42,19 +65,82 @@ export function portableChecksum(payload: string): string {
   return hash.toString(16).padStart(16, '0');
 }
 
+function payloadHash(payload: Record<string, unknown>): string {
+  return portableChecksum(JSON.stringify(payload));
+}
+
 export class ScoringLedger {
   private events: ScoringLedgerEvent[] = [];
   private seq = 0;
+  private seenKeys = new Set<string>();
 
   clear(): void {
     this.events = [];
     this.seq = 0;
+    this.seenKeys.clear();
   }
 
   append(partial: Omit<ScoringLedgerEvent, 'seq'>): ScoringLedgerEvent {
-    const event: ScoringLedgerEvent = { ...partial, seq: ++this.seq };
+    const event: ScoringLedgerEvent = {
+      accepted: partial.accepted ?? partial.kind !== 'rejected',
+      rejection_reason: partial.rejection_reason ?? null,
+      score_delta: partial.score_delta ?? (partial.kind === 'score' ? (partial.points ?? 0) : 0),
+      ...partial,
+      seq: ++this.seq,
+    };
+    if (event.idempotency_key) {
+      this.seenKeys.add(event.idempotency_key);
+    }
     this.events.push(event);
     return event;
+  }
+
+  /**
+   * Authoritative input-event append with idempotency.
+   * Duplicate idempotency_key → rejected, score_delta 0.
+   */
+  appendInputEvent(args: AppendInputEventArgs): ScoringLedgerEvent {
+    const hash = payloadHash(args.payload);
+    if (this.seenKeys.has(args.idempotency_key)) {
+      return this.append({
+        kind: 'rejected',
+        atMs: args.atMs,
+        event_id: args.event_id,
+        round_id: args.round_id,
+        idempotency_key: args.idempotency_key,
+        payload_hash: hash,
+        accepted: false,
+        rejection_reason: 'duplicate_idempotency_key',
+        score_delta: 0,
+        playerId: args.playerId,
+        teamId: args.teamId,
+        points: 0,
+        grade: args.grade,
+        crowdDelta: 0,
+        meta: { ...(args.meta ?? {}), duplicate: true },
+      });
+    }
+    return this.append({
+      kind: args.kind,
+      atMs: args.atMs,
+      event_id: args.event_id,
+      round_id: args.round_id,
+      idempotency_key: args.idempotency_key,
+      payload_hash: hash,
+      accepted: true,
+      rejection_reason: null,
+      score_delta: args.kind === 'score' ? (args.points ?? 0) : 0,
+      playerId: args.playerId,
+      teamId: args.teamId,
+      points: args.points,
+      grade: args.grade,
+      crowdDelta: args.crowdDelta,
+      meta: args.meta,
+    });
+  }
+
+  hasIdempotencyKey(key: string): boolean {
+    return this.seenKeys.has(key);
   }
 
   snapshot(): ScoringLedgerEvent[] {
@@ -72,15 +158,15 @@ export class ScoringLedger {
     let crowdMeter = initialCrowd;
 
     for (const ev of this.events) {
-      if (ev.kind === 'score' && ev.playerId) {
+      if (ev.kind === 'score' && ev.accepted !== false && ev.playerId) {
         const teamId = ev.teamId ?? 'solo';
-        const points = ev.points ?? 0;
+        const points = ev.score_delta ?? ev.points ?? 0;
         const prev = scores.get(ev.playerId) ?? { score: 0, teamId };
         prev.score += points;
         prev.teamId = teamId;
         scores.set(ev.playerId, prev);
         teamScores[teamId] += points;
-      } else if (ev.kind === 'audience_influence') {
+      } else if (ev.kind === 'audience_influence' && ev.accepted !== false) {
         crowdMeter = Math.min(100, Math.max(0, crowdMeter + (ev.crowdDelta ?? 0)));
       } else if (ev.kind === 'rematch' || ev.kind === 'round_start') {
         scores.clear();
@@ -114,6 +200,13 @@ export function replayLedgerEvents(
     ledger.append({
       kind: ev.kind,
       atMs: ev.atMs,
+      event_id: ev.event_id,
+      round_id: ev.round_id,
+      idempotency_key: ev.idempotency_key,
+      payload_hash: ev.payload_hash,
+      accepted: ev.accepted,
+      rejection_reason: ev.rejection_reason,
+      score_delta: ev.score_delta,
       playerId: ev.playerId,
       teamId: ev.teamId,
       points: ev.points,

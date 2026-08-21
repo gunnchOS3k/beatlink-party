@@ -15,7 +15,10 @@
   "UNCONDITIONAL_TRUE_CLASSIFIERS": 0,
   "UNCONDITIONAL_TRUE_CLASSIFIERS_COMPUTED": true,
   "BEHAVIORAL_NEGATIVE_CONTROLS_PASS": true,
+  "BEHAVIORAL_NEGATIVE_CONTROL_COUNT": 11,
   "BROKEN_EVALUATOR_GATE_RESULT": "REJECTED",
+  "PLAYWRIGHT_MANDATORY": true,
+  "PLAYWRIGHT_SKIPPED": false,
   "PARTIAL": false,
   "wave007_ok": true,
   "OS_PLATFORM_020_UNTOUCHED": true,
@@ -34,7 +37,7 @@
     "GAME-BEATLINK-009",
     "GAME-BEATLINK-010"
   ],
-  "head_sha": "057e55600bf21b6992531d5e1813d0ed912d6dcd",
+  "head_sha": "cc71b25238c034fba4314b9f35df1286d599ea8d",
   "claim_flags": {
     "PHYSICAL_VALIDATION": false,
     "HUMAN_E6": false,
@@ -45,7 +48,21 @@
     "LINK_EQUALS_RIP_PERMISSION": false,
     "OS_PLATFORM_020_TOUCHED": false,
     "BASELINE_COUNTS_UPDATED": false,
-    "CURSOR_MERGED": false
+    "CURSOR_MERGED": false,
+    "STORE_CERTIFIED": false,
+    "PRODUCTION_SCALE_VALIDATED": false,
+    "SPOTIFY_PLAYBACK_INTEGRATION": false,
+    "APPLE_MUSIC_PLAYBACK_INTEGRATION": false,
+    "YOUTUBE_PLAYBACK_INTEGRATION": false,
+    "COMMERCIAL_MUSIC_LICENSED": false,
+    "GENERAL_VOCAL_RECOGNITION": false,
+    "MICROPHONE_PITCH_ANALYSIS": false,
+    "PRODUCTION_ANTI_CHEAT": false
   },
-  "generated_at_utc": "2026-08-21T00:57:35.100Z"
+  "VOCAL_PATH_CLASSIFICATION": "VOCAL_PROMPT_TIMING_MODE",
+  "completion_gate": {
+    "ok": true,
+    "validated": 10
+  },
+  "generated_at_utc": "2026-08-21T01:33:06.253Z"
 }

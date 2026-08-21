@@ -71,9 +71,18 @@ export default function AudiencePage() {
     if (!member || cooldown || member.muted) return;
     setCooldown(true);
     window.setTimeout(() => setCooldown(false), 4000);
+    const eventId = `${member.id}:${type}:${Date.now()}`;
     socket.emit(
       'audience.influence',
-      { code, audienceId: member.id, type, choice },
+      {
+        code,
+        audienceId: member.id,
+        type,
+        choice,
+        event_id: eventId,
+        idempotency_key: eventId,
+        round_id: room?.round_id,
+      },
       (result?: { ok?: boolean; event?: AudienceInfluenceEvent }) => {
         if (result?.event) setLastEvent(result.event);
       },
@@ -97,7 +106,11 @@ export default function AudiencePage() {
               placeholder="Your name"
             />
           </div>
-          <button className="btn-primary btn-large" onClick={handleJoin}>
+          <button
+            className="btn-primary btn-large"
+            onClick={handleJoin}
+            data-testid="audience-enter"
+          >
             Enter as Spectator
           </button>
         </div>
@@ -123,6 +136,7 @@ export default function AudiencePage() {
             className="btn-primary"
             disabled={cooldown || member?.muted}
             onClick={() => sendInfluence('hype')}
+            data-testid="audience-hype"
           >
             Send Hype
           </button>
@@ -130,16 +144,24 @@ export default function AudiencePage() {
             className="btn-secondary"
             disabled={cooldown || member?.muted}
             onClick={() => sendInfluence('vote', 'encore')}
+            data-testid="audience-vote"
           >
             Vote Encore
           </button>
         </div>
         {lastEvent && (
-          <p style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>
+          <p
+            style={{ fontSize: '0.9rem', color: 'var(--muted)' }}
+            data-testid="audience-last-influence"
+          >
             Last influence: {lastEvent.accepted ? 'accepted' : `rejected (${lastEvent.reason})`} ·
             Δcrowd {lastEvent.crowdDelta}
           </p>
         )}
+        <p style={{ fontSize: '0.9rem' }} data-testid="audience-roster-phase">
+          Phase: {room?.phase ?? '…'} · Crowd {room?.crowdMeter ?? 0}% · Team {room?.teamScore ?? 0}
+          {room?.round_id ? ` · round ${room.round_id}` : ''}
+        </p>
         <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
           Anti-grief: 4s cooldown, max 8 influences per round. You are not a scoring player.
         </p>

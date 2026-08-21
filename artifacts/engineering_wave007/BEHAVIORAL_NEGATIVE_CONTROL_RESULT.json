@@ -1,9 +1,18 @@
 {
   "BEHAVIORAL_NEGATIVE_CONTROLS_PASS": true,
+  "BEHAVIORAL_NEGATIVE_CONTROL_COUNT": 11,
   "checks": {
-    "invalid_room_join_rejected": true,
-    "rip_intent_detected": true,
-    "spam_cap_rejects_burst": true,
-    "forged_reconnect_rejected": true
-  }
+    "create_room_handler_removed_fails": true,
+    "join_nonexistent_room_rejected": true,
+    "provider_reference_cannot_cache": true,
+    "audience_cannot_become_player": true,
+    "calibration_ignored_detected": true,
+    "duplicate_performance_no_double_score": true,
+    "audience_spam_cap_holds": true,
+    "client_final_score_ignored": true,
+    "reconnect_forged_rejected": true,
+    "provider_auth_failure_no_downloader": true,
+    "rip_intent_detected": true
+  },
+  "ok": true
 }

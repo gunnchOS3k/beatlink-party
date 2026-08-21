@@ -5,132 +5,131 @@
       "requirement_id": "GAME-BEATLINK-001",
       "evaluator_name": "evaluate_game_beatlink_001",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "CREATE_ROOM_REACHES_LOBBY",
-        "room_code_pattern_ok",
-        "product_state",
-        "host_token_issued",
-        "ui_button",
-        "e2e_path"
+        "CREATE_ROOM_UI_TO_REAL_SERVER",
+        "room_code",
+        "playwright_ran"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-002",
       "evaluator_name": "evaluate_game_beatlink_002",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "MULTI_CLIENT_JOIN",
-        "player_count",
-        "audience_count",
-        "join_paths"
+        "independent_browser_contexts",
+        "host_context_id",
+        "performer_context_id",
+        "audience_context_id",
+        "canonical_room_code_same"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-003",
       "evaluator_name": "evaluate_game_beatlink_003",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "SONG_SOURCE_LAWFUL",
         "COPYRIGHT_SAFE_FIXTURE",
-        "fixture_kind",
-        "linkIsNotRipPermission",
-        "ripAllowed",
-        "downloadAllowed"
+        "LINK_IS_NOT_RIP_PERMISSION",
+        "SONG_SOURCE_REFERENCE_ONLY_TRUTHFUL",
+        "REFERENCE_ONLY_CAN_GAMEPLAY_STREAM",
+        "REFERENCE_ONLY_CAN_CACHE_MEDIA",
+        "PROVIDER_LINK_RIP_BLOCK",
+        "PROVIDER_AUTH_FAILURE_NO_DOWNLOADER_FALLBACK",
+        "ARBITRARY_URL_FETCH_BLOCKED",
+        "SPOTIFY_PLAYBACK_INTEGRATION",
+        "APPLE_MUSIC_PLAYBACK_INTEGRATION",
+        "YOUTUBE_PLAYBACK_INTEGRATION",
+        "COMMERCIAL_MUSIC_LICENSED",
+        "ok"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-004",
       "evaluator_name": "evaluate_game_beatlink_004",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "ACTIVE_AND_AUDIENCE_ROLES",
+        "ROLE_SYNC_REAL_BROWSER",
         "performer_role",
-        "audience_seat_distinct",
-        "seat_kinds"
+        "audience_seat"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-005",
       "evaluator_name": "evaluate_game_beatlink_005",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "DEVICE_TIMING_PROFILE",
+        "DEVICE_CALIBRATION_UI_FLOW",
+        "CALIBRATION_AFFECTS_SCORING",
         "PROFILES_AFFECT_SCORING_WINDOWS",
-        "per_player_offset_ms",
-        "late_vs_early_delta_ms"
+        "audio_output_latency_ms"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-006",
       "evaluator_name": "evaluate_game_beatlink_006",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "AUTHORITATIVE_ROUND_CLOCK",
         "TAP_INPUT",
         "SWIPE_INPUT",
-        "VOCAL_FALLBACK_TYPE",
-        "product_states",
-        "server_scored"
+        "VOCAL_PATH_CLASSIFICATION",
+        "MICROPHONE_PITCH_ANALYSIS",
+        "GENERAL_VOCAL_RECOGNITION",
+        "PERFORMER_REAL_BROWSER_GAMEPLAY"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-007",
       "evaluator_name": "evaluate_game_beatlink_007",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "AUDIENCE_INFLUENCE_ENGINE",
+        "AUDIENCE_REAL_BROWSER_INFLUENCE",
         "SPAM_CAPS",
-        "accepted",
-        "rejected",
-        "unit_burst"
+        "AUDIENCE_SPAM_BOUNDED"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-008",
       "evaluator_name": "evaluate_game_beatlink_008",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "SCORING_LEDGER_REPLAY",
-        "INDIVIDUAL_AND_TEAM_OUTCOMES",
-        "unit_replay_match",
-        "endgame_ledger_checksum",
-        "replay_checksum"
+        "OUTCOME_HASH_CONSISTENT_ACROSS_CLIENTS",
+        "TEAM_ASSIGNMENT_SERVER_AUTHORITATIVE",
+        "DUPLICATE_GAMEPLAY_SCORE_DELTA",
+        "SCORING_REPLAY_DETERMINISTIC"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-009",
       "evaluator_name": "evaluate_game_beatlink_009",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "SESSION_RESUME_A_B_C",
-        "forged_token_rejected",
-        "rematch",
-        "rematch_round",
-        "process_a",
-        "process_b",
-        "process_c"
+        "NEW_CLIENT_CONTEXT_B",
+        "NEW_CLIENT_CONTEXT_C",
+        "RECONNECT_SAME_IDENTITY",
+        "RECONNECT_ROSTER_DUPLICATES",
+        "REMATCH_NEW_ROUND",
+        "PRIOR_RESULT_IMMUTABLE"
       ]
     },
     {
       "requirement_id": "GAME-BEATLINK-010",
       "evaluator_name": "evaluate_game_beatlink_010",
       "classification": "IMPLEMENTED_AND_VALIDATED",
-      "unconditional": false,
       "evidence_keys": [
         "LINK_IS_NOT_RIP_PERMISSION",
-        "rip_intent_blocked",
-        "resolver_no_download_url",
-        "source_ripAllowed",
-        "source_downloadAllowed"
+        "PROVIDER_LINK_RIP_BLOCK",
+        "PROVIDER_AUTH_FAILURE_NO_DOWNLOADER_FALLBACK",
+        "ARBITRARY_URL_FETCH_BLOCKED",
+        "SONG_SOURCE_REFERENCE_ONLY_TRUTHFUL"
       ]
     }
   ]

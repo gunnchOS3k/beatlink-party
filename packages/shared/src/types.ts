@@ -84,6 +84,14 @@ export interface DeviceTimingProfileView {
   confidence: number;
   accepted: boolean;
   calibratedAtMs: number | null;
+  inputLatencyMs?: number;
+  audioOutputLatencyMs?: number | null;
+  networkOffsetMs?: number | null;
+  effectiveScoringOffsetMs?: number;
+  jitterMs?: number;
+  calibrationMethod?: string;
+  provenance?: string;
+  expiresAt?: number | null;
 }
 
 export interface Player {
@@ -156,6 +164,8 @@ export interface RoomState {
   crowdMeter: number;
   /** Rematch / round counter (increments on rematch). */
   rematchRound: number;
+  /** Stable round identity for ledger / idempotency (Wave007). */
+  round_id?: string;
   /** Structured join payload for QR / deep-link (no third-party dependency). */
   joinQr: RoomJoinQrPayload | null;
   /** Room privacy posture — controls telemetry retention + name visibility. */
@@ -371,6 +381,11 @@ export interface PlayerInputEvent {
   sectionId?: string;
   /** PredictionTrivia — chosen section id or label (case-insensitive match). */
   predictionChoice?: string;
+  /** Client event identity for server idempotency (Wave007). */
+  event_id?: string;
+  idempotency_key?: string;
+  round_id?: string;
+  client_sequence?: number;
 }
 
 export interface ScoreEvent {

@@ -1,8 +1,95 @@
 {
-  "landing_create_room": true,
-  "join_form": true,
-  "performer_controls": true,
-  "audience_controls": true,
-  "css_responsive": "apps/web/src/styles/global.css",
+  "RESPONSIVE_VIEWPORTS_EXECUTED": true,
+  "viewports": [
+    "390x844",
+    "412x915",
+    "1366x768"
+  ],
+  "measurements": [
+    {
+      "label": "landing-1366",
+      "width": 1366,
+      "height": 768,
+      "scrollWidth": 1366,
+      "primaryTop": 308,
+      "primaryLeft": 483,
+      "primaryBottom": 366.1875,
+      "primaryRight": 883,
+      "overflowX": false,
+      "intersects_viewport": true
+    },
+    {
+      "label": "join-390",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "primaryTop": 446.375,
+      "primaryLeft": 41,
+      "primaryBottom": 504.5625,
+      "primaryRight": 349,
+      "overflowX": false,
+      "intersects_viewport": true
+    },
+    {
+      "label": "audience-join-412",
+      "width": 412,
+      "height": 915,
+      "scrollWidth": 412,
+      "primaryTop": 446.375,
+      "primaryLeft": 41,
+      "primaryBottom": 504.5625,
+      "primaryRight": 371,
+      "overflowX": false,
+      "intersects_viewport": true
+    },
+    {
+      "label": "playing-390",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "primaryTop": 126,
+      "primaryLeft": 55,
+      "primaryBottom": 406,
+      "primaryRight": 335,
+      "overflowX": false,
+      "intersects_viewport": true
+    },
+    {
+      "label": "landing-390x844",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "primaryTop": 284,
+      "primaryLeft": 32,
+      "primaryBottom": 342.1875,
+      "primaryRight": 358,
+      "overflowX": false,
+      "intersects_viewport": true
+    },
+    {
+      "label": "landing-412x915",
+      "width": 412,
+      "height": 915,
+      "scrollWidth": 412,
+      "primaryTop": 284,
+      "primaryLeft": 32,
+      "primaryBottom": 342.1875,
+      "primaryRight": 380,
+      "overflowX": false,
+      "intersects_viewport": true
+    },
+    {
+      "label": "landing-1366x768",
+      "width": 1366,
+      "height": 768,
+      "scrollWidth": 1366,
+      "primaryTop": 308,
+      "primaryLeft": 483,
+      "primaryBottom": 366.1875,
+      "primaryRight": 883,
+      "overflowX": false,
+      "intersects_viewport": true
+    }
+  ],
   "ok": true
 }

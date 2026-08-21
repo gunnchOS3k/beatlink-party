@@ -1,6 +1,6 @@
 {
-  "runtime": "node+vitest",
+  "runtime": "node+vitest+playwright",
   "package": "beatlink-party",
   "wave": "007",
-  "generated_at_utc": "2026-08-21T00:57:35.088Z"
+  "generated_at_utc": "2026-08-21T01:33:06.253Z"
 }

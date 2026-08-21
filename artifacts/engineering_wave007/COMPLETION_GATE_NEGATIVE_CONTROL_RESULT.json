@@ -1,6 +1,12 @@
 {
+  "BROKEN_EVALUATOR_REJECTED": true,
+  "MISSING_EVALUATOR_REJECTED": true,
+  "FALSE_EVALUATOR_REJECTED": true,
+  "UNEXPECTED_ID_REJECTED": true,
+  "EMPTY_EVIDENCE_REJECTED": true,
+  "WRONG_EVALUATOR_IDENTITY_REJECTED": true,
+  "STALE_EVIDENCE_REJECTED": true,
   "BROKEN_EVALUATOR_GATE_RESULT": "REJECTED",
-  "COMPLETE_GATE_REQUIRES_10_OF_10": true,
-  "unconditional_true_alone_insufficient": true,
-  "ok": true
+  "ok": true,
+  "COMPLETE_GATE_REQUIRES_10_OF_10": true
 }

@@ -679,6 +679,7 @@ export class RoomManager {
     audienceId: string,
     type: AudienceInfluenceType,
     choice?: string,
+    identity?: { event_id?: string; idempotency_key?: string; round_id?: string },
   ): { room: RoomState; event: AudienceInfluenceEvent } | null {
     const room = this.getRoom(code);
     if (!room) return null;
@@ -686,6 +687,37 @@ export class RoomManager {
     if (!member || !member.connected) return null;
 
     const now = Date.now();
+    const roundId = identity?.round_id ?? room.round_id ?? `${room.code}-r${room.rematchRound}`;
+    const idemKey =
+      identity?.idempotency_key ??
+      identity?.event_id ??
+      `${audienceId}:${type}:${now}`;
+
+    if (room.scoringLedger.hasIdempotencyKey(idemKey)) {
+      room.scoringLedger.appendInputEvent({
+        kind: 'audience_influence',
+        atMs: now,
+        round_id: roundId,
+        event_id: identity?.event_id ?? idemKey,
+        idempotency_key: idemKey,
+        crowdDelta: 0,
+        payload: { type, choice: choice ?? null },
+        meta: { duplicate: true },
+      });
+      return {
+        room: this.publish(room),
+        event: {
+          audienceId,
+          type,
+          choice,
+          accepted: false,
+          reason: 'duplicate_idempotency_key',
+          crowdDelta: 0,
+          atMs: now,
+        },
+      };
+    }
+
     const decision = this.audienceEngine.evaluate(
       member,
       type,
@@ -701,15 +733,32 @@ export class RoomManager {
         1.25,
         room.audienceEnergyMultiplier * decision.energyMultiplier,
       );
-      room.scoringLedger.append({
+      room.scoringLedger.appendInputEvent({
         kind: 'audience_influence',
         atMs: now,
+        round_id: roundId,
+        event_id: identity?.event_id ?? idemKey,
+        idempotency_key: idemKey,
         crowdDelta: decision.crowdDelta,
+        payload: { type, choice: choice ?? null },
         meta: {
           type,
           awardHint: decision.awardHint,
           energyMultiplier: room.audienceEnergyMultiplier,
         },
+      });
+    } else {
+      room.scoringLedger.append({
+        kind: 'rejected',
+        atMs: now,
+        event_id: identity?.event_id ?? idemKey,
+        round_id: roundId,
+        idempotency_key: `reject:${idemKey}:${now}`,
+        accepted: false,
+        rejection_reason: decision.reason ?? 'audience_rejected',
+        score_delta: 0,
+        crowdDelta: 0,
+        meta: { type },
       });
     }
 
@@ -877,11 +926,33 @@ export class RoomManager {
     const beatmap = getBeatmapForSong(songId);
     if (!beatmap) return null;
     room.selectedSongId = songId;
+    const e2e = process.env.BEATLINK_WAVE007_E2E === '1';
+    const durationMs = e2e ? Math.min(beatmap.durationMs, 12000) : beatmap.durationMs;
     room.beatmap = {
       ...beatmap,
+      durationMs,
       offsetMs: room.calibrationOffsetMs,
+      notes: e2e
+        ? [
+            { id: 'e2e-tap-0', timeMs: 500, type: 'tap', role: 'beat_tapper' },
+            { id: 'e2e-swipe-0', timeMs: 900, type: 'swipe', role: 'beat_tapper' },
+            { id: 'e2e-tap-1', timeMs: 1300, type: 'tap', role: 'beat_tapper' },
+            ...beatmap.notes.filter((n) => n.timeMs < durationMs - 500).slice(0, 8),
+          ]
+        : beatmap.notes,
+      vocalPrompts: e2e
+        ? [
+            {
+              id: 'e2e-vocal-0',
+              timeMs: 700,
+              text: 'Prompt timing — tap the phrase window',
+              durationMs: 2000,
+            },
+            ...beatmap.vocalPrompts.filter((v) => v.timeMs < durationMs - 500).slice(0, 2),
+          ]
+        : beatmap.vocalPrompts,
     };
-    room.gameDurationMs = room.beatmap?.durationMs ?? 45000;
+    room.gameDurationMs = durationMs;
     room.phase = 'song_select';
     return this.publish(room);
   }
@@ -1028,20 +1099,32 @@ export class RoomManager {
       deviceId: deviceId ?? `device:${playerId}`,
       playerId,
       samples,
+      audioOutputLatencyMs: null,
+      networkOffsetMs: null,
+      calibrationMethod: samples.length ? 'tap_samples' : 'deterministic_fixture',
+      provenance: 'player_device',
     });
     room.deviceTimingProfiles.set(playerId, profile);
     player.deviceTiming = {
-      deviceId: profile.deviceId,
-      offsetMs: profile.offsetMs,
-      sampleCount: profile.sampleCount,
+      deviceId: profile.device_id,
+      offsetMs: profile.effective_scoring_offset_ms,
+      sampleCount: profile.sample_count,
       confidence: profile.confidence,
       accepted: profile.accepted,
-      calibratedAtMs: profile.calibratedAtMs,
+      calibratedAtMs: profile.created_at,
+      inputLatencyMs: profile.input_latency_ms,
+      audioOutputLatencyMs: profile.audio_output_latency_ms,
+      networkOffsetMs: profile.network_offset_ms,
+      effectiveScoringOffsetMs: profile.effective_scoring_offset_ms,
+      jitterMs: profile.jitter_ms,
+      calibrationMethod: profile.calibration_method,
+      provenance: profile.provenance,
+      expiresAt: profile.expires_at,
     };
     emitTelemetry('calibration_submitted', room.code, {
       accepted: profile.accepted,
       confidence: profile.confidence,
-      sampleCount: profile.sampleCount,
+      sampleCount: profile.sample_count,
       playerScoped: true,
     });
     return this.publish(room);
@@ -1096,10 +1179,16 @@ export class RoomManager {
     room.hypeCooldowns.clear();
     room.scoredTargets.clear();
     room.audienceEnergyMultiplier = 1;
+    room.round_id = `${room.code}-r${room.rematchRound}-${Date.now()}`;
     room.scoringLedger.clear();
     room.scoringLedger.append({
       kind: 'round_start',
       atMs: Date.now(),
+      round_id: room.round_id,
+      event_id: `round_start:${room.round_id}`,
+      idempotency_key: `round_start:${room.round_id}`,
+      accepted: true,
+      score_delta: 0,
       meta: { rematchRound: room.rematchRound, gameMode: room.gameMode },
     });
     this.rankFloor.set(room.code, new Map());
@@ -1188,6 +1277,42 @@ export class RoomManager {
     const player = room.players.find((p) => p.id === input.playerId);
     if (!player) return null;
 
+    const roundId = input.round_id ?? room.round_id ?? `${room.code}-r${room.rematchRound}`;
+    if (input.round_id && room.round_id && input.round_id !== room.round_id) {
+      room.scoringLedger.append({
+        kind: 'rejected',
+        atMs: Date.now(),
+        event_id: input.event_id ?? `stale:${Date.now()}`,
+        round_id: input.round_id,
+        idempotency_key: input.idempotency_key ?? input.event_id ?? `stale:${Date.now()}`,
+        accepted: false,
+        rejection_reason: 'stale_round',
+        score_delta: 0,
+        playerId: player.id,
+      });
+      return { room: this.publish(room), scoreEvent: null };
+    }
+
+    const idemKey =
+      input.idempotency_key ??
+      input.event_id ??
+      `${player.id}:${input.type}:${input.noteId ?? input.promptId ?? input.clientTimeMs}`;
+    if (room.scoringLedger.hasIdempotencyKey(idemKey)) {
+      room.scoringLedger.appendInputEvent({
+        kind: 'score',
+        atMs: Date.now(),
+        round_id: roundId,
+        event_id: input.event_id ?? idemKey,
+        idempotency_key: idemKey,
+        playerId: player.id,
+        teamId: player.teamId,
+        points: 0,
+        payload: { type: input.type, noteId: input.noteId ?? null },
+        meta: { duplicate: true },
+      });
+      return { room: this.publish(room), scoreEvent: null };
+    }
+
     const rawGameTimeMs = this.getGameTimeMs(code);
     const profile = room.deviceTimingProfiles.get(player.id) ?? null;
     const gameTimeMs = applyDeviceTimingProfile(
@@ -1264,13 +1389,17 @@ export class RoomManager {
           combo: result.combo,
           message: result.message,
         };
-        room.scoringLedger.append({
+        room.scoringLedger.appendInputEvent({
           kind: 'score',
           atMs: Date.now(),
+          round_id: roundId,
+          event_id: input.event_id ?? `${player.id}:note:${note.id}:${input.type}`,
+          idempotency_key: idemKey,
           playerId: player.id,
           teamId: player.teamId,
           points: result.points,
           grade: result.grade,
+          payload: { type: input.type, noteId: note.id },
           meta: {
             inputType: input.type,
             offsetMs: profile?.offsetMs ?? room.calibrationOffsetMs,
@@ -1337,13 +1466,17 @@ export class RoomManager {
           combo: result.combo,
           message: result.message,
         };
-        room.scoringLedger.append({
+        room.scoringLedger.appendInputEvent({
           kind: 'score',
           atMs: Date.now(),
+          round_id: roundId,
+          event_id: input.event_id ?? `${player.id}:vocal:${prompt.id}:${input.type}`,
+          idempotency_key: idemKey,
           playerId: player.id,
           teamId: player.teamId,
           points: result.points,
           grade: result.grade,
+          payload: { type: input.type, promptId: prompt.id },
           meta: {
             inputType: input.type,
             fallback: input.type === 'vocal_fallback_tap',

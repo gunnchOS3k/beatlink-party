@@ -1,7 +1,6 @@
 {
   "SESSION_RESUME_A_B_C": true,
-  "ok": true,
-  "process_a": "disconnect",
-  "process_b": "reconnect",
-  "process_c": "reconnect_again"
+  "NEW_CLIENT_CONTEXT_B": true,
+  "NEW_CLIENT_CONTEXT_C": true,
+  "ok": true
 }

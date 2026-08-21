@@ -1,0 +1,8 @@
+{
+  "CREATE_ROOM_UI_TO_REAL_SERVER": true,
+  "room_code": "T4QKS",
+  "host_lobby_visible": true,
+  "share_join_visible": true,
+  "host_connection_visible": true,
+  "ok": true
+}

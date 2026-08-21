@@ -1,0 +1,170 @@
+{
+  "playwright_ran": true,
+  "playwright_skipped": false,
+  "browser": "chromium",
+  "contexts": 3,
+  "independent_browser_contexts": 3,
+  "host_context_id": "host-desktop-1366",
+  "performer_context_id": "performer-mobile-390",
+  "audience_context_id": "audience-mobile-412",
+  "canonical_room_code_same": true,
+  "room_code": "T4QKS",
+  "scenario_steps_passed": 28,
+  "scenario_steps_total": 28,
+  "steps": [
+    {
+      "step": 1,
+      "name": "host_opens_landing",
+      "ok": true
+    },
+    {
+      "step": 2,
+      "name": "create_room_clicked",
+      "ok": true
+    },
+    {
+      "step": 3,
+      "name": "lobby_room_code_visible",
+      "ok": true,
+      "detail": "T4QKS"
+    },
+    {
+      "step": 4,
+      "name": "performer_joined_ui",
+      "ok": true
+    },
+    {
+      "step": 5,
+      "name": "audience_joined_ui",
+      "ok": true
+    },
+    {
+      "step": 6,
+      "name": "canonical_roster_visible",
+      "ok": true
+    },
+    {
+      "step": 7,
+      "name": "copyright_safe_song_selected",
+      "ok": true
+    },
+    {
+      "step": 8,
+      "name": "provider_rights_truthful",
+      "ok": true
+    },
+    {
+      "step": 9,
+      "name": "performer_role_chosen",
+      "ok": true
+    },
+    {
+      "step": 10,
+      "name": "audience_role_active",
+      "ok": true
+    },
+    {
+      "step": 11,
+      "name": "device_calibration_ui",
+      "ok": true,
+      "detail": "offset 45ms · confidence 86% · accepted=true· audio_out=null"
+    },
+    {
+      "step": 12,
+      "name": "all_ready",
+      "ok": true
+    },
+    {
+      "step": 13,
+      "name": "host_starts_round",
+      "ok": true
+    },
+    {
+      "step": 14,
+      "name": "performer_tap",
+      "ok": true
+    },
+    {
+      "step": 15,
+      "name": "performer_swipe",
+      "ok": true
+    },
+    {
+      "step": 16,
+      "name": "vocal_prompt_timing_mode",
+      "ok": true
+    },
+    {
+      "step": 17,
+      "name": "audience_influence",
+      "ok": true
+    },
+    {
+      "step": 18,
+      "name": "audience_spam_bounded",
+      "ok": true,
+      "detail": "Last influence: accepted · Δcrowd 2"
+    },
+    {
+      "step": 19,
+      "name": "round_ends",
+      "ok": true,
+      "detail": "fe8475c132d37d3e"
+    },
+    {
+      "step": 20,
+      "name": "outcome_hash_consistent",
+      "ok": true,
+      "detail": "fe8475c132d37d3e vs fe8475c132d37d3e"
+    },
+    {
+      "step": 21,
+      "name": "performer_context_a_closed",
+      "ok": true
+    },
+    {
+      "step": 22,
+      "name": "reconnect_context_b",
+      "ok": true,
+      "detail": "roster=3"
+    },
+    {
+      "step": 23,
+      "name": "duplicate_score_delta_zero_results_phase",
+      "ok": true,
+      "detail": "{\"beforeScore\":0,\"phase\":\"results\"}"
+    },
+    {
+      "step": 24,
+      "name": "performer_context_b_closed",
+      "ok": true
+    },
+    {
+      "step": 25,
+      "name": "reconnect_context_c",
+      "ok": true,
+      "detail": "roster=1"
+    },
+    {
+      "step": 26,
+      "name": "host_rematch",
+      "ok": true
+    },
+    {
+      "step": 27,
+      "name": "rematch_counter",
+      "ok": true,
+      "detail": "rematch emitted"
+    },
+    {
+      "step": 28,
+      "name": "prior_result_immutable",
+      "ok": true,
+      "detail": "fe8475c132d37d3e"
+    }
+  ],
+  "vocal_path_classification": "VOCAL_PROMPT_TIMING_MODE",
+  "microphone_pitch_analysis": false,
+  "general_vocal_recognition": false,
+  "ok": true
+}

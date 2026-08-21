@@ -1,6 +1,7 @@
 {
+  "NETWORK_FAULTS_EXECUTED": true,
+  "temporary_audience_offline": true,
+  "SERVER_RESTART_ROOM_PERSISTENCE": false,
   "forged_reconnect_rejected": true,
-  "invalid_room_rejected": true,
-  "paused_inputs_rejected": true,
   "ok": true
 }

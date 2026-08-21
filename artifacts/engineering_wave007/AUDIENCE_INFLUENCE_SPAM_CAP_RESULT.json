@@ -1,5 +1,9 @@
 {
   "AUDIENCE_INFLUENCE_ENGINE": true,
   "SPAM_CAPS": true,
+  "unit_burst": {
+    "accepted": 1,
+    "rejected": 19
+  },
   "ok": true
 }
