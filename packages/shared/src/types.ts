@@ -54,13 +54,16 @@ export type RightsAttestationStatus =
 export type InputType =
   | 'tap'
   | 'hold'
+  | 'swipe'
   | 'vocal_phrase'
   | 'hype_cheer'
   | 'hype_lights'
   | 'hype_boost'
   | 'hype_combo_save'
   /** PredictionTrivia — lock a section/label choice before the section starts. */
-  | 'prediction_lock';
+  | 'prediction_lock'
+  /** Accessibility / mic-denied fallback — tap-as-vocal when prompt is active. */
+  | 'vocal_fallback_tap';
 
 /** Device UX roles from field-kit G2-C6 matrix (+ optional docked). */
 export type DeviceRoleId =
@@ -72,6 +75,24 @@ export type DeviceRoleId =
 
 /** Competitive team seat for versus / band split scoring. */
 export type TeamId = 'A' | 'B' | 'solo';
+
+/** Per-seat device timing profile (Wave007) — affects authoritative scoring windows. */
+export interface DeviceTimingProfileView {
+  deviceId: string;
+  offsetMs: number;
+  sampleCount: number;
+  confidence: number;
+  accepted: boolean;
+  calibratedAtMs: number | null;
+  inputLatencyMs?: number;
+  audioOutputLatencyMs?: number | null;
+  networkOffsetMs?: number | null;
+  effectiveScoringOffsetMs?: number;
+  jitterMs?: number;
+  calibrationMethod?: string;
+  provenance?: string;
+  expiresAt?: number | null;
+}
 
 export interface Player {
   id: string;
@@ -88,6 +109,8 @@ export interface Player {
   combo: number;
   /** Team assignment — defaults to solo until host assigns A/B. */
   teamId: TeamId;
+  /** Wave007 per-device timing profile applied during processInput. */
+  deviceTiming?: DeviceTimingProfileView | null;
 }
 
 /** Spectator seat — cannot score as a player; moderated influence only. */
@@ -141,6 +164,8 @@ export interface RoomState {
   crowdMeter: number;
   /** Rematch / round counter (increments on rematch). */
   rematchRound: number;
+  /** Stable round identity for ledger / idempotency (Wave007). */
+  round_id?: string;
   /** Structured join payload for QR / deep-link (no third-party dependency). */
   joinQr: RoomJoinQrPayload | null;
   /** Room privacy posture — controls telemetry retention + name visibility. */
@@ -356,6 +381,11 @@ export interface PlayerInputEvent {
   sectionId?: string;
   /** PredictionTrivia — chosen section id or label (case-insensitive match). */
   predictionChoice?: string;
+  /** Client event identity for server idempotency (Wave007). */
+  event_id?: string;
+  idempotency_key?: string;
+  round_id?: string;
+  client_sequence?: number;
 }
 
 export interface ScoreEvent {
@@ -443,6 +473,10 @@ export interface GameResults {
     maxStreak: number;
   }>;
   awards: Award[];
+  /** Wave007 scoring ledger checksum when outcomes were sealed. */
+  ledgerChecksum?: string;
+  /** Ledger-derived team scores for replay cross-check. */
+  ledgerDerivedTeamScores?: TeamScoreboard;
 }
 
 export const PLAYER_COLORS = [

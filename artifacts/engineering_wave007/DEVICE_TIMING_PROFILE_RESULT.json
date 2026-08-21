@@ -1,0 +1,6 @@
+{
+  "DEVICE_TIMING_PROFILE": true,
+  "PROFILES_AFFECT_SCORING_WINDOWS": true,
+  "audio_output_latency_ms": null,
+  "ok": true
+}

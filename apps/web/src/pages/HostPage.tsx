@@ -300,6 +300,7 @@ function CalibrationPanel({
       <button
         type="button"
         className="btn-primary btn-large"
+        data-testid="host-save-calibration"
         onClick={() => {
           stop();
           onSubmit(average);
@@ -311,6 +312,7 @@ function CalibrationPanel({
       <button
         type="button"
         className="btn-secondary"
+        data-testid="host-skip-calibration"
         onClick={() => {
           stop();
           onSubmit(0);
@@ -600,14 +602,14 @@ export default function HostPage() {
         <>
           <div className="card" style={{ marginBottom: '1.5rem' }}>
             <p className="label">Room Code — share with players</p>
-            <div className="room-code">{code}</div>
+            <div className="room-code" data-testid="host-room-code">{code}</div>
             <div className="row" style={{ justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
               <img src={qrUrl} alt={`QR code for ${joinUrl}`} width={220} height={220} />
               <div>
-                <p style={{ color: 'var(--muted)', marginBottom: '0.5rem' }}>
+                <p style={{ color: 'var(--muted)', marginBottom: '0.5rem' }} data-testid="host-join-url">
                   Players join at: <strong>{joinUrl}</strong>
                 </p>
-                <p style={{ color: 'var(--muted)' }}>
+                <p style={{ color: 'var(--muted)' }} data-testid="host-connection">
                   Connection: {socket.connected ? '✓ Room server connected' : '… Connecting'}
                 </p>
               </div>
@@ -729,10 +731,12 @@ export default function HostPage() {
                     key={s.id}
                     className={`song-item ${room?.selectedSongId === s.id ? 'selected' : ''}`}
                     onClick={() => selectSong(s.id)}
+                    data-testid={`select-song-${s.id}`}
                   >
                     <strong>{s.title}</strong>
                     <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
-                      {s.artist} · {Math.round(s.durationMs / 1000)}s · {s.bpm} BPM
+                      {s.artist} · {Math.round(s.durationMs / 1000)}s · {s.bpm} BPM ·{' '}
+                      {s.license ?? 'catalog'}
                     </div>
                   </button>
                 ))}
@@ -807,10 +811,19 @@ export default function HostPage() {
               </p>
 
               <button
+                className="btn-secondary"
+                type="button"
+                data-testid="host-auto-teams"
+                onClick={() => socket.emit('room.auto_teams', { code, hostToken })}
+              >
+                Auto-assign teams A/B
+              </button>
+              <button
                 className="btn-primary btn-large"
                 onClick={startCalibration}
                 disabled={!canStartCalibration}
                 type="button"
+                data-testid="host-start-calibration"
               >
                 Start Calibration
               </button>
@@ -898,6 +911,14 @@ export default function HostPage() {
               </div>
             ))}
           </div>
+          <button
+            className="btn-secondary btn-large"
+            type="button"
+            data-testid="host-force-end-playing"
+            onClick={() => socket.emit('game.force_end', { code, hostToken })}
+          >
+            End Round Now
+          </button>
         </div>
       )}
 
@@ -908,7 +929,12 @@ export default function HostPage() {
             <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--accent3)' }}>
               {results.teamScore}
             </div>
-            <p>Team Score · Crowd {results.crowdMeter}% · Round {(room?.rematchRound ?? 0) + 1}</p>
+            <p data-testid="host-results-meta">
+              Team Score · Crowd {results.crowdMeter}% · Round {(room?.rematchRound ?? 0) + 1}
+            </p>
+            <p data-testid="host-ledger-checksum" style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+              Ledger: {results.ledgerChecksum ?? 'n/a'}
+            </p>
           </div>
 
           <div className="grid-2">
@@ -939,7 +965,12 @@ export default function HostPage() {
             </div>
           </div>
 
-          <button className="btn-primary btn-large" onClick={rematch} type="button">
+          <button
+            className="btn-primary btn-large"
+            onClick={rematch}
+            type="button"
+            data-testid="host-rematch"
+          >
             Rematch / Next Song
           </button>
           <button className="btn-secondary btn-large" onClick={endRoom} type="button">

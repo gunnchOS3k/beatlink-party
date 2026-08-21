@@ -1,0 +1,7 @@
+{
+  "playwright_ran": true,
+  "playwright_skipped": false,
+  "browser": "chromium",
+  "contexts": 3,
+  "ok": true
+}

@@ -1,0 +1,7 @@
+{
+  "host_token_auth": true,
+  "player_token_auth": true,
+  "audience_spam_caps": true,
+  "rip_intent_blocked": true,
+  "ok": true
+}

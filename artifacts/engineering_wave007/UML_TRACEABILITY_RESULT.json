@@ -1,0 +1,22 @@
+{
+  "product_states": [
+    "HOME",
+    "LOBBY",
+    "SONG_SELECT",
+    "CALIBRATING",
+    "COUNTDOWN",
+    "PLAYING",
+    "PAUSED",
+    "RESULTS",
+    "REMATCH",
+    "ERROR"
+  ],
+  "product_room_consistency": true,
+  "can_error_to_home": true,
+  "sources": [
+    "docs/uml/wave007/state_product.md",
+    "docs/uml/wave007/sequence_party_loop.md",
+    "docs/uml/wave007/component.md"
+  ],
+  "ok": true
+}

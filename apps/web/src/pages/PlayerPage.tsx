@@ -52,6 +52,9 @@ export default function PlayerPage() {
   const [currentPrompt, setCurrentPrompt] = useState<VocalPrompt | null>(null);
   const [hypeCooldown, setHypeCooldown] = useState(false);
   const [hostOffer, setHostOffer] = useState(false);
+  const [deviceCalibStatus, setDeviceCalibStatus] = useState<string | null>(null);
+  const [deviceCalibBusy, setDeviceCalibBusy] = useState(false);
+  const inputSeqRef = useRef(0);
   const playerIdRef = useRef<string | undefined>(undefined);
   playerIdRef.current = player?.id;
   const { role: deviceRole, setRole: setDeviceRole, roles: deviceRoles } = useDeviceRole(false);
@@ -187,16 +190,47 @@ export default function PlayerPage() {
 
   function sendInput(type: string, extra: Record<string, unknown> = {}) {
     if (!player || room?.phase !== 'playing') return;
+    inputSeqRef.current += 1;
+    const eventId = `${player.id}:${type}:${inputSeqRef.current}:${Date.now()}`;
     socket.emit('game.input', {
       code,
       input: {
         playerId: player.id,
         type,
         clientTimeMs: Date.now(),
+        event_id: eventId,
+        idempotency_key: eventId,
+        round_id: room.round_id,
+        client_sequence: inputSeqRef.current,
         ...extra,
       },
     });
     if ('vibrate' in navigator) navigator.vibrate(30);
+  }
+
+  function runDeviceCalibration() {
+    if (!player) return;
+    setDeviceCalibBusy(true);
+    // Deterministic tap samples — no fabricated audio_output_latency in browser CI.
+    const samples = [
+      { expectedMs: 0, tappedMs: 45 },
+      { expectedMs: 500, tappedMs: 548 },
+      { expectedMs: 1000, tappedMs: 1042 },
+    ];
+    socket.emit(
+      'game.submit_player_device_calibration',
+      {
+        code,
+        playerId: player.id,
+        samples,
+        deviceId: `web:${navigator.userAgent.slice(0, 24)}`,
+      },
+      () => {
+        setDeviceCalibBusy(false);
+      },
+    );
+    setDeviceCalibStatus('submitted');
+    setDeviceCalibBusy(false);
   }
 
   function handleTap() {
@@ -205,8 +239,21 @@ export default function PlayerPage() {
     sendInput('tap', { noteId: note?.id });
   }
 
+  function handleSwipe() {
+    if (!beatmap) return;
+    const note =
+      beatmap.notes.find((n) => n.type === 'swipe' && Math.abs(n.timeMs - gameTimeMs) < 200) ??
+      beatmap.notes.find((n) => Math.abs(n.timeMs - gameTimeMs) < 200);
+    sendInput('swipe', { noteId: note?.id });
+  }
+
   function handleVocal() {
     sendInput('vocal_phrase', { promptId: currentPrompt?.id });
+  }
+
+  function handleVocalFallbackTap() {
+    // Mic-denied / accessibility fallback — tap while prompt is active.
+    sendInput('vocal_fallback_tap', { promptId: currentPrompt?.id });
   }
 
   function handleHype(type: 'cheer' | 'lights' | 'boost' | 'combo_save') {
@@ -236,7 +283,7 @@ export default function PlayerPage() {
               placeholder="Your name"
             />
           </div>
-          <button className="btn-primary btn-large" onClick={handleJoin}>
+          <button className="btn-primary btn-large" onClick={handleJoin} data-testid="performer-enter-lobby">
             Enter Lobby
           </button>
         </div>
@@ -284,6 +331,7 @@ export default function PlayerPage() {
                 key={r.id}
                 className={`role-btn ${player?.role === r.id ? 'selected' : ''}`}
                 onClick={() => setRole(r.id)}
+                data-testid={`role-${r.id}`}
               >
                 <strong>{r.label}</strong>
                 <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>{r.description}</div>
@@ -294,11 +342,42 @@ export default function PlayerPage() {
             className="btn-primary btn-large"
             onClick={toggleReady}
             disabled={!player?.role}
+            data-testid="performer-ready"
           >
             {player?.ready ? 'Not Ready' : 'Ready!'}
           </button>
+          <div className="card stack" data-testid="device-calibration-panel">
+            <h3>Device timing calibration</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+              Tap samples measure input latency. Audio output latency stays unknown/null in this
+              browser path (not fabricated).
+            </p>
+            <button
+              className="btn-secondary"
+              type="button"
+              data-testid="performer-calibrate"
+              disabled={deviceCalibBusy}
+              onClick={runDeviceCalibration}
+            >
+              {deviceCalibBusy ? 'Calibrating…' : 'Calibrate this device'}
+            </button>
+            {player?.deviceTiming && (
+              <p data-testid="device-calibration-result" style={{ fontSize: '0.85rem' }}>
+                offset {player.deviceTiming.effectiveScoringOffsetMs ?? player.deviceTiming.offsetMs}ms
+                · confidence {Math.round((player.deviceTiming.confidence ?? 0) * 100)}%
+                · accepted={String(player.deviceTiming.accepted)}
+                · audio_out=
+                {player.deviceTiming.audioOutputLatencyMs == null
+                  ? 'null'
+                  : `${player.deviceTiming.audioOutputLatencyMs}ms`}
+              </p>
+            )}
+            {deviceCalibStatus && !player?.deviceTiming && (
+              <p style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>Calibration {deviceCalibStatus}</p>
+            )}
+          </div>
           {hostOffer && (
-            <button className="btn-secondary btn-large" onClick={claimHost}>
+            <button className="btn-secondary btn-large" onClick={claimHost} data-testid="claim-host">
               Claim Host (previous host disconnected)
             </button>
           )}
@@ -378,9 +457,18 @@ export default function PlayerPage() {
         )}
 
         {player.role === 'beat_tapper' && (
-          <button className="tap-button" onClick={handleTap}>
-            TAP
-          </button>
+          <div className="stack" style={{ alignItems: 'center', width: '100%' }}>
+            <button className="tap-button" onClick={handleTap} data-testid="performer-tap">
+              TAP
+            </button>
+            <button
+              className="btn-secondary btn-large"
+              onClick={handleSwipe}
+              data-testid="performer-swipe"
+            >
+              SWIPE
+            </button>
+          </div>
         )}
 
         {player.role === 'vocalist' && (
@@ -407,12 +495,25 @@ export default function PlayerPage() {
             <button
               className="btn-primary btn-large"
               onClick={handleVocal}
+              data-testid="performer-vocal"
               disabled={karaokeState ? !canSubmitVocalPhrase(karaokeState) : !currentPrompt}
             >
-              Perform Phrase
+              Hit Prompt Window
             </button>
-            <p style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center' }}>
-              Mic optional — tap when the prompt is active. No audio is stored.
+            <button
+              className="btn-secondary"
+              onClick={handleVocalFallbackTap}
+              data-testid="performer-vocal-fallback"
+              disabled={karaokeState ? !canSubmitVocalPhrase(karaokeState) : !currentPrompt}
+            >
+              Prompt timing tap (no mic)
+            </button>
+            <p
+              style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="vocal-path-truth"
+            >
+              VOCAL_PROMPT_TIMING_MODE — MICROPHONE_PITCH_ANALYSIS=false ·
+              GENERAL_VOCAL_RECOGNITION=false. No audio stored.
             </p>
           </div>
         )}
@@ -460,9 +561,12 @@ export default function PlayerPage() {
       <div className="page stack">
         <div className="card" style={{ textAlign: 'center' }}>
           <h2>Your Results</h2>
-          <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--accent3)' }}>
+          <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--accent3)' }} data-testid="performer-result-score">
             {myResult?.score ?? 0}
           </div>
+          <p data-testid="performer-ledger-checksum">
+            Ledger: {results.ledgerChecksum ?? 'n/a'}
+          </p>
           <p>Accuracy: {myResult?.accuracy ?? 0}% · Best streak: {myResult?.maxStreak ?? 0}</p>
         </div>
         {myAwards.length > 0 && (

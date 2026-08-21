@@ -69,12 +69,13 @@ export default function JoinPage() {
             maxLength={20}
           />
         </div>
-        <button type="submit" className="btn-primary btn-large">
+        <button type="submit" className="btn-primary btn-large" data-testid="join-submit">
           {seat === 'audience' ? 'Enter as Spectator' : 'Join Room'}
         </button>
         <button
           type="button"
           className="btn-secondary"
+          data-testid="join-toggle-seat"
           onClick={() =>
             navigate(seat === 'audience' ? '/join' : '/join?seat=audience')
           }

@@ -1,0 +1,9 @@
+{
+  "PERFORMER_REAL_BROWSER_GAMEPLAY": true,
+  "TAP_INPUT": true,
+  "SWIPE_INPUT": true,
+  "VOCAL_PATH_CLASSIFICATION": "VOCAL_PROMPT_TIMING_MODE",
+  "MICROPHONE_PITCH_ANALYSIS": false,
+  "score_before_end": "Score: 0",
+  "ok": true
+}

@@ -1,0 +1,89 @@
+{
+  "UNCONDITIONAL_TRUE_CLASSIFIERS": 0,
+  "UNCONDITIONAL_TRUE_CLASSIFIERS_COMPUTED": true,
+  "evaluators_inspected": 10,
+  "ok": true,
+  "requirements": [
+    {
+      "evaluator_name": "evaluate_game_beatlink_001",
+      "requirement_id": "GAME-BEATLINK-001",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "dd157cda692c6c33acf1981b2c538d854a391da9a5a243b332cb7beef5b7e759"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_002",
+      "requirement_id": "GAME-BEATLINK-002",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "237b34e9e5ff0337029e85ec9447441a647788c636a7e64d336d792fb7670df4"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_003",
+      "requirement_id": "GAME-BEATLINK-003",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "cc9134119346e7082f6620f342d2c264a9349832882c6ef7b406bd10199a218d"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_004",
+      "requirement_id": "GAME-BEATLINK-004",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "c07bd117f5c4afa597de2b6830b8aba860f22efab7894e9fbc3a114e5612cb09"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_005",
+      "requirement_id": "GAME-BEATLINK-005",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "fde7b945b9349cd41742812b32050d8f6f52e3a8682b4f087c79212aa3acfe70"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_006",
+      "requirement_id": "GAME-BEATLINK-006",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "9e9a088c726cc975feae49d78ab98a8600bf7d9733f13add3647a52db7cf869b"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_007",
+      "requirement_id": "GAME-BEATLINK-007",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "6e79a7d7d5e861f5039e28a291d85658800ec43ebb5a45430e3488d063e6483e"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_008",
+      "requirement_id": "GAME-BEATLINK-008",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "bdeaa914cab84c57a0ad1933c26f7814f09b7c49ecc3acc1acc52bc1db92a0be"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_009",
+      "requirement_id": "GAME-BEATLINK-009",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "b6534d87b5cdb4c295adb0fb8a3456bb89fb960acbba61ebb1deabbd0324baa9"
+    },
+    {
+      "evaluator_name": "evaluate_game_beatlink_010",
+      "requirement_id": "GAME-BEATLINK-010",
+      "unconditional": false,
+      "literal_success_findings": [],
+      "integrity_ok": true,
+      "source_hash": "62adc70239e56d18a47209379729dd4c04a98914c6a369ff3de38551616f2e80"
+    }
+  ],
+  "scanner": "typescript-ast+source-body"
+}

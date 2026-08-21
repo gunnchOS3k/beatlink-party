@@ -19,3 +19,5 @@ gate1/evidence/out/**
 !gate1/evidence/out/**/.gitkeep
 gate1/status/*
 !gate1/status/.gitkeep
+test-results/
+artifacts/engineering_wave007/*.log

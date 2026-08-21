@@ -1,0 +1,18 @@
+{
+  "DEAD_CONTROL_CHECKS_EXECUTED": true,
+  "controls": [
+    "Create Room",
+    "Join Room",
+    "Choose Role",
+    "Calibrate",
+    "Ready",
+    "Start",
+    "Tap",
+    "Swipe",
+    "Audience Influence",
+    "Reconnect",
+    "Rematch"
+  ],
+  "create_room_causes_navigation": true,
+  "ok": true
+}

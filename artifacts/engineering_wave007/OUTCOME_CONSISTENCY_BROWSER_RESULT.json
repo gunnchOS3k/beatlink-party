@@ -1,0 +1,6 @@
+{
+  "OUTCOME_HASH_CONSISTENT_ACROSS_CLIENTS": true,
+  "host_ledger_checksum": "a507aa8c9cb5f87b",
+  "performer_ledger_checksum": "a507aa8c9cb5f87b",
+  "ok": true
+}

@@ -1,0 +1,9 @@
+{
+  "independent_browser_contexts": 3,
+  "host_context_id": "host-desktop-1366",
+  "performer_context_id": "performer-mobile-390",
+  "audience_context_id": "audience-mobile-412",
+  "canonical_room_code_same": true,
+  "room_code": "WXL2J",
+  "ok": true
+}

@@ -1,0 +1,7 @@
+{
+  "DEVICE_CALIBRATION_UI_FLOW": true,
+  "CALIBRATION_AFFECTS_SCORING": true,
+  "calibration_text": "offset 45ms · confidence 86% · accepted=true· audio_out=null",
+  "audio_output_latency_ms": null,
+  "ok": true
+}

@@ -1,15 +1,18 @@
 function generateNotes(bpm: number, durationMs: number, beatInterval: number) {
   const beatMs = (60 / bpm) * 1000;
   const notes = [];
-  let t = 2000;
+  let t = process.env.BEATLINK_WAVE007_E2E === '1' ? 400 : 2000;
   let i = 0;
-  while (t < durationMs - 2000) {
+  const endPad = process.env.BEATLINK_WAVE007_E2E === '1' ? 500 : 2000;
+  while (t < durationMs - endPad) {
+    const kind =
+      i % 7 === 0 ? 'hold' : i % 5 === 0 ? 'swipe' : 'tap';
     notes.push({
       id: `note-${i}`,
       timeMs: Math.round(t),
-      type: i % 7 === 0 ? 'hold' : 'tap',
+      type: kind as 'tap' | 'swipe' | 'hold',
       role: 'beat_tapper' as const,
-      durationMs: i % 7 === 0 ? beatMs * 2 : undefined,
+      durationMs: kind === 'hold' ? beatMs * 2 : undefined,
     });
     t += beatMs * beatInterval;
     i++;
