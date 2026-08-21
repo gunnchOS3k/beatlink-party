@@ -3,7 +3,6 @@
  * Outcomes (individual + team) are derived from the ledger, not client-asserted totals.
  */
 
-import { createHash } from 'node:crypto';
 import type { TeamId, TimingGrade } from '@beatlink/shared';
 
 export type LedgerEventKind =
@@ -32,6 +31,17 @@ export interface LedgerDerivedOutcomes {
   checksum: string;
 }
 
+/** Portable FNV-1a 64-bit hex — browser+node safe (identity checksum, not a crypto claim). */
+export function portableChecksum(payload: string): string {
+  let hash = 0xcbf29ce484222325n;
+  const prime = 0x100000001b3n;
+  for (let i = 0; i < payload.length; i++) {
+    hash ^= BigInt(payload.charCodeAt(i));
+    hash = (hash * prime) & 0xffffffffffffffffn;
+  }
+  return hash.toString(16).padStart(16, '0');
+}
+
 export class ScoringLedger {
   private events: ScoringLedgerEvent[] = [];
   private seq = 0;
@@ -52,8 +62,7 @@ export class ScoringLedger {
   }
 
   checksum(): string {
-    const payload = JSON.stringify(this.events);
-    return createHash('sha256').update(payload).digest('hex');
+    return portableChecksum(JSON.stringify(this.events));
   }
 
   /** Recompute individual + team outcomes purely from ledger events. */

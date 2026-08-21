@@ -107,8 +107,8 @@
         "SCORING_LEDGER_REPLAY": true,
         "INDIVIDUAL_AND_TEAM_OUTCOMES": true,
         "unit_replay_match": true,
-        "endgame_ledger_checksum": "9f097f2a7e49062e0781ff0df678126cac2b8597f01ae4b610d6a3ba304f1630",
-        "replay_checksum": "3694fb9eda3394e328ab5905f7fe1438037daabd3e5e1053ea19c7fc2e97fa6b"
+        "endgame_ledger_checksum": "7d88b82aeab842f2",
+        "replay_checksum": "38581d38027270db"
       }
     },
     "GAME-BEATLINK-009": {
