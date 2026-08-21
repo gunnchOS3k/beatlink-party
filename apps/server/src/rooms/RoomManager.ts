@@ -688,18 +688,14 @@ export class RoomManager {
 
     const now = Date.now();
     const roundId = identity?.round_id ?? room.round_id ?? `${room.code}-r${room.rematchRound}`;
-    const idemKey =
-      identity?.idempotency_key ??
-      identity?.event_id ??
-      `${audienceId}:${type}:${now}`;
-
-    if (room.scoringLedger.hasIdempotencyKey(idemKey)) {
+    const explicitKey = identity?.idempotency_key ?? identity?.event_id;
+    if (explicitKey && room.scoringLedger.hasIdempotencyKey(explicitKey)) {
       room.scoringLedger.appendInputEvent({
         kind: 'audience_influence',
         atMs: now,
         round_id: roundId,
-        event_id: identity?.event_id ?? idemKey,
-        idempotency_key: idemKey,
+        event_id: identity?.event_id ?? explicitKey,
+        idempotency_key: explicitKey,
         crowdDelta: 0,
         payload: { type, choice: choice ?? null },
         meta: { duplicate: true },
@@ -717,6 +713,9 @@ export class RoomManager {
         },
       };
     }
+    const idemKey =
+      explicitKey ??
+      `${audienceId}:${type}:${now}:${room.scoringLedger.snapshot().length}`;
 
     const decision = this.audienceEngine.evaluate(
       member,

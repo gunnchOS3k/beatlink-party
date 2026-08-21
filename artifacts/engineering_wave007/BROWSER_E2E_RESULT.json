@@ -8,7 +8,7 @@
   "performer_context_id": "performer-mobile-390",
   "audience_context_id": "audience-mobile-412",
   "canonical_room_code_same": true,
-  "room_code": "Q6L7M",
+  "room_code": "WXL2J",
   "scenario_steps_passed": 28,
   "scenario_steps_total": 28,
   "steps": [
@@ -26,7 +26,7 @@
       "step": 3,
       "name": "lobby_room_code_visible",
       "ok": true,
-      "detail": "Q6L7M"
+      "detail": "WXL2J"
     },
     {
       "step": 4,
@@ -109,13 +109,13 @@
       "step": 19,
       "name": "round_ends",
       "ok": true,
-      "detail": "01234b4bc27b55d7"
+      "detail": "a507aa8c9cb5f87b"
     },
     {
       "step": 20,
       "name": "outcome_hash_consistent",
       "ok": true,
-      "detail": "01234b4bc27b55d7 vs 01234b4bc27b55d7"
+      "detail": "a507aa8c9cb5f87b vs a507aa8c9cb5f87b"
     },
     {
       "step": 21,
@@ -160,7 +160,7 @@
       "step": 28,
       "name": "prior_result_immutable",
       "ok": true,
-      "detail": "01234b4bc27b55d7"
+      "detail": "a507aa8c9cb5f87b"
     }
   ],
   "vocal_path_classification": "VOCAL_PROMPT_TIMING_MODE",

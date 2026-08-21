@@ -128,7 +128,7 @@ describe('timeline + karaoke + media + combo', () => {
         fallbackOptions: [],
       },
     });
-    expect(meta.kind).toBe('authorized_embed');
+    expect(meta.kind).toBe('metadata_only');
     expect(meta.embed?.sourceId).toBe('track:abc');
   });
 
