@@ -40,6 +40,18 @@ def head_sha() -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
 
 
+def win_cmd(name: str) -> str:
+    if platform.system() != "Windows":
+        return name
+    from shutil import which
+
+    for cand in (f"{name}.cmd", name):
+        found = which(cand)
+        if found:
+            return found
+    return f"{name}.cmd"
+
+
 def main() -> int:
     if platform.system() != "Windows":
         print("REFUSE: must run on Windows", file=sys.stderr)
@@ -63,9 +75,9 @@ def main() -> int:
         "BEATLINK_RIGHTS_SAFE_PILOT_READY": True,
     }
 
-    corepack = subprocess.run(["corepack", "enable"], cwd=ROOT, text=True, capture_output=True)
-    install = subprocess.run(["pnpm", "install", "--frozen-lockfile"], cwd=ROOT, text=True, capture_output=True)
-    build = subprocess.run(["pnpm", "build"], cwd=ROOT, text=True, capture_output=True)
+    corepack = subprocess.run([win_cmd("corepack"), "enable"], cwd=ROOT, text=True, capture_output=True)
+    install = subprocess.run([win_cmd("pnpm"), "install", "--frozen-lockfile"], cwd=ROOT, text=True, capture_output=True)
+    build = subprocess.run([win_cmd("pnpm"), "build"], cwd=ROOT, text=True, capture_output=True)
     index = WEB_DIST / "index.html"
     checks["compile_package"] = {
         "status": "PASS" if index.is_file() and build.returncode == 0 else "FAIL",
