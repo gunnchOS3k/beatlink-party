@@ -21,3 +21,7 @@ gate1/status/*
 !gate1/status/.gitkeep
 test-results/
 artifacts/engineering_wave007/*.log
+
+# Stream C quarantine binary copies (ledger JSON is committed)
+artifacts/digital_engineering_exhaustion/stream_c/quarantine/unclear_third_party/*
+!artifacts/digital_engineering_exhaustion/stream_c/quarantine/unclear_third_party/.gitkeep

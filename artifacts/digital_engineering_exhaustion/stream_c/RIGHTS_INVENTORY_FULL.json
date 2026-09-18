@@ -1,0 +1,2042 @@
+[
+  {
+    "bytes": 198278,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-land-hdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "c008f42e2dc5c9b23b9ef2e64f5a69b764370937e070982c60cf90dd71bd25d9",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 89364,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-land-mdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "83c8473d0ea832d3f6de80c1cef539d297abc001372cb2ba4e74a7b010b0658b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 462352,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-land-xhdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "c9ad4f6c4f1a1dbaa55bd685761ac703ca4312dd9424161e8781e15a445ed713",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 1029002,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-land-xxhdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "5a763677e6e9e13d1a011040fc8d5c1a11aef4e9210fcc7a4959bd0223337778",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 2019218,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-land-xxxhdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "1d23f4fa496e03502df7d8992d3b6307e1fa06ae4c727faef171dbf0f26d31d7",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 197909,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-port-hdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a2ce5524d97104e3a80bb4a84933d69a963719b97f365db0d42960c79ef7c235",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 89547,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-port-mdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "cf8224954360dca9b0b8fe4a95b6525e576aaab4ac478f9a94acf77d4856fb1b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 459139,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-port-xhdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "147e72de6c7abc02af0e3d13056363a756cfada2ed0ddb4d043828bcc13b4c93",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 1010202,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-port-xxhdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "6efec4f4ac9ac82655843d3c326afad75ac818af0d427873e2bcee1503d17a5a",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 1920163,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable-port-xxxhdpi/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "05606aaf84b63deeec749f403ade1e80a9cada51584af91343719c4d073aef19",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 197909,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/drawable/splash.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a2ce5524d97104e3a80bb4a84933d69a963719b97f365db0d42960c79ef7c235",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 9954,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7929871864619434afa411467a11a33abc9575e43979a5fd3f61526a2a21b378",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 9954,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7929871864619434afa411467a11a33abc9575e43979a5fd3f61526a2a21b378",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 9954,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7929871864619434afa411467a11a33abc9575e43979a5fd3f61526a2a21b378",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 4968,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2d9b89618bd3ebedfdd77158b3c1a1e1e3e88bf2934fec98597f94101a8c10d8",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 4968,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2d9b89618bd3ebedfdd77158b3c1a1e1e3e88bf2934fec98597f94101a8c10d8",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 4968,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2d9b89618bd3ebedfdd77158b3c1a1e1e3e88bf2934fec98597f94101a8c10d8",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 16386,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "5df4037dd2c4f0d3835ab31816a13b598cd3b658bbc5bca6d192cd3da00a7c82",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 16386,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "5df4037dd2c4f0d3835ab31816a13b598cd3b658bbc5bca6d192cd3da00a7c82",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 16386,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "5df4037dd2c4f0d3835ab31816a13b598cd3b658bbc5bca6d192cd3da00a7c82",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 33482,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "38e782c190086efabaa7f59da49eb2c84a137f4710f13b612c3fa073d676920f",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 33482,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "38e782c190086efabaa7f59da49eb2c84a137f4710f13b612c3fa073d676920f",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 33482,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "38e782c190086efabaa7f59da49eb2c84a137f4710f13b612c3fa073d676920f",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 55241,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "20a81f52378bc50904f0822bd7ff22916e8cbcf3778ac99be0f2c51dfb6e0f75",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 55241,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "20a81f52378bc50904f0822bd7ff22916e8cbcf3778ac99be0f2c51dfb6e0f75",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 55241,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "20a81f52378bc50904f0822bd7ff22916e8cbcf3778ac99be0f2c51dfb6e0f75",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 476,
+    "ext": ".svg",
+    "license": null,
+    "path": "apps/web/public/favicon.svg",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b0c4c5aa383185b7739d22116816481cb42ea410db522f33b8c457e8979c5aab",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 717,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/public/icons/icon-192.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "69eec58041741b4b5351838484437903ff9b10acf0d4640d2cb3c84060ad65a9",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 3292,
+    "ext": ".png",
+    "license": null,
+    "path": "apps/web/public/icons/icon-512.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "e16d376c5b82d65157c070519d6aa13af740caddc5205e7e13e3dc37b334c88c",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 225850,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/01-host-startup.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "549010459c9e8e62f6c1cd089e63ac76f012df6232c8eb53f5360b285f81ede5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 149895,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/02-host-lobby.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "940d40ba59ec5e1c16d5b5bd3f7bcbd144ee93da91a57effb52b0582b72fccac",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 151323,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/03-host-lobby-with-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "8cae189bbf2c96886d748097074b4a9f11890b57c239e47f2fc0f840b6d15b16",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 78321,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/04-player-lobby.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2a3f33510e78ea1aea4ef8fdb2cb763d4f6182df1bd62caea7702a510e6434fa",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 151798,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/05-ready-state-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "5dbd800368d5bbf75ae17adb96806eafeea0964b7a8213cbaea0c8acb42e30ea",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 79658,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/05-ready-state-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f27eb42d31ad088aa1e052554f1918086d6c57747ceee73479834f789377fbbd",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 67202,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/06-countdown-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f6c2615e6efebb1e9ab989d8ac36e8038d086907cba5944eff58e25bd26ec41b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 119542,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/06-countdown-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "4a27cb69f3adda9b4ac0cef32a9ab67d9401604b992871bfa33d80732d215f00",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 82792,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/07-round-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2211a5c29d0707e0d053169a0e1fcdcb0e2b3190b7baa070c665dd12ad225b55",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 180609,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/07-round-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ef05f7115c80943a5962dd13645372861017af061ab4ef93803a7de05f0c7c80",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 145484,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/08-results-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "408aa948d87a7d99ed52420daa00d82ff067dfb181a1abec53af1588a26f66bb",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 72614,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/08-results-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ec33b3d5f38755a9b506716e472575daddcbdb68eccfb37bc787a0be927361c5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 145484,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/09-reconnect-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "408aa948d87a7d99ed52420daa00d82ff067dfb181a1abec53af1588a26f66bb",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 115219,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/09-reconnect-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "96404cdb76bc50d2a279b5d52b920086ce5b84618879ee21f607c7eb3f8b69de",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 225836,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/10-room-close-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "0c77d20caa1804a40d7b58017c6577f537e2ae72ddb525319a66ead159744e93",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 148000,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/browser-two-client/11-room-reuse-rejected.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "79cc0e38970807f85feaac53ebb9e1f610677d30ba74081ecfceca1839bef323",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 425217,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-after-create.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3e8abb49fdfc24e8685fd579c40d2a8ae02dbb140da98c4dcd881d883d783381",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 620969,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-app.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "1cd0d9128b6d2d845a3c575ebe5fa19e3c4970bde1e6478955eb639777416887",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576395,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-connected.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ef470235f8e02e452ec9b00380b14359aef7da476f20618e0b90e3783f290351",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 1162598,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/00-app-drawer.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "023b983bfb9870193a4445e7d416a87a0ac0bbe3561cdf05acf48c2e0d24d2a3",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576647,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/01-cold-launch.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "d58842e6f7ea7d83d201b7d830e8d2aeaffe8f9f60a5d3f15ad711fa0032086b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576647,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/01b-after-wait.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "d58842e6f7ea7d83d201b7d830e8d2aeaffe8f9f60a5d3f15ad711fa0032086b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 575583,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/01c-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "20a3786f0301dda7b5508ea7d8d57caa1b7a12f46356fbb5a86d3ec6ca2d15c4",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 289546,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/02-host-lobby.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "cd7ea92ec3459413018236edfb7e8a5703ec50f85a31387980cbf73a940f9abf",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 290589,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/03-host-with-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "c1a4ff1397c1312c73ced7c0f49ea33b32facdefd5b0a766e6898017560b9b45",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 312442,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/03b-host-songs.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "4b06721356761e6c41fd1ec9a415177570d9493a0219e67544368c7a3f8e2948",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 235180,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/04-countdown.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "5ef44cc78dd6dc2c596a32904615d3a058615b5628c555bc02360334248c1674",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 305237,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/05-round-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ec7864367c6b34a4c49adceee77c1d62d804029a8e2dc1dd2671f7302872b01d",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 146634,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/06-mac-aux.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "92615d952d0b26f19dfc0a6d6b8844c8f9f890591f9e8ff79b84afba92a6b6e0",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 280173,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/07-results-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f776f305649e2d2933176da27bebb92a5528990088a7e387a9d69a8cf9bfb39e",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 278810,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/07b-results-host-scrolled.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2c0a102c4d65e95e0f5f7950ce20b23ef9358c8ff3bd117ec75459283da79b30",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 670419,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/08-mac-results.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7bfeda48c3feaadfab955a880fafba7c5c7d4c0f675b978cc4947c26d4971126",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 278409,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/09-host-after-reconnect.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "06f72503f5bda26d0f7fbcd7695c324ceeb7a3dc72efd24b483e5fc69ca436c9",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 293323,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/09b-before-end.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b57bc757247b4d0d5d02b5410f48356890e69554342c9f8785d3d2b4170140e0",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 316152,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/09c-scrolled-for-end.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "5b9139814d6db2594fb22f58970a688de653181064ed99c374ee4903161918f4",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 311421,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/09d-lobby-bottom.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "484b74f81703371119ed50f23040a4c8ebb893b69980fbf59d28756f38d7b876",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 295701,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/10-room-ended.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b553288e654bb216a1d636ea73cb014465e4a20268f94928d3929cbf8718ab77",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 2520205,
+    "ext": ".mp4",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/beatlink-direction-a.mp4",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "05d5437eda64094da804806cc3b1b2eadffacc42c81701b652bb5adcefe52c3d",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576753,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/01-cold.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "e769cd499d1aa0fbcae62bcbece59975500cbf780e5db8441f88c7526c54a352",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576772,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/02-pixel-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b9b1082df941118c0940009d5bbc86ecd54a506874be1d4fdc5dc4143b4f157e",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576772,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/03-join-form.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b9b1082df941118c0940009d5bbc86ecd54a506874be1d4fdc5dc4143b4f157e",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 381786,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/04-pixel-joined.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "243e84e2bfd325e4f3a71a2e69acd9d778980b2ef4802c98a8f1f5a980721b1f",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 274356,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/05-pixel-role.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7a5e85d982176787633cc55cd3322e91c0d615494118e532a052cab3736087e2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 274356,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/06-pixel-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7a5e85d982176787633cc55cd3322e91c0d615494118e532a052cab3736087e2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 273631,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/99-current.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "fcb48ad5978991464e0bccaa89c6bc99f68bfc3804395d1701c6e7642caf4fc9",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 10080784,
+    "ext": ".mp4",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/beatlink-direction-b.mp4",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "07822a3237cfa0ab2b25b4500756a6f2914e2ec03916e10b1442dba7e6578e04",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576871,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c1.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "794b782b31b8fbf1aee850e28fed35a067919e4aa0ba19d2cbc01ad7456fc8f2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576871,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c2.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "794b782b31b8fbf1aee850e28fed35a067919e4aa0ba19d2cbc01ad7456fc8f2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 293287,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c3.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "bb21e359fb2b85bb7dffe6f1518be19f4afb02c6c64883c8789e48c7c1db17c2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 292359,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c4.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "8e49aabd1d0cf0ce3a8e77081ce5ee01ac9be3b442b151f1680495bf9bdc6dd5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 292359,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c5-ready-attempt.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "8e49aabd1d0cf0ce3a8e77081ce5ee01ac9be3b442b151f1680495bf9bdc6dd5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 292359,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c6-countdown.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "8e49aabd1d0cf0ce3a8e77081ce5ee01ac9be3b442b151f1680495bf9bdc6dd5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 292970,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c7-results.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "428e577a6c29400912a7e5f1e5793b9f9d8f16453e36d7c9a080c9fb35b32ec5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 292970,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c8-resume.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "428e577a6c29400912a7e5f1e5793b9f9d8f16453e36d7c9a080c9fb35b32ec5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 292970,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/c9-ended.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "428e577a6c29400912a7e5f1e5793b9f9d8f16453e36d7c9a080c9fb35b32ec5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 130217,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/d-mac-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b12893eb4ee728c276a833d14519a695887f59432780e4616e0ce041b6bc9c98",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 130217,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/d-mac-with-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b12893eb4ee728c276a833d14519a695887f59432780e4616e0ce041b6bc9c98",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576563,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/d1-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "997d479d8e7fa435ede192d6034c6c518657d1acae8b411f9928348b7d53c25b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 425756,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/d2-after-join-tap.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f004c18390dd83f97793039b818aa24686f928d12faf2aef0f852a8c18216e49",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411643,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/d3-after-join-room.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b72bb9fabc4f326ddd094a768e1805ecad0be9e1158cff9c33f267b6dadc6289",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 420591,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/d4-lobby-or-role.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "29c7dcc8de4ec89ed2d85172f011cf05c3e5dc397004a6e96c16112a5ebadcb6",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411643,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/d5-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b72bb9fabc4f326ddd094a768e1805ecad0be9e1158cff9c33f267b6dadc6289",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576871,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/deeplink-join.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "794b782b31b8fbf1aee850e28fed35a067919e4aa0ba19d2cbc01ad7456fc8f2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 132273,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e-mac-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "abd0637058ddaa65395bfc92125a5d86f3e89532e5891e3984a484b83495162c",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 132273,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e-mac-with-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "abd0637058ddaa65395bfc92125a5d86f3e89532e5891e3984a484b83495162c",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576924,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e1-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b3423d257eb1fe054ee824d760ed51d1347c7743451c2e490bfbdfc839dcf5f7",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 413600,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e2-join-form.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "6341cabc131ee1545f610b4eb65595e23106b8b72d162a1cfccaaaf143c1480f",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576924,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e3-code-entered.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b3423d257eb1fe054ee824d760ed51d1347c7743451c2e490bfbdfc839dcf5f7",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 412727,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e4-name-entered.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7a00e111c13de140e9cc914ac285d55b8fa2c7566d32f5a8e0891d667bb67451",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411988,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e5-after-join.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "d639c3cffcc956f6dde289f55054b37e6ba178e3907e849d88ad23510205e0dd",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411988,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e6-role.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "d639c3cffcc956f6dde289f55054b37e6ba178e3907e849d88ad23510205e0dd",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411988,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/e7-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "d639c3cffcc956f6dde289f55054b37e6ba178e3907e849d88ad23510205e0dd",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 131141,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f-mac-with-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7a1a571ff643465eb25c62479d16acdec7d11f4009fec288e89a489d570487a4",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 575551,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f1-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3b126289661a77725e8c6451aa73734f30a94c386c73b83fcf7a61c486f123b3",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 424848,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f2-join.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "76de7f379eee9fc69642a090fbff46ffe13fd72f884b9858ea2dd8c6a9cb35bc",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411921,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f3-code.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "1495ec76ee97152f7d77376690cc3a55c74d8d804bd2fee2efe091825182fd7e",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 416108,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f4-name.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7605d889a5bd4eb9e87e884fc0ab0fbd496cf0249df9811dd16bf0f65f556826",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 409061,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f5-kb-hidden.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "e864ea100103285916da851c0f6b2fb33eff8057e3b31d8fd08f51d00b2e08f5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 410868,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f6-entered.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "c13171e7d423c6a5bff64a71085432f176cfda54a982443c05f90e9e349aee33",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 410868,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f7-after-pink.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "c13171e7d423c6a5bff64a71085432f176cfda54a982443c05f90e9e349aee33",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 410868,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/f8-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "c13171e7d423c6a5bff64a71085432f176cfda54a982443c05f90e9e349aee33",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 133009,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g-mac.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "22447c06e25a7c2597c860d085a83cedffa26e155861416a55832f8034c6a2d2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576661,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g1.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f34b71ec74ca9051e39cff6b260231655b09d817b1683d5f686d09bce9e5a998",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 425814,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g2-join.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "879bf05edc7466a8716d3376065fec7fcd1c44075cd5bbce6c86d15045430cfa",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 412655,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g3-code.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7774116111c084b47d3b1c831da5c8de0e4d4286e4e1fe1c88e344dae41c3b40",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 421496,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g4-name.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a295dad1812b7863c433321d32853a7a018a92583d1f616734df1f457984ca55",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411067,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g5.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "caba3d9496cd2c2abfcc058422400ef3c7f35cc53cfb8d45f81bf084ef029d46",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411067,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g6.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "caba3d9496cd2c2abfcc058422400ef3c7f35cc53cfb8d45f81bf084ef029d46",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411067,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g7.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "caba3d9496cd2c2abfcc058422400ef3c7f35cc53cfb8d45f81bf084ef029d46",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411067,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/g8.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "caba3d9496cd2c2abfcc058422400ef3c7f35cc53cfb8d45f81bf084ef029d46",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 133319,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/h-mac-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "fd412f21a52214e0b561023045186b309fbf24712a33d157f986be18733890d9",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 133319,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/h-mac.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "fd412f21a52214e0b561023045186b309fbf24712a33d157f986be18733890d9",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 575577,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/h1-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7751fc6846fcdcd63eccdfca7160f0d3d67bba00df44c89411478a063afee46a",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 424869,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/h2-join-form.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f09c6310aeef5a4f6d9e28430eafa34e6ae4c1681f3d29350c524a19104deba2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 410875,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/h3-filled.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "078089f74363b04bf1a497b5b5d7a93d2b7b859d2869723ee88a2886f63beb65",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 425052,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/h4-enter-lobby.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "86ae5738f0e94b807a620cb0b62de7414cb066b4bc623fe3117832d33ad04e67",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 419698,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/h5-role.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "847f8aef711783f650cd5f0948c6093520ee949fa12df9be3152e62b8dc04046",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 423833,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/h6-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b7d171c133d931af0efd274ff586ef19145143b3efea96f96a5c99d8e14f4d6b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 131087,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/j-mac-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "fb759064446ab5eeddcabb666ffdcc22bc4a30f8ebc523d0c3e832fde9498768",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 131087,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/j-mac.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "fb759064446ab5eeddcabb666ffdcc22bc4a30f8ebc523d0c3e832fde9498768",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576839,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/j1-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a58f2fea485d478b420a0daeac18d1e64f4dcf70107b3f0914bf787a96e380c5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576839,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/j2-after-broadcast.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a58f2fea485d478b420a0daeac18d1e64f4dcf70107b3f0914bf787a96e380c5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576839,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/j3.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a58f2fea485d478b420a0daeac18d1e64f4dcf70107b3f0914bf787a96e380c5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 301355,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/j4.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3c4e95a8fa1b2043b89b55bb978aefbaffcf7af22dff2d25ec1abb23c7d37a7b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 301355,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/j5-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3c4e95a8fa1b2043b89b55bb978aefbaffcf7af22dff2d25ec1abb23c7d37a7b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 114274,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k-mac-cd.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "413d46e4eef90c47c5b938790b3bb3995a8bf4ff306c1824be2d181d16987231",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 125428,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k-mac-end.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "01a43dcf8907640a2971038e4cac59282e75ea1789a51ed6b292424ba8b88101",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 130485,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k-mac-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "376cd55236791442cae5145fe9b859c224364373c2747f73fc3c228ba2409160",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 126635,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k-mac-res.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "75e947bce1c8c36033e438671a110f1dcc126023837a14d484a3d6159dc73c56",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 131613,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k-mac.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ac236ccbcd35d8d246f9ea2cedd9c30e0e7cc86246c75f38fdcdc33dd7deee85",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 574668,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k1.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "6679ce4920f82b003592d36840f80a4d2500bb99c275218ae1b5fe57d6ac1e84",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 381733,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k2.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "9a57b0ef9212ceff862bca5e1ee33aca4f5157c6479dbc13fb383e88406bdebc",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 272587,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k3.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ab109135daf1234a3793aa53f2af5f0a6661389dcef41378dabec6b4fe6c2b4a",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 275725,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k4-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "b28f76a1d946c601de98db3a9c3256ed5b2905730fad488c90f110b7c41d2133",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 470652,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k5-cd.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3cb163aa020727bcc874fdd2e563d4c118f87f1fc3437b6b06173bb72497bc78",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 250647,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k6-res.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7b675d8533cbe2dbcf64c0908835d0cc59a4741f7a71b75d41906c297286fe2c",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 250647,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k7-resume.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7b675d8533cbe2dbcf64c0908835d0cc59a4741f7a71b75d41906c297286fe2c",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 250647,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/k8-end.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7b675d8533cbe2dbcf64c0908835d0cc59a4741f7a71b75d41906c297286fe2c",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 225307,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/mac-01-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "102e9b07a0e1e871eb80d3e959dc65663134643157070afd26370a6813fedaca",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 114461,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/mac-02-host-lobby.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "7ebea4b20487163680ed7880100b91a8effe7f3efc3c9d2505d22211c3d036b1",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 114825,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/mac-03-with-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3e0cab94814c295496f15a11ff13651c37b2a94e246c694e13baf9124ab90646",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 109742,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/mac-countdown.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ef194ecab84c31711fe7e6f1a0d3ecfc8e2749d0ebe1a1c9d5e520d5a0507878",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 109741,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/mac-ended.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "8096588af6399c0f635701e5355677605439bdb0c7f93f604486a1580e597a6d",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 133111,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/mac-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ee6574a43d2f3ee604ab6464e17a1782422b292c93de53c4af2f7195562f8a73",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 109741,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/mac-results.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "8096588af6399c0f635701e5355677605439bdb0c7f93f604486a1580e597a6d",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 133712,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/mac-with-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "df8abdd31dfe1d18b9b33a584b5b3fea160b06c72cf65833dfedf9ca57de3f96",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 411909,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-final/direction-b/nav-smoke.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "bed3b1485dfc8b2c165416c051301f9931c719c6fd1c4e2c9632702927f6e905",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 304025,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-host-with-mac.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a523b2985c3b38d40fcb558fb1d2125b934f2a39f6e3252885f0ef39d4cb26dc",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 382823,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/debug-after-join.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ec2c17b501d419f2f5b2e5a0fa74dc16f91c169d1defe6de1c0bc55fd87bace7",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 366091,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/debug-after-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3b845b76f042bc5ff0ac378f1716c0dd9771006e432a5a72f29fb6d2443bb63e",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 366091,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/debug-js-probe.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3b845b76f042bc5ff0ac378f1716c0dd9771006e432a5a72f29fb6d2443bb63e",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 273122,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/debug-probe-ready2.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "0cfe73cfbb09e992ec3d33394a5957c734c9a23e40fff04334794acac8b2139c",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576016,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/01-cold-launch.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "9edf51465780f100587a374a77063dcbcc22ce79e43db45f65b9318595eb5fc2",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 302681,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/02-host-lobby.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "45818794c7dff03f3360b937acb693ad4df8482d5fec27d36c0e3ca9339645f3",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 62357,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/03-mac-joined-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f48e163d7acbf9cfd6df7ebe22cc74ed3b8e1929a4204a1ec419ea1d45147774",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 304942,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/04-pixel-host-with-player.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "45ffd364377a83654b46c58b5bee288ac10a47f8b538ce7de5c54f4c94e00bee",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 236080,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/05-countdown.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "806131e13be31470c91ee260a177f7e2fe5568af1eeb652b45e4d48fa548029e",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 106623,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/06-mac-countdown.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "40908ef566da0119f528a0f86ac11befd0caadef06af337bbc6a01d85dda4e08",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 310357,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/07-round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "64c9c5625086d5d1e75aed558439da301d5148b2fe43b826b197cdcabe1ed035",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 106623,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/08-mac-round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "40908ef566da0119f528a0f86ac11befd0caadef06af337bbc6a01d85dda4e08",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 286224,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/09-results.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "cc205af2bb5da0de7470425fa38e2032bbe28ab376e5470c0915772c10c1b419",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 62177,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/10-mac-results.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2488f8f20d5eb83c9b06063bf2841d4f5a43372c08f0f81e1d0086f581b89989",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 68848,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/11-mac-reconnect.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "9f33cc37eab4368b0925ec44e872eea38eff467830c30c776020098472e9e762",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 286224,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/12-pixel-after-reconnect.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "cc205af2bb5da0de7470425fa38e2032bbe28ab376e5470c0915772c10c1b419",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 576588,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/13-room-ended.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ee252762cd3c4a75c5ce35125bf40c1688b45b0480beefb487cfd999c389cc47",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 68355,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/14-reuse-rejected.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "05a923cfba1ca32da4df0f468e2d2702b31ea91aff337b1c51dd5b465917458c",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 56652341,
+    "ext": ".mp4",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/beatlink-direction-a.mp4",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": null,
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 302681,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-a/live-now.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "45818794c7dff03f3360b937acb693ad4df8482d5fec27d36c0e3ca9339645f3",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 231623,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/01-mac-landing.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "69712a3d3c9dfe9c8f8d6ce78bf977bf74aa4b0bf4e2b34eb8580b2f9dc4ff11",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 157588,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/02-mac-host-qr.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2da94270dadaabf9f188e9be4bca317abe9ab090144ef7d2f2b4f608687bd471",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 383782,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/03-pixel-joined.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "1643c42465de0912b37724549513273cc6c3e6b94aeceb4dde0cb3b913a811be",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 62172,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/04-mac-player-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f7699373ca1f179947011db3d7b016bcc6c3eed4591aa4946af50179276e4477",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 275947,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/05-pixel-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "6b84450882f467200e9a74b0e817b5402b5bb4375670c683df997fc0f60fa638",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 163459,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/06-host-both-ready.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "9e4793d9a2a9cf30e5822ced6161e95a767f5969c07fc293f6db25767fccfb9f",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 88939,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/07-countdown.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ed59765113644233915107715ba35031503e00b0ffa8d3ad7fb526371b455222",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 393463,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/08-pixel-countdown.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "ce66c1e46cb3fcb9ec73095216dbfbe78912ba3748dca33ec2ed57e7c8adf90f",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 107994,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/09-round-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "f405d04b7b7973221f7cec6a4ec42a6c0e5e5c84ade34cd5c81c3ab496e1143b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 597495,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/10-pixel-round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "c62ae66637f8a6afd13a82c0ce731a12708de53291fa2f50bff1e2731124df36",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 148153,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/11-results-host.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "75b9530cdf9f5b6c0b83a9b7274cddba3d30f9061a285c3e1ee28dd4f9d3a575",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 278630,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/12-pixel-results.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "75e0e6e2c3cda73f4a0473eeb40643f4a4b3b3ec36011634ee91ced8354b7f6b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 64277,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/13-mac-player-results.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "bc5c090602cf1e497c30603f82a8f5e5724a5ff193c9093c319f44442d407839",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 278630,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/14-pixel-resume.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "75e0e6e2c3cda73f4a0473eeb40643f4a4b3b3ec36011634ee91ced8354b7f6b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 231623,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/15-mac-after-end.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "69712a3d3c9dfe9c8f8d6ce78bf977bf74aa4b0bf4e2b34eb8580b2f9dc4ff11",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 278630,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/16-pixel-room-ended.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "75e0e6e2c3cda73f4a0473eeb40643f4a4b3b3ec36011634ee91ced8354b7f6b",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 68962,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/17-reuse-rejected.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "82e379bfeae7a0b67b87d0b42b06df3f26feb8873a204d0ea068deeab5ee7ac9",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 67722,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/18-invalid-code.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "9abe53abe8808567ec14aa576e6cce63a779841b269c62a1e3aa9c8798381fd5",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 9629477,
+    "ext": ".mp4",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/direction-b/beatlink-direction-b.mp4",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "3463a85abf76330fc927e06a3271b13e08a536a085a1c32c04464c18b42f1b2d",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 383664,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-multiplayer/tmp-pixel-lobby.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "11dcd161ce3bd6ab71ce3e6405a2cb34c328a3a18efe5d2514c64ba0dd901f60",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 315509,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-prestart.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "2af01f46dca0194177b197659ec6b4baf25605cedc84fc33ad42606fc30fd2d8",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 307860,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-round.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "4357ec71a6f635b12e58532bcb490e54f26f8d22eb4a98ae92a2efb136c0b684",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 547682,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-startup.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "aef67eb26ce1cbab24ec2a222b3980f12358653d2e877a189dcfa1480b5701b9",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 302541,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-tap-760.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a0d7a27a716e2c2fe755a23d5bea12c3af5a31733f07451895d3518cd04a4933",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 302541,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-tap-820.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a0d7a27a716e2c2fe755a23d5bea12c3af5a31733f07451895d3518cd04a4933",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 302541,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-tap-880.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a0d7a27a716e2c2fe755a23d5bea12c3af5a31733f07451895d3518cd04a4933",
+    "status": "UNPROVENANCED"
+  },
+  {
+    "bytes": 302541,
+    "ext": ".png",
+    "license": null,
+    "path": "docs/product-quality/evidence/pixel-tap-920.png",
+    "quarantine_mode": "ledger_only",
+    "reason": "no provenance entry for binary asset path",
+    "sha256": "a0d7a27a716e2c2fe755a23d5bea12c3af5a31733f07451895d3518cd04a4933",
+    "status": "UNPROVENANCED"
+  }
+]

@@ -1,0 +1,115 @@
+{
+  "artifact_root": "artifacts/digital_engineering_exhaustion/stream_c",
+  "claims": {
+    "fun_balance_feel": false,
+    "human_playtest_completed": false,
+    "rights_clearance_complete": false
+  },
+  "emitted_at": "2026-09-18T18:57:43.352262+00:00",
+  "fixtures": {
+    "deterministic": "artifacts/digital_engineering_exhaustion/stream_c/fixtures/DETERMINISTIC_BOT_TRAVERSAL.json",
+    "smoke_scenes": "artifacts/digital_engineering_exhaustion/stream_c/fixtures/SMOKE_SCENES.json"
+  },
+  "game": {
+    "godot_path": "",
+    "id": "beatlink-party",
+    "kind": "web",
+    "title": "BeatLink Party"
+  },
+  "gate": {
+    "GAMES_PRE_HUMAN_PLAYTEST_ENGINEERING_EXHAUSTED": true,
+    "HUMAN_FUN_BALANCE_FEEL": "HUMAN_VALIDATION_REQUIRED",
+    "RIGHTS_CLEARANCE_COMPLETE": false,
+    "RIGHTS_QUARANTINE_ACTIVE": true,
+    "accepted_main_sha": "06b4a6f74159ee933984be913e269eab64246efb",
+    "blockers": [
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "menus",
+        "evidence": "web UI create-room flows"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "input",
+        "evidence": "device UX package"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "pause_resume",
+        "evidence": "session resume A/B/C"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "crash_recovery",
+        "evidence": "reconnect / network failure tests"
+      },
+      {
+        "blocker_class": "PHYSICAL_HARDWARE_REQUIRED",
+        "dimension": "frame_pacing",
+        "evidence": "device timing profile needs hardware"
+      },
+      {
+        "blocker_class": "PHYSICAL_HARDWARE_REQUIRED",
+        "dimension": "leaks",
+        "evidence": "needs soak on device"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "resolution",
+        "evidence": "viewport responsive tests in wave007"
+      },
+      {
+        "blocker_class": "LEGAL_RIGHTS_REVIEW_REQUIRED",
+        "dimension": "audio",
+        "evidence": "synthetic catalog + rights gate; commercial playback not licensed"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "a11y",
+        "evidence": "a11y not disability-validated"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "local_multiplayer",
+        "evidence": "multi-client browser tests"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "offline",
+        "evidence": "degraded network paths; full offline party limited"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "install_update",
+        "evidence": "web/server deploy"
+      },
+      {
+        "blocker_class": "PHYSICAL_HARDWARE_REQUIRED",
+        "dimension": "android",
+        "evidence": "no adb device"
+      },
+      {
+        "blocker_class": "LEGAL_RIGHTS_REVIEW_REQUIRED",
+        "dimension": "rights",
+        "evidence": "204 quarantined assets"
+      },
+      {
+        "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+        "dimension": "fun_balance_feel",
+        "evidence": "playtest task sheets are templates only"
+      }
+    ],
+    "evaluated_at": "2026-09-18T18:57:43.313566+00:00",
+    "failures": [],
+    "game_id": "beatlink-party",
+    "host": {
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "python": "3.14.7"
+    },
+    "unclassified_partial": []
+  },
+  "playtest_task_sheets": "artifacts/digital_engineering_exhaustion/stream_c/playtest/PLAYTEST_TASK_SHEETS.md",
+  "rights_quarantine_count": 204,
+  "section": 9,
+  "stream": "C"
+}
