@@ -35,3 +35,7 @@ verify:
 
 test:
 	pnpm test
+
+.PHONY: stream-c-exhaust
+stream-c-exhaust:
+	python3 tools/digital_engineering_exhaustion/stream_c/run_stream_c.py

@@ -1,0 +1,80 @@
+{
+  "adb_devices": {
+    "cmd": [
+      "/opt/homebrew/bin/adb",
+      "devices"
+    ],
+    "cwd": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest",
+    "exit_code": 0,
+    "ok": true,
+    "seconds": 0.324,
+    "stderr_tail": "",
+    "stdout_tail": "List of devices attached\n\n"
+  },
+  "build": {
+    "cmd": [
+      "pnpm",
+      "build"
+    ],
+    "cwd": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest",
+    "exit_code": 0,
+    "ok": true,
+    "seconds": 5.964,
+    "stderr_tail": "",
+    "stdout_tail": "\n> beatlink-party@0.1.0 build /Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest\n> pnpm -r build\n\nScope: 5 of 6 workspace projects\npackages/shared build$ tsc -p tsconfig.json\npackages/shared build: Done\ndevice_ux build$ tsc -p tsconfig.json\npackages/game-engine build$ tsc -p tsconfig.json\ndevice_ux build: Done\npackages/game-engine build: Done\napps/web build$ tsc -p tsconfig.json && vite build\napps/server build$ tsc -p tsconfig.json\napps/server build: Done\napps/web build: vite v6.4.3 building for production...\napps/web build: transforming...\napps/web build: \u2713 143 modules transformed.\napps/web build: rendering chunks...\napps/web build: computing gzip size...\napps/web build: dist/index.html                   0.67 kB \u2502 gzip:   0.38 kB\napps/web build: dist/assets/index-DWF9vyzn.css    6.62 kB \u2502 gzip:   2.28 kB\napps/web build: dist/assets/index-cPnE818D.js   349.64 kB \u2502 gzip: 104.87 kB\napps/web build: \u2713 built in 910ms\napps/web build: Done\n"
+  },
+  "lint": {
+    "cmd": [
+      "pnpm",
+      "lint"
+    ],
+    "cwd": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest",
+    "exit_code": 0,
+    "ok": true,
+    "seconds": 2.655,
+    "stderr_tail": "",
+    "stdout_tail": "\n> beatlink-party@0.1.0 lint /Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest\n> eslint . --ext .ts,.tsx --max-warnings 0\n\n"
+  },
+  "rights_hint": {
+    "commercial_music_licensed_claim": false,
+    "song_source_rights_artifact": true
+  },
+  "rights_test": {
+    "cmd": [
+      "pnpm",
+      "vitest",
+      "run",
+      "tests/rights.test.ts"
+    ],
+    "cwd": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest",
+    "exit_code": 0,
+    "ok": true,
+    "seconds": 1.223,
+    "stderr_tail": "",
+    "stdout_tail": "\n RUN  v2.1.9 /Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest\n\n \u2713 tests/rights.test.ts (6 tests) 2ms\n\n Test Files  1 passed (1)\n      Tests  6 passed (6)\n   Start at  13:57:42\n   Duration  445ms (transform 35ms, setup 0ms, collect 36ms, tests 2ms, environment 0ms, prepare 121ms)\n\n"
+  },
+  "test": {
+    "cmd": [
+      "pnpm",
+      "test"
+    ],
+    "cwd": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest",
+    "exit_code": 0,
+    "ok": true,
+    "seconds": 69.542,
+    "stderr_tail": "",
+    "stdout_tail": "12,\"total\":14,\"percent\":85.71428571428571,\"entries\":[{\"id\":\"bl.first_party\",\"title\":\"First Party\",\"description\":\"Host a party room.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:27.827Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.beat_tap\",\"title\":\"Beat Tap\",\"description\":\"Play a Beat Tap round.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:30.878Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.call_and_response\",\"title\":\"Call and Response\",\"description\":\"Play a Call and Response round.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:33.946Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.karaoke\",\"title\":\"Karaoke Night\",\"description\":\"Play a Karaoke Performance round.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:37.020Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.band_cooperation\",\"title\":\"Band Cooperation\",\"description\":\"Start Band Roles with two different player roles.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:40.098Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.prediction\",\"title\":\"Prediction Lock\",\"description\":\"Play a Prediction/Trivia round.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:43.148Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.audience\",\"title\":\"Crowd Work\",\"description\":\"Accept a live audience hype or vote.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:43.160Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.host_recovery\",\"title\":\"Host Continuity\",\"description\":\"Recover the party after host disconnect/migration.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:43.208Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.comeback\",\"title\":\"Comeback\",\"description\":\"Finish a round in first after having been last.\",\"hidden\":false,\"unlocked\":false,\"unlocked_at\":\"\",\"percent\":0,\"current\":0,\"target\":1},{\"id\":\"bl.five_mode\",\"title\":\"Five-Mode Session\",\"description\":\"Play all five modes in one party session.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:43.148Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.pause_and_breathe\",\"title\":\"Pause and Breathe\",\"description\":\"Host-pause a live round and resume it.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:30.889Z\",\"percent\":100,\"current\":1,\"target\":1},{\"id\":\"bl.hidden_full_house\",\"title\":\"Full House\",\"description\":\"Five-mode session plus audience influence and host recovery.\",\"hidden\":true,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:43.208Z\",\"percent\":100,\"current\":3,\"target\":3},{\"id\":\"bl.first_minutes\",\"title\":\"First Minutes\",\"description\":\"Complete calibration and a Beat Tap round in one party session.\",\"hidden\":false,\"unlocked\":false,\"unlocked_at\":\"\",\"percent\":50,\"current\":1,\"target\":2},{\"id\":\"bl.reconnect\",\"title\":\"Back Online\",\"description\":\"Reconnect a player after a disconnect during a live party.\",\"hidden\":false,\"unlocked\":true,\"unlocked_at\":\"2026-09-18T18:56:43.204Z\",\"percent\":100,\"current\":1,\"target\":1}]}}},\"provider\":\"EXTERNAL_PENDING\"}\n\n \u2713 tests/game_rc_002_independent_verifier.test.ts (3 tests) 15459ms\n   \u2713 INDEPENDENT VERIFIER Socket.IO topology (not a static page) > create/join/audience/five modes/score/pause/reconnect/migrate/results/rematch over sockets 15432ms\n \u2713 tests/network_load.test.ts (2 tests) 42604ms\n   \u2713 Continuation V \u2014 network load (real WebSocket) > measures localhost p50/p95/p99 for 8\u00d725/50/100/300 (in-process socket server) 23610ms\n   \u2713 Continuation V \u2014 network load (real WebSocket) > cross-process load: parent clients \u2192 child tsx server (full matrix) 18992ms\n \u2713 tests/continuation_vi.test.ts (2 tests) 67496ms\n   \u2713 Continuation VI \u2014 network SLOs + digital token re-earn > meets digital SLOs then re-earns BETA_CONTENT + DIGITAL_RC with gap audit 67493ms\n\n Test Files  29 passed (29)\n      Tests  138 passed (138)\n   Start at  13:56:26\n   Duration  68.67s (transform 1.14s, setup 0ms, collect 7.15s, tests 127.17s, environment 5ms, prepare 4.11s)\n\n"
+  },
+  "typecheck": {
+    "cmd": [
+      "pnpm",
+      "typecheck"
+    ],
+    "cwd": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest",
+    "exit_code": 0,
+    "ok": true,
+    "seconds": 5.486,
+    "stderr_tail": "",
+    "stdout_tail": "\n> beatlink-party@0.1.0 typecheck /Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest\n> pnpm --filter @beatlink/shared build && pnpm --filter @beatlink/game-engine build && pnpm --filter @beatlink/device-ux build && pnpm -r typecheck\n\n\n> @beatlink/shared@0.1.0 build /Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest/packages/shared\n> tsc -p tsconfig.json\n\n\n> @beatlink/game-engine@0.1.0 build /Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest/packages/game-engine\n> tsc -p tsconfig.json\n\n\n> @beatlink/device-ux@0.1.0 build /Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/beatlink-party/.worktrees/stream-c-pre-human-playtest/device_ux\n> tsc -p tsconfig.json\n\nScope: 5 of 6 workspace projects\npackages/shared typecheck$ tsc -p tsconfig.json --noEmit\npackages/shared typecheck: Done\ndevice_ux typecheck$ tsc -p tsconfig.json --noEmit\npackages/game-engine typecheck$ tsc -p tsconfig.json --noEmit\ndevice_ux typecheck: Done\npackages/game-engine typecheck: Done\napps/web typecheck$ tsc -p tsconfig.json --noEmit\napps/server typecheck$ tsc -p tsconfig.json --noEmit\napps/server typecheck: Done\napps/web typecheck: Done\n"
+  }
+}

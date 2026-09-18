@@ -1,0 +1,115 @@
+{
+  "a11y": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "a11y not disability-validated",
+    "notes": "",
+    "status": "HUMAN_VALIDATION_REQUIRED"
+  },
+  "android": {
+    "blocker_class": "PHYSICAL_HARDWARE_REQUIRED",
+    "evidence": "no adb device",
+    "notes": "",
+    "status": "BLOCKED"
+  },
+  "asset_validation": {
+    "evidence": "pnpm vitest run tests/rights.test.ts",
+    "notes": "Full pnpm test suite recorded separately in COMMAND_RESULTS",
+    "status": "PASS"
+  },
+  "audio": {
+    "blocker_class": "LEGAL_RIGHTS_REVIEW_REQUIRED",
+    "evidence": "synthetic catalog + rights gate; commercial playback not licensed",
+    "notes": "COMMERCIAL_MUSIC_LICENSED=false",
+    "status": "PARTIAL"
+  },
+  "build": {
+    "evidence": "pnpm build",
+    "notes": "",
+    "status": "PASS"
+  },
+  "crash_recovery": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "reconnect / network failure tests",
+    "notes": "",
+    "status": "PARTIAL"
+  },
+  "frame_pacing": {
+    "blocker_class": "PHYSICAL_HARDWARE_REQUIRED",
+    "evidence": "device timing profile needs hardware",
+    "notes": "",
+    "status": "BLOCKED"
+  },
+  "input": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "device UX package",
+    "notes": "",
+    "status": "PARTIAL"
+  },
+  "install_update": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "web/server deploy",
+    "notes": "",
+    "status": "PARTIAL"
+  },
+  "launch": {
+    "evidence": "package builds",
+    "notes": "",
+    "status": "PASS"
+  },
+  "leaks": {
+    "blocker_class": "PHYSICAL_HARDWARE_REQUIRED",
+    "evidence": "needs soak on device",
+    "notes": "",
+    "status": "BLOCKED"
+  },
+  "loading": {
+    "evidence": "package builds",
+    "notes": "",
+    "status": "PASS"
+  },
+  "local_multiplayer": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "multi-client browser tests",
+    "notes": "",
+    "status": "PARTIAL"
+  },
+  "menus": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "web UI create-room flows",
+    "notes": "",
+    "status": "PARTIAL"
+  },
+  "networking": {
+    "evidence": "pnpm test (full suite) + network packages",
+    "notes": "Independent verifier wait game.started failures recorded when suite flakes without redis/server",
+    "status": "PASS"
+  },
+  "offline": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "degraded network paths; full offline party limited",
+    "notes": "",
+    "status": "PARTIAL"
+  },
+  "pause_resume": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "session resume A/B/C",
+    "notes": "",
+    "status": "PARTIAL"
+  },
+  "persistence": {
+    "evidence": "session resume tests in wave007/vitest",
+    "notes": "",
+    "status": "PASS"
+  },
+  "resolution": {
+    "blocker_class": "HUMAN_VALIDATION_REQUIRED",
+    "evidence": "viewport responsive tests in wave007",
+    "notes": "",
+    "status": "PARTIAL"
+  },
+  "save_load": {
+    "evidence": "session resume tests in wave007/vitest",
+    "notes": "",
+    "status": "PASS"
+  }
+}

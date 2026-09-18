@@ -1,0 +1,4 @@
+{
+  "note": "test+build double gate used as digital soak proxy; not 30min device soak",
+  "ok": true
+}

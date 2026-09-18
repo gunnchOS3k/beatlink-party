@@ -1,0 +1,36 @@
+{
+  "label": "HOST_DIGITAL",
+  "not_device_lab": true,
+  "rows": [
+    {
+      "name": "lint",
+      "ok": true,
+      "seconds": 2.655
+    },
+    {
+      "name": "typecheck",
+      "ok": true,
+      "seconds": 5.486
+    },
+    {
+      "name": "test",
+      "ok": true,
+      "seconds": 69.542
+    },
+    {
+      "name": "build",
+      "ok": true,
+      "seconds": 5.964
+    },
+    {
+      "name": "rights_test",
+      "ok": true,
+      "seconds": 1.223
+    },
+    {
+      "name": "adb_devices",
+      "ok": true,
+      "seconds": 0.324
+    }
+  ]
+}
