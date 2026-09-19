@@ -1,0 +1,412 @@
+{
+  "program": "VXP-5",
+  "evidence_class_default": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+  "network_topology": "local_loopback_vite_plus_socketio",
+  "redis": "not_required_for_capture",
+  "store": "in_memory_default",
+  "wan_carrier_claimed": false,
+  "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+  "captured_at": "2026-09-19T19:04:10.428Z",
+  "entries": [
+    {
+      "id": "landing_desktop",
+      "path": "artifacts/vxp5/captures/runtime/landing_desktop.png",
+      "surface": "landing",
+      "client_type": "host",
+      "room_state": "pre_party",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "d53a5f09e5832b768894806559353b8614df893f5019e1d60a3aee278021131c",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "landing_phone",
+      "path": "artifacts/vxp5/captures/runtime/landing_phone.png",
+      "surface": "landing",
+      "client_type": "player",
+      "room_state": "pre_party",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "7c31b0c6269a109f261f76f28d5e53a741c779ea8a6e255bb62059f17ce31b33",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "host_create",
+      "path": "artifacts/vxp5/captures/runtime/host_create.png",
+      "surface": "host_create",
+      "client_type": "host",
+      "room_state": "lobby",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "9937bb1e4dd73109cc5d92225ae519f400e58ddb88362ba6dcb694f9a5acfdb9",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "host_lobby",
+      "path": "artifacts/vxp5/captures/runtime/host_lobby.png",
+      "surface": "host_lobby",
+      "client_type": "host",
+      "room_state": "lobby",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "635970de8a6e7ffa9a8f29d6435941ecfb14110169891c40d161a773899d894c",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "player_join",
+      "path": "artifacts/vxp5/captures/runtime/player_join.png",
+      "surface": "player_join",
+      "client_type": "player",
+      "room_state": "joining",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "35c030f0b71ea40cf4789fc1cebed1b9f0f69a65ef0442208b3466b051f97fe5",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "player_role_select",
+      "path": "artifacts/vxp5/captures/runtime/player_role_select.png",
+      "surface": "player_role_select",
+      "client_type": "player",
+      "room_state": "lobby",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "3b1ff98c26f41961950d94f1d05328848d9dbf1e7988b0b4970272fa7db267c7",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "player_ready",
+      "path": "artifacts/vxp5/captures/runtime/player_ready.png",
+      "surface": "player_ready",
+      "client_type": "player",
+      "room_state": "lobby_ready",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "af4eee8b2e4aa58e9fc44ec92663cad1e02dd367767fe9030cdcd0ffe4dcd86f",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "host_lobby_with_player",
+      "path": "artifacts/vxp5/captures/runtime/host_lobby_with_player.png",
+      "surface": "host_lobby",
+      "client_type": "host",
+      "room_state": "lobby_with_player",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "16184ee4ab9171b9133eaeb57447cd715ba033155bd70490462dbad2075d0ccd",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "host_song_select",
+      "path": "artifacts/vxp5/captures/runtime/host_song_select.png",
+      "surface": "host_song_select",
+      "client_type": "host",
+      "room_state": "song_select",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "7fa01366c3751d875af1d2063bce53ee61e73c61f0ff9fb73fcb8271d1a9a426",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "host_link_compliance",
+      "path": "artifacts/vxp5/captures/runtime/host_link_compliance.png",
+      "surface": "host_link_compliance",
+      "client_type": "host",
+      "room_state": "song_select",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "62f97a7537fd0795070446f084fcf0cd6256be8813160a8eb2c503c5d81dfa82",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "countdown",
+      "path": "artifacts/vxp5/captures/runtime/countdown.png",
+      "surface": "countdown",
+      "client_type": "host",
+      "room_state": "countdown",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "bd9ef236ad9498dae92eb702fe9f38810728f90256bf59926372482118438f1a",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "host_gameplay",
+      "path": "artifacts/vxp5/captures/runtime/host_gameplay.png",
+      "surface": "host_gameplay",
+      "client_type": "host",
+      "room_state": "playing",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "cf75933e9a65b014842dbdba30f93d7beef8bd2e790c3bfa073300caacfe4db0",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "controller_beat_tapper",
+      "path": "artifacts/vxp5/captures/runtime/controller_beat_tapper.png",
+      "surface": "controller_beat_tapper",
+      "client_type": "player",
+      "room_state": "playing",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "046d8fbccdc838d609ff9a0fcab637b96b89172ee4940899598d42606ff7fa45",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "reconnect",
+      "path": "artifacts/vxp5/captures/runtime/reconnect.png",
+      "surface": "reconnect",
+      "client_type": "player",
+      "room_state": "offline",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "a98a8b7d0717c2fd5f8e3ccf221c8666a824e5c4ea3d772be590a52407348cbe",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "host_results",
+      "path": "artifacts/vxp5/captures/runtime/host_results.png",
+      "surface": "host_results",
+      "client_type": "host",
+      "room_state": "results",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "d05c3d7df79fc8e9aa7586eb24e3469cc837d78192a84be8ddeebd558012f891",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "player_results",
+      "path": "artifacts/vxp5/captures/runtime/player_results.png",
+      "surface": "player_results",
+      "client_type": "player",
+      "room_state": "results",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "8b96104aabc4240ad3e2a78aaffc34f7e356392bf9942acd6188ed40b148826d",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "replay_controls",
+      "path": "artifacts/vxp5/captures/runtime/replay_controls.png",
+      "surface": "replay",
+      "client_type": "host",
+      "room_state": "results",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "d05c3d7df79fc8e9aa7586eb24e3469cc837d78192a84be8ddeebd558012f891",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "replay",
+      "path": "artifacts/vxp5/captures/runtime/replay.png",
+      "surface": "replay",
+      "client_type": "host",
+      "room_state": "lobby",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "9c76faa21cd545424058786fe6252d9ed20a642d15e44c0a5bfc73104af9c94f",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "a11y_reduce_motion",
+      "path": "artifacts/vxp5/captures/runtime/a11y_reduce_motion.png",
+      "surface": "a11y",
+      "client_type": "host",
+      "room_state": "pre_party",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "4814fd65f7ee8e78f306825d81727d49b6467d494abc71727173a83bca6dee90",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "a11y_high_contrast",
+      "path": "artifacts/vxp5/captures/runtime/a11y_high_contrast.png",
+      "surface": "a11y",
+      "client_type": "host",
+      "room_state": "pre_party",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "6648c3089bc6945cb9ee0bedc4f15bc3273a58e0f5ab7e56e7645e54208306e4",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "viewport_host_1920",
+      "path": "artifacts/vxp5/captures/runtime/viewport_host_1920.png",
+      "surface": "landing",
+      "client_type": "host",
+      "room_state": "pre_party",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "8eda3042abb2bdcea1dd274dac1686268d8edadea17f020e63f5ca415cf8d830",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "viewport_phone_360",
+      "path": "artifacts/vxp5/captures/runtime/viewport_phone_360.png",
+      "surface": "player_join",
+      "client_type": "player",
+      "room_state": "joining",
+      "viewport": {
+        "width": 360,
+        "height": 740
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "981b9eadc15e68d65b6b17a6a56f385b3679175d7088f06576969feda8d15b10",
+      "width": 360,
+      "height": 740
+    },
+    {
+      "id": "viewport_phone_412",
+      "path": "artifacts/vxp5/captures/runtime/viewport_phone_412.png",
+      "surface": "landing",
+      "client_type": "player",
+      "room_state": "pre_party",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "0a417fe450ee36e37e4273d744b687e3ad2d0c049fea8a626f1170f0ed6ed746",
+      "width": 412,
+      "height": 915
+    },
+    {
+      "id": "controller_vocalist",
+      "path": "artifacts/vxp5/captures/runtime/controller_vocalist.png",
+      "surface": "controller_vocalist",
+      "client_type": "player",
+      "room_state": "playing",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "1272714e51f74ccf8a95d3deb74651c0b63ce92e3b2360b4e96bd71f1ef52e13",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "controller_hype_captain",
+      "path": "artifacts/vxp5/captures/runtime/controller_hype_captain.png",
+      "surface": "controller_hype_captain",
+      "client_type": "player",
+      "room_state": "playing",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "evidence_class": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
+      "source_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+      "sha256": "4ae37fbf049b12c3962aa05be67f3916933d55adeb16c7019d0d76780ee7f885",
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

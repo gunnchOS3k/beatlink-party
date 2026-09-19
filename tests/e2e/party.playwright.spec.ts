@@ -5,6 +5,7 @@ import { test, expect } from '@playwright/test';
  * `pnpm dev` is already serving :5173 + :3001. Never rips audio.
  */
 const enabled = process.env.BEATLINK_E2E === '1';
+const WEB = process.env.BEATLINK_WEB_URL ?? 'http://127.0.0.1:5173';
 
 test.describe('BeatLink host + player (Playwright multi-context)', () => {
   test.skip(!enabled, 'Set BEATLINK_E2E=1 with pnpm dev running on :5173');
@@ -15,16 +16,16 @@ test.describe('BeatLink host + player (Playwright multi-context)', () => {
     const hostPage = await hostCtx.newPage();
     const playerPage = await playerCtx.newPage();
 
-    await hostPage.goto('http://127.0.0.1:5173/');
+    await hostPage.goto(`${WEB}/`);
     await hostPage.getByTestId('create-room').click();
     await hostPage.waitForURL(/\/host\//);
     const code = hostPage.url().split('/host/')[1]?.split('?')[0]?.toUpperCase();
     expect(code).toMatch(/^[A-Z0-9]{5}$/);
 
-    await playerPage.goto(`http://127.0.0.1:5173/join`);
+    await playerPage.goto(`${WEB}/join`);
     await playerPage.getByPlaceholder('ABCDE').fill(code!);
     await playerPage.getByPlaceholder('Your name').fill('PlaywrightP2');
-    await playerPage.getByRole('button', { name: /Join/i }).click();
+    await playerPage.getByTestId('join-submit').click();
     await expect(playerPage).toHaveURL(new RegExp(`/play/${code}`, 'i'));
 
     await hostCtx.close();

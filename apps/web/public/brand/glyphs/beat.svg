@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-label="Beat Tapper glyph">
+  <title>Beat Tapper  Stage Energy original glyph</title>
+  <circle cx="24" cy="24" r="18" stroke="#ff2d92" stroke-width="3" opacity="0.35"/>
+  <circle cx="24" cy="24" r="11" stroke="#ff2d92" stroke-width="3"/>
+  <circle cx="24" cy="24" r="4" fill="#ff2d92"/>
+  <path d="M24 6v4M24 38v4M6 24h4M38 24h4" stroke="#ff2d92" stroke-width="3" stroke-linecap="round"/>
+</svg>

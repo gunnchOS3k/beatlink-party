@@ -20,6 +20,10 @@ import {
   useAccessibility,
   useDeviceRole,
 } from '../lib/deviceSettings';
+import { NetworkStatus, SettingsDrawer } from '../components/NetworkStatus';
+import { BrandMark } from '../components/StageChrome';
+import { roleGlyph } from '../brand/glyphs';
+import { catalogEligibility, linkEligibility } from '../brand/complianceLabels';
 import {
   getGameMode,
   isCallAndResponseWindow,
@@ -27,26 +31,17 @@ import {
   resolveMediaDescriptor,
 } from '@beatlink/game-engine';
 
-function statusBadgeClass(status: LinkResolveResult['playbackStatus']): string {
-  if (status === 'PLAYABLE_APPROVED' || status === 'PLAYABLE_AUTHORIZED_PLATFORM') {
-    return 'status-playable';
-  }
-  if (
-    status === 'UNSUPPORTED' ||
-    status === 'BLOCKED_BY_POLICY' ||
-    status === 'TAKEN_DOWN' ||
-    status === 'RIGHTS_EXPIRED'
-  ) {
-    return 'status-blocked';
-  }
-  return 'status-metadata';
-}
-
 function LinkPreview({ result }: { result: LinkResolveResult }) {
+  const eligibility = linkEligibility(result);
   return (
-    <div className="compliance-banner link-preview">
+    <div
+      className={`compliance-banner link-preview eligibility-${eligibility.cls}`}
+      data-testid="host-link-compliance"
+      data-eligibility={eligibility.cls}
+    >
       <div className="row" style={{ marginBottom: '0.75rem' }}>
-        <span className={`status-badge ${statusBadgeClass(result.playbackStatus)}`}>
+        <span className={`status-badge ${eligibility.badgeClass}`}>{eligibility.label}</span>
+        <span className="status-badge status-pending" style={{ fontWeight: 600 }}>
           {result.playbackStatus}
         </span>
         <span style={{ fontSize: '0.85rem' }}>{result.platform}</span>
@@ -344,6 +339,7 @@ export default function HostPage() {
   const [difficulty, setDifficulty] = useState<DifficultyId>('casual');
   const [playMode, setPlayMode] = useState<GameModeId>('BeatTap');
   const [hostToken, setHostToken] = useState<string>('');
+  const [copied, setCopied] = useState(false);
   const metronomeRef = useRef<{ stop: () => void } | null>(null);
   const { role, setRole, roles, profile } = useDeviceRole(true);
   const { settings, update } = useAccessibility();
@@ -571,6 +567,14 @@ export default function HostPage() {
   const selectedSong = songs.find((s) => s.id === room?.selectedSongId);
   const activeMode = getGameMode(room?.gameMode ?? playMode);
 
+
+  function copyRoomCode() {
+    void navigator.clipboard?.writeText(code).then(() => {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    });
+  }
+
   if (!code) {
     return (
       <div className="page">
@@ -590,27 +594,37 @@ export default function HostPage() {
   }
 
   return (
-    <div className="page">
-      <div className="row" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <Link to="/" style={{ color: 'var(--muted)' }}>
-          ← Home
+    <div className="page page-host surface-host" data-surface="host" data-testid="host-page">
+      <div className="row" style={{ justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
+        <Link to="/" className="btn-ghost" style={{ color: 'var(--muted)' }}>
+          Home
         </Link>
-        <span className="status-badge status-playable">Host Mode</span>
+        <BrandMark size="sm" />
+        <span className="status-badge status-playable">Host / Stage</span>
       </div>
+
+      <NetworkStatus connected={socket.connected} compact={socket.connected} />
 
       {room?.phase === 'lobby' || room?.phase === 'song_select' || !room ? (
         <>
-          <div className="card" style={{ marginBottom: '1.5rem' }}>
-            <p className="label">Room Code — share with players</p>
-            <div className="room-code" data-testid="host-room-code">{code}</div>
+          <div className="panel" style={{ marginBottom: '1.5rem', textAlign: 'center' }} data-testid="host-create-stage">
+            <p className="label">Opening the stage — room code</p>
+            <div className="room-code room-code-hero" data-testid="host-room-code">
+              {code}
+            </div>
+            <div className="row" style={{ justifyContent: 'center', marginBottom: '1rem' }}>
+              <button type="button" className="btn-secondary" onClick={copyRoomCode} data-testid="copy-room-code">
+                {copied ? 'Copied' : 'Copy room code'}
+              </button>
+            </div>
             <div className="row" style={{ justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
               <img src={qrUrl} alt={`QR code for ${joinUrl}`} width={220} height={220} />
               <div>
                 <p style={{ color: 'var(--muted)', marginBottom: '0.5rem' }} data-testid="host-join-url">
-                  Players join at: <strong>{joinUrl}</strong>
+                  Join URL (secondary): <strong>{joinUrl}</strong>
                 </p>
                 <p style={{ color: 'var(--muted)' }} data-testid="host-connection">
-                  Connection: {socket.connected ? '✓ Room server connected' : '… Connecting'}
+                  {socket.connected ? 'Party server connected' : 'Connecting to party server…'}
                 </p>
               </div>
             </div>
@@ -622,22 +636,28 @@ export default function HostPage() {
           )}
 
           <div className="grid-2">
-            <div className="card stack">
-              <h3>Players ({room?.players.length ?? 0}/{MAX_PERFORMERS})</h3>
+            <div className="panel stack" data-testid="host-lobby">
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <h3>
+                  Players ({room?.players.length ?? 0}/{MAX_PERFORMERS})
+                </h3>
+                <span className="lobby-pulse" aria-hidden="true" title="Lobby live" />
+              </div>
               {(room?.players ?? []).map((p) => (
                 <div key={p.id} className="player-card" style={{ borderColor: p.color }}>
                   <div className="player-dot" style={{ background: p.color }} />
+                  <div style={{ color: p.color }}>{roleGlyph(p.role, 28)}</div>
                   <div>
                     <strong>{p.name}</strong>
                     <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
                       {p.role ? ROLES.find((r) => r.id === p.role)?.label : 'No role'} ·{' '}
-                      {p.ready ? '✓ Ready' : 'Not ready'}
+                      {p.ready ? 'Ready' : 'Not ready'}
                     </div>
                   </div>
                 </div>
               ))}
               {(room?.players.length ?? 0) === 0 && (
-                <p style={{ color: 'var(--muted)' }}>Waiting for players to join...</p>
+                <p style={{ color: 'var(--muted)' }}>Waiting for players to join…</p>
               )}
               <h3 style={{ marginTop: '0.75rem' }}>
                 Audience ({room?.audience?.length ?? 0})
@@ -684,9 +704,11 @@ export default function HostPage() {
                   </button>
                 </div>
               ))}
-              <DeviceRolePicker role={role} roles={roles} onChange={setRole} />
-              <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{profile.hints[0]}</p>
-              <AccessibilityPanel settings={settings} update={update} />
+              <SettingsDrawer>
+                <DeviceRolePicker role={role} roles={roles} onChange={setRole} />
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{profile.hints[0]}</p>
+                <AccessibilityPanel settings={settings} update={update} />
+              </SettingsDrawer>
               {(room?.phase === 'playing' || room?.phase === 'paused') && (
                 <button
                   className="btn-secondary"
@@ -703,7 +725,7 @@ export default function HostPage() {
               )}
             </div>
 
-            <div className="card stack">
+            <div className="panel stack">
               <h3>
                 Achievements ({room?.achievementSummary?.unlocked ?? 0}/
                 {room?.achievementSummary?.total ?? 0} ·{' '}
@@ -722,24 +744,31 @@ export default function HostPage() {
               )}
             </div>
 
-            <div className="card stack">
+            <div className="panel stack" data-testid="host-song-select">
               <h3>Select Song</h3>
               <div className="song-list">
-                {songs.map((s) => (
-                  <button
-                    type="button"
-                    key={s.id}
-                    className={`song-item ${room?.selectedSongId === s.id ? 'selected' : ''}`}
-                    onClick={() => selectSong(s.id)}
-                    data-testid={`select-song-${s.id}`}
-                  >
-                    <strong>{s.title}</strong>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
-                      {s.artist} · {Math.round(s.durationMs / 1000)}s · {s.bpm} BPM ·{' '}
-                      {s.license ?? 'catalog'}
-                    </div>
-                  </button>
-                ))}
+                {songs.map((s) => {
+                  const eligibility = catalogEligibility(s);
+                  return (
+                    <button
+                      type="button"
+                      key={s.id}
+                      className={`song-item eligibility-${eligibility.cls} ${room?.selectedSongId === s.id ? 'selected' : ''}`}
+                      onClick={() => selectSong(s.id)}
+                      data-testid={`select-song-${s.id}`}
+                      data-eligibility={eligibility.cls}
+                    >
+                      <div className="row" style={{ justifyContent: 'space-between', gap: '0.5rem' }}>
+                        <strong>{s.title}</strong>
+                        <span className={`status-badge status-playable`}>{eligibility.label}</span>
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+                        {s.artist} · {Math.round(s.durationMs / 1000)}s · {s.bpm} BPM ·{' '}
+                        {s.license ?? 'catalog'}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
 
               <div>
@@ -848,8 +877,8 @@ export default function HostPage() {
       )}
 
       {room?.phase === 'countdown' && (
-        <div className="stage">
-          <div className="countdown">{room.countdown}</div>
+        <div className="stage" data-testid="host-countdown" data-phase="countdown">
+          <div className="countdown">{room.countdown === 0 ? 'GO' : room.countdown}</div>
           <p style={{ textAlign: 'center', fontSize: '1.5rem' }}>Get ready!</p>
           {room.calibrationOffsetMs != null && (
             <p style={{ textAlign: 'center', color: 'var(--muted)' }}>
@@ -860,8 +889,10 @@ export default function HostPage() {
       )}
 
       {room?.phase === 'playing' && (
-        <div className="stage">
-          <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>LIVE</h2>
+        <div className="stage" data-testid="host-gameplay" data-phase="playing">
+          <h2 style={{ textAlign: 'center', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>
+            LIVE ON STAGE
+          </h2>
           <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '0.75rem' }}>
             Media: {mediaDescriptor.kind} — {mediaDescriptor.message}
           </p>
@@ -923,10 +954,10 @@ export default function HostPage() {
       )}
 
       {room?.phase === 'results' && results && (
-        <div className="stack">
+        <div className="stack" data-testid="host-results">
           <div className="stage" style={{ textAlign: 'center' }}>
-            <h2>Round Complete!</h2>
-            <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--accent3)' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)' }}>Celebration</h2>
+            <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--se-success-lime)' }}>
               {results.teamScore}
             </div>
             <p data-testid="host-results-meta">
@@ -938,7 +969,7 @@ export default function HostPage() {
           </div>
 
           <div className="grid-2">
-            <div className="card">
+            <div className="panel">
               <h3>Individual Scores</h3>
               {results.players.map((p) => (
                 <div key={p.id} className="player-card">
@@ -951,7 +982,7 @@ export default function HostPage() {
                 </div>
               ))}
             </div>
-            <div className="card">
+            <div className="panel">
               <h3>Awards</h3>
               <div className="stack">
                 {results.awards.map((a) => (
@@ -971,7 +1002,7 @@ export default function HostPage() {
             type="button"
             data-testid="host-rematch"
           >
-            Rematch / Next Song
+            Play Again / Next Song
           </button>
           <button className="btn-secondary btn-large" onClick={endRoom} type="button">
             End Room

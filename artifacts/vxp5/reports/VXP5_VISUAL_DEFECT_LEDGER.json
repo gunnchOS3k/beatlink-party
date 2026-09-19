@@ -1,0 +1,78 @@
+{
+  "program": "VXP-5",
+  "title": "Stage Energy visual defect ledger",
+  "base_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+  "categories": {
+    "hierarchy_and_flow": [],
+    "brand_and_typography": [],
+    "host_stage_readability": [],
+    "player_controller_ergonomics": [],
+    "music_compliance_presentation": [],
+    "network_and_reconnect_ux": [],
+    "accessibility_digital": [],
+    "responsive_viewports": []
+  },
+  "open_S0": 0,
+  "open_S1": 0,
+  "open_S2_digitally_solvable": 0,
+  "deferred_human_or_physical": [
+    {
+      "id": "VXP5-H1",
+      "severity": "S2",
+      "summary": "Human visual validation of Stage Energy party loop",
+      "status": "HUMAN_PENDING",
+      "gate": "HUMAN_VISUAL"
+    },
+    {
+      "id": "VXP5-H2",
+      "severity": "S2",
+      "summary": "Human fun validation in a live multiplayer party",
+      "status": "HUMAN_PENDING",
+      "gate": "HUMAN_FUN"
+    },
+    {
+      "id": "VXP5-H3",
+      "severity": "S2",
+      "summary": "Human accessibility validation with real assistive tech users",
+      "status": "HUMAN_PENDING",
+      "gate": "HUMAN_A11Y"
+    },
+    {
+      "id": "VXP5-P1",
+      "severity": "S2",
+      "summary": "Physical Pixel device capture unauthorized this lane",
+      "status": "PHYSICAL_PENDING",
+      "gate": "PIXEL_PHYSICAL"
+    }
+  ],
+  "resolved_digital": [
+    {
+      "id": "VXP5-D1",
+      "severity": "S2",
+      "summary": "Landing led with network-config / stacked forms",
+      "status": "FIXED",
+      "fix": "Create a Party / Join a Party first; settings demoted"
+    },
+    {
+      "id": "VXP5-D2",
+      "severity": "S2",
+      "summary": "Hype Captain used emoji in production controls",
+      "status": "FIXED",
+      "fix": "Original SVG glyphs"
+    },
+    {
+      "id": "VXP5-D3",
+      "severity": "S2",
+      "summary": "Song eligibility presented as raw enums only",
+      "status": "FIXED",
+      "fix": "PLAYABLE NOW / METADATA ONLY / NOT ELIGIBLE labels"
+    },
+    {
+      "id": "VXP5-D4",
+      "severity": "S2",
+      "summary": "Host/player surfaces not clearly dual-mode",
+      "status": "FIXED",
+      "fix": "page-host vs page-player Stage Energy shells"
+    }
+  ]
+}
