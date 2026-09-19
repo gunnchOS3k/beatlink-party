@@ -4,7 +4,7 @@
   "parent_head_sha": "3bef89875f2736f371ef46b6c674d52bb0358288",
   "observed_live_head_claimed": "99d29fb24f5a40577dad469585c0a86ba8537a74",
   "branch": "vxp/vxp-5-1-beatlink-human-feedback-start-game",
-  "worktree_head_at_stamp": "3bef89875f2736f371ef46b6c674d52bb0358288",
+  "worktree_head_at_stamp": "a7be25d47fa37924a15dbf0ce44ac00ff669ea83",
   "stamped_at": "2026-09-19T21:09:50.242Z",
   "gates": {
     "VXP51_HUMAN_PATH_REPRODUCED": true,
