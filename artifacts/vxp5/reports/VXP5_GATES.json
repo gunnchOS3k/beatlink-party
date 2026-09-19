@@ -2,7 +2,6 @@
   "program": "VXP-5",
   "title": "BeatLink Party Stage Energy visual experience",
   "base_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
-  "head_sha_pending_commit": true,
   "branch": "vxp/vxp-5-beatlink-party-stage-energy",
   "expected_main_at_prompt": "22a21a411463344450f121d281b3a0dba27f1c56",
   "live_origin_main": "22a21a411463344450f121d281b3a0dba27f1c56",
@@ -36,5 +35,6 @@
     "wan_carrier_claimed": false,
     "capture_ports": "web:5180 server:3010 (5173/3001 occupied by stale listeners)"
   },
-  "notes": "Digital closure for Stage Energy presentation. Human/physical/music-rights/merge gates remain false. DO NOT MERGE."
+  "notes": "Digital closure for Stage Energy presentation. Human/physical/music-rights/merge gates remain false. DO NOT MERGE.",
+  "head_sha": "17f94c953295dc729c68314b1188fc2e806b3767"
 }
