@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-label="Vocalist glyph">
+  <title>Vocalist  Stage Energy original glyph (cue timing, not pitch claim)</title>
+  <path d="M10 30c4-8 8-12 14-12s10 4 14 12" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M14 34c3.5-5.5 6.5-8 10-8s6.5 2.5 10 8" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <rect x="20" y="10" width="8" height="12" rx="4" stroke="#8b5cf6" stroke-width="3"/>
+  <path d="M18 38h12" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round"/>
+</svg>

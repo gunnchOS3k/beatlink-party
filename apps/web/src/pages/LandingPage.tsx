@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateRoom, useSocket } from '../lib/socket';
 import { isBackendConfigured } from '../lib/api';
+import { GlyphJoin, GlyphParty } from '../brand/glyphs';
 import {
-  AccessibilityPanel,
-  DeviceRolePicker,
-  useAccessibility,
-  useDeviceRole,
-} from '../lib/deviceSettings';
+  BrandMark,
+  HowToPlay,
+  PartyLoop,
+  PRODUCT_NAME,
+  SurfaceShell,
+} from '../components/StageChrome';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -16,8 +18,6 @@ export default function LandingPage() {
   const backendReady = isBackendConfigured();
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { role, setRole, roles, profile } = useDeviceRole(false);
-  const { settings, update } = useAccessibility();
 
   async function handleCreate() {
     if (!backendReady) {
@@ -39,84 +39,65 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="page">
-      <div className="hero">
-        <h1>BeatLink Party</h1>
-        <p>
-          Rhythm + karaoke party game. Host on the big screen, play from your phone — or spectate as
-          audience.
+    <SurfaceShell
+      surface="host"
+      connected={connected || creating}
+      backendReady={backendReady}
+      preferHost
+      networkCompact={connected}
+    >
+      <header className="hero">
+        <BrandMark as="h1" />
+        <p className="brand-sub">
+          Festival energy on the big screen. Friends on phones. One room code — then the stage takes
+          over.
         </p>
-        {!backendReady && (
-          <div className="compliance-banner" style={{ marginBottom: '1rem' }}>
-            <strong>Setup required.</strong> This install does not include a hosted room server.
-            Configure <code>VITE_API_URL</code> and <code>VITE_WS_URL</code> at build time, or run
-            the dev server on your network. You can still browse Join and read the how-to flow
-            offline.
-          </div>
-        )}
+        <p className="sr-only">{PRODUCT_NAME} party loop</p>
+
         {error && (
           <div
             className="compliance-banner"
-            style={{ marginBottom: '1rem', borderColor: 'var(--accent)' }}
+            style={{ marginBottom: '1rem', borderColor: 'var(--danger)', textAlign: 'left' }}
           >
-            <strong>Could not create room.</strong> {error}
+            <strong>Could not create party.</strong> {error}
           </div>
         )}
-        {backendReady && !connected && !creating && (
-          <div className="compliance-banner" style={{ marginBottom: '1rem' }}>
-            Connecting to room server…
-          </div>
-        )}
-        <div className="stack" style={{ maxWidth: 400, margin: '0 auto' }}>
+
+        <div className="cta-stack">
           <button
             className="btn-primary btn-large"
             onClick={handleCreate}
             disabled={!backendReady || creating}
             data-testid="create-room"
           >
-            {creating ? 'Creating room…' : 'Create Room (Host)'}
-          </button>
-          <button className="btn-secondary btn-large" onClick={() => navigate('/join')}>
-            Join with Code (Player)
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.55rem' }}>
+              <GlyphParty size={22} />
+              {creating ? 'Opening stage…' : 'Create a Party'}
+            </span>
           </button>
           <button
             className="btn-secondary btn-large"
+            onClick={() => navigate('/join')}
+            data-testid="join-party"
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.55rem' }}>
+              <GlyphJoin size={22} />
+              Join a Party
+            </span>
+          </button>
+          <button
+            className="btn-ghost"
             onClick={() => navigate('/join?seat=audience')}
+            data-testid="watch-audience"
           >
             Watch as Audience
           </button>
         </div>
-      </div>
-      <div className="card stack" style={{ maxWidth: 700, margin: '2rem auto' }}>
-        <h3>First minutes</h3>
-        <ol style={{ paddingLeft: '1.25rem', color: 'var(--muted)', lineHeight: 1.8 }}>
-          <li>Host creates a room on the big screen.</li>
-          <li>Players join with the code; audience can spectate.</li>
-          <li>Pick a role, choose a local/open catalog song (no DRM rip).</li>
-          <li>Calibrate once, then play Beat Tap for the first fun loop.</li>
-          <li>See scores, rematch, or leave — Socket.IO topology, not a static page.</li>
-        </ol>
-        <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
-          Guided first-minutes path is digital. Human first-fun-in-minutes remains HUMAN_PENDING.
-        </p>
-        <h3>How to play</h3>
-        <ol style={{ paddingLeft: '1.25rem', color: 'var(--muted)', lineHeight: 1.8 }}>
-          <li>Host creates a room and displays the code on a TV or laptop.</li>
-          <li>Players join at <strong>/join</strong> with the room code.</li>
-          <li>Audience can spectate and send moderated hype/votes (rate-limited).</li>
-          <li>Pick a role: Beat Tapper, Vocalist, or Hype Captain.</li>
-          <li>Host selects a local/open catalog song (or approved demo) and starts the round.</li>
-          <li>Perform from your phone — score awards at the end!</li>
-        </ol>
-        <div className="compliance-banner">
-          Music compliance: pasted YouTube/Spotify/Apple links are metadata-only. Official provider
-          playback is EXTERNAL_PENDING without credentials. No audio is downloaded or DRM-bypassed.
-          Use owned/open/local catalog songs for gameplay.
-        </div>
-        <DeviceRolePicker role={role} roles={roles} onChange={setRole} />
-        <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{profile.hints.join(' · ')}</p>
-        <AccessibilityPanel settings={settings} update={update} />
-      </div>
-    </div>
+
+        <PartyLoop />
+      </header>
+
+      <HowToPlay />
+    </SurfaceShell>
   );
 }

@@ -1,0 +1,48 @@
+{
+  "program": "VXP-5",
+  "label": "STAGE_ENERGY",
+  "player_facing_name": "BeatLink Party",
+  "assets": [
+    {
+      "path": "apps/web/public/brand/glyphs/beat.svg",
+      "kind": "glyph",
+      "origin": "ORIGINAL_INTERNAL",
+      "author": "gunnchOS3k / VXP-5 agent",
+      "license": "MIT (repo LICENSE)"
+    },
+    {
+      "path": "apps/web/public/brand/glyphs/vocal.svg",
+      "kind": "glyph",
+      "origin": "ORIGINAL_INTERNAL",
+      "author": "gunnchOS3k / VXP-5 agent",
+      "license": "MIT (repo LICENSE)"
+    },
+    {
+      "path": "apps/web/public/brand/glyphs/hype.svg",
+      "kind": "glyph",
+      "origin": "ORIGINAL_INTERNAL",
+      "author": "gunnchOS3k / VXP-5 agent",
+      "license": "MIT (repo LICENSE)"
+    },
+    {
+      "path": "apps/web/src/brand/glyphs.tsx",
+      "kind": "glyph_component",
+      "origin": "ORIGINAL_INTERNAL",
+      "license": "MIT (repo LICENSE)"
+    },
+    {
+      "path": "apps/web/src/styles/stage-energy.css",
+      "kind": "theme",
+      "origin": "ORIGINAL_INTERNAL",
+      "license": "MIT (repo LICENSE)"
+    }
+  ],
+  "typography": {
+    "display": "Space Grotesk",
+    "body": "Outfit",
+    "source": "Google Fonts CDN",
+    "license": "SIL Open Font License 1.1",
+    "vendored_locally": false,
+    "note": "CDN load for draft; local woff2 vendoring optional follow-up"
+  }
+}

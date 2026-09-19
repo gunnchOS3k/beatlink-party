@@ -27,6 +27,16 @@ import {
   useAccessibility,
   useDeviceRole,
 } from '../lib/deviceSettings';
+import { NetworkStatus, SettingsDrawer } from '../components/NetworkStatus';
+import {
+  GlyphBeat,
+  GlyphBoost,
+  GlyphCheer,
+  GlyphCombo,
+  GlyphLights,
+  GlyphVocal,
+  roleGlyph,
+} from '../brand/glyphs';
 
 const PLAYER_STORAGE_KEY = 'beatlink_player';
 
@@ -269,11 +279,17 @@ export default function PlayerPage() {
 
   if (!joined) {
     return (
-      <div className="page">
+      <div className="page page-player" data-surface="player-join" data-testid="player-join">
+        <NetworkStatus connected={socket.connected} />
         <div className="hero">
-          <h1 style={{ fontSize: '2rem' }}>Join {code}</h1>
+          <p className="brand-mark" style={{ fontSize: '2rem' }}>
+            BeatLink Party
+          </p>
+          <h1 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-display)', marginTop: '0.75rem' }}>
+            Join {code}
+          </h1>
         </div>
-        <div className="card stack" style={{ maxWidth: 400, margin: '0 auto' }}>
+        <div className="panel stack" style={{ maxWidth: 400, margin: '0 auto' }}>
           <div>
             <label className="label">Display Name</label>
             <input
@@ -293,9 +309,12 @@ export default function PlayerPage() {
 
   if (room?.phase === 'calibrating') {
     return (
-      <div className="page">
-        <div className="card stack" style={{ textAlign: 'center' }}>
-          <h2>Host is calibrating</h2>
+      <div className="page page-player" data-surface="player-calibrating">
+        <div className="panel stack" style={{ textAlign: 'center' }}>
+          <div className="waiting-energy">
+            <div className="spot" aria-hidden="true" />
+            <h2>Host is calibrating</h2>
+          </div>
           <p style={{ color: 'var(--muted)' }}>
             Latency offset: {room.calibrationOffsetMs ?? 0} ms. Get ready — countdown starts next.
           </p>
@@ -312,9 +331,14 @@ export default function PlayerPage() {
 
   if (room?.phase === 'lobby' || room?.phase === 'song_select') {
     return (
-      <div className="page">
-        <div className="card stack">
-          <h2>Welcome, {player?.name}!</h2>
+      <div className="page page-player" data-surface="player-lobby" data-testid="player-lobby">
+        <NetworkStatus connected={socket.connected} compact={socket.connected} />
+        <div className="panel stack">
+          <h2 style={{ fontFamily: 'var(--font-display)' }}>Welcome, {player?.name}!</h2>
+          <div className="waiting-energy">
+            <div className="spot" aria-hidden="true" />
+            <p style={{ color: 'var(--muted)' }}>Stage is warming up — pick a role and get ready.</p>
+          </div>
           {room.linkResolveResult ? (
             <div className="compliance-banner">
               <span className="status-badge status-metadata">{room.linkResolveResult.playbackStatus}</span>
@@ -325,16 +349,20 @@ export default function PlayerPage() {
             </div>
           ) : null}
           <p style={{ color: 'var(--muted)' }}>Choose your role</p>
-          <div className="role-grid">
+          <div className="role-grid" data-testid="player-role-select">
             {ROLES.map((r) => (
               <button
                 key={r.id}
                 className={`role-btn ${player?.role === r.id ? 'selected' : ''}`}
+                data-role={r.id}
                 onClick={() => setRole(r.id)}
                 data-testid={`role-${r.id}`}
               >
-                <strong>{r.label}</strong>
-                <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>{r.description}</div>
+                <span style={{ color: 'var(--se-electric-cyan)' }}>{roleGlyph(r.id, 36)}</span>
+                <span>
+                  <strong>{r.label}</strong>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>{r.description}</div>
+                </span>
               </button>
             ))}
           </div>
@@ -346,7 +374,7 @@ export default function PlayerPage() {
           >
             {player?.ready ? 'Not Ready' : 'Ready!'}
           </button>
-          <div className="card stack" data-testid="device-calibration-panel">
+          <div className="panel stack" data-testid="device-calibration-panel">
             <h3>Device timing calibration</h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
               Tap samples measure input latency. Audio output latency stays unknown/null in this
@@ -381,8 +409,10 @@ export default function PlayerPage() {
               Claim Host (previous host disconnected)
             </button>
           )}
-          <DeviceRolePicker role={deviceRole} roles={deviceRoles} onChange={setDeviceRole} />
-          <AccessibilityPanel settings={settings} update={update} />
+          <SettingsDrawer>
+            <DeviceRolePicker role={deviceRole} roles={deviceRoles} onChange={setDeviceRole} />
+            <AccessibilityPanel settings={settings} update={update} />
+          </SettingsDrawer>
         </div>
       </div>
     );
@@ -390,17 +420,26 @@ export default function PlayerPage() {
 
   if (room?.phase === 'countdown') {
     return (
-      <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="countdown">{room.countdown}</div>
+      <div
+        className="page page-player"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        data-testid="player-countdown"
+        data-phase="countdown"
+      >
+        <div className="countdown">{room.countdown === 0 ? 'GO' : room.countdown}</div>
       </div>
     );
   }
 
   if (room?.phase === 'playing' && player) {
     return (
-      <div className="page">
+      <div className="page page-player" data-surface="player-controller" data-testid="player-controller">
+        <NetworkStatus connected={socket.connected} compact={socket.connected} />
         <div className="row" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <span>{ROLES.find((r) => r.id === player.role)?.label}</span>
+          <span className="row" style={{ gap: '0.5rem' }}>
+            {roleGlyph(player.role, 24)}
+            {ROLES.find((r) => r.id === player.role)?.label}
+          </span>
           <span>Score: {player.score}</span>
           <span>
             Streak: {player.streak} · {describeCombo(player.combo ?? 1)}
@@ -426,7 +465,7 @@ export default function PlayerPage() {
         )}
 
         {room.gameMode === 'PredictionTrivia' && beatmap && (
-          <div className="card stack" style={{ marginBottom: '1rem', textAlign: 'center' }}>
+          <div className="panel stack" style={{ marginBottom: '1rem', textAlign: 'center' }}>
             <p className="label">Predict the next section</p>
             {(() => {
               const target = nextPredictionSection(beatmap.sections, gameTimeMs);
@@ -457,8 +496,9 @@ export default function PlayerPage() {
         )}
 
         {player.role === 'beat_tapper' && (
-          <div className="stack" style={{ alignItems: 'center', width: '100%' }}>
+          <div className="stack" style={{ alignItems: 'center', width: '100%' }} data-testid="controller-beat-tapper">
             <button className="tap-button" onClick={handleTap} data-testid="performer-tap">
+              <GlyphBeat size={40} />
               TAP
             </button>
             <button
@@ -472,10 +512,10 @@ export default function PlayerPage() {
         )}
 
         {player.role === 'vocalist' && (
-          <div className="stack" style={{ alignItems: 'center' }}>
-            <div className="card" style={{ textAlign: 'center', width: '100%' }}>
+          <div className="stack" style={{ alignItems: 'center' }} data-testid="controller-vocalist">
+            <div className="panel" style={{ textAlign: 'center', width: '100%' }}>
               <p className="label">
-                Karaoke · {karaokeState?.phase ?? 'idle'}
+                <GlyphVocal size={20} /> Karaoke cue · {karaokeState?.phase ?? 'idle'}
                 {karaokeState?.msUntilStart != null && karaokeState.phase === 'upcoming'
                   ? ` · in ${Math.ceil(karaokeState.msUntilStart / 1000)}s`
                   : ''}
@@ -513,40 +553,48 @@ export default function PlayerPage() {
               data-testid="vocal-path-truth"
             >
               VOCAL_PROMPT_TIMING_MODE — MICROPHONE_PITCH_ANALYSIS=false ·
-              GENERAL_VOCAL_RECOGNITION=false. No audio stored.
+              GENERAL_VOCAL_RECOGNITION=false. No audio stored. No fake pitch meter.
             </p>
           </div>
         )}
 
         {player.role === 'hype_captain' && (
-          <div className="hype-grid">
+          <div className="hype-grid" data-testid="controller-hype-captain">
             <button
               className="hype-btn cheer"
               onClick={() => handleHype('cheer')}
               disabled={hypeCooldown}
+              data-testid="hype-cheer"
             >
-              🎉 Cheer
+              <GlyphCheer size={32} />
+              Cheer
             </button>
             <button
               className="hype-btn lights"
               onClick={() => handleHype('lights')}
               disabled={hypeCooldown}
+              data-testid="hype-lights"
             >
-              💡 Lights
+              <GlyphLights size={32} />
+              Lights
             </button>
             <button
               className="hype-btn boost"
               onClick={() => handleHype('boost')}
               disabled={hypeCooldown}
+              data-testid="hype-boost"
             >
-              🚀 Boost
+              <GlyphBoost size={32} />
+              Boost
             </button>
             <button
               className="hype-btn combo"
               onClick={() => handleHype('combo_save')}
               disabled={hypeCooldown}
+              data-testid="hype-combo"
             >
-              ⚡ Combo Save
+              <GlyphCombo size={32} />
+              Combo Save
             </button>
           </div>
         )}
@@ -558,10 +606,10 @@ export default function PlayerPage() {
     const myResult = results.players.find((p) => p.id === player?.id);
     const myAwards = results.awards.filter((a) => a.playerId === player?.id);
     return (
-      <div className="page stack">
-        <div className="card" style={{ textAlign: 'center' }}>
-          <h2>Your Results</h2>
-          <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--accent3)' }} data-testid="performer-result-score">
+      <div className="page page-player stack" data-testid="player-results">
+        <div className="panel" style={{ textAlign: 'center' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)' }}>Your Results</h2>
+          <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--se-success-lime)' }} data-testid="performer-result-score">
             {myResult?.score ?? 0}
           </div>
           <p data-testid="performer-ledger-checksum">
@@ -570,7 +618,7 @@ export default function PlayerPage() {
           <p>Accuracy: {myResult?.accuracy ?? 0}% · Best streak: {myResult?.maxStreak ?? 0}</p>
         </div>
         {myAwards.length > 0 && (
-          <div className="card">
+          <div className="panel">
             <h3>Your Awards</h3>
             {myAwards.map((a) => (
               <div key={a.id} className="award-card" style={{ marginTop: '0.5rem' }}>
@@ -583,7 +631,7 @@ export default function PlayerPage() {
           Waiting for host to start next round...
         </p>
         {room?.achievementSummary && (
-          <div className="card">
+          <div className="panel">
             <h3>
               Achievements {room.achievementSummary.unlocked}/{room.achievementSummary.total} (
               {Math.round(room.achievementSummary.percent)}%)
@@ -595,8 +643,9 @@ export default function PlayerPage() {
   }
 
   return (
-    <div className="page">
-      <p style={{ textAlign: 'center', color: 'var(--muted)' }}>Connecting...</p>
+    <div className="page page-player">
+      <NetworkStatus connected={socket.connected} />
+      <p style={{ textAlign: 'center', color: 'var(--muted)' }}>Connecting to party…</p>
     </div>
   );
 }
