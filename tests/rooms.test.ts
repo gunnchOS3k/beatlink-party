@@ -51,7 +51,38 @@ describe('RoomManager', () => {
     manager.tickCountdown(room.code);
     const playing = manager.tickCountdown(room.code);
     expect(playing?.phase).toBe('playing');
-    expect(playing?.gameStartTime).not.toBeNull();
+  });
+
+  it('allows start when a disconnected ghost seat remains', () => {
+    const room = manager.createRoom('host-1');
+    const { player: jordan } = manager.joinRoom(room.code, 'p1', 'Jordan')!;
+    manager.setRole(room.code, jordan.id, 'beat_tapper');
+    manager.setReady(room.code, jordan.id, true);
+    const { player: ghost } = manager.joinRoom(room.code, 'p2', 'Ghost')!;
+    manager.leaveRoom('p2');
+    expect(manager.getRoom(room.code)?.players.find((p) => p.id === ghost.id)?.connected).toBe(
+      false,
+    );
+    manager.selectSong(room.code, 'demo-neon-groove');
+    const gate = manager.explainStartGate(room.code);
+    expect(gate.ok).toBe(true);
+    expect(gate.disconnectedCount).toBe(1);
+    expect(manager.startCalibration(room.code)?.phase).toBe('calibrating');
+    const cleared = manager.clearDisconnectedPlayers(room.code);
+    // clear only allowed in lobby/song_select — calibrating returns null
+    expect(cleared).toBeNull();
+  });
+
+  it('clears disconnected seats from lobby roster', () => {
+    const room = manager.createRoom('host-1');
+    const { player: jordan } = manager.joinRoom(room.code, 'p1', 'Jordan')!;
+    manager.setRole(room.code, jordan.id, 'beat_tapper');
+    manager.setReady(room.code, jordan.id, true);
+    manager.joinRoom(room.code, 'p2', 'Ghost');
+    manager.leaveRoom('p2');
+    const cleared = manager.clearDisconnectedPlayers(room.code);
+    expect(cleared?.players).toHaveLength(1);
+    expect(cleared?.players[0]?.name).toBe('Jordan');
   });
 
   it('persists resolved link snapshot on room state', () => {

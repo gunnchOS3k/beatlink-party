@@ -1,0 +1,29 @@
+{
+  "parent_pr": 28,
+  "parent_head_sha": "3bef89875f2736f371ef46b6c674d52bb0358288",
+  "observed_live_head_claimed": "99d29fb24f5a40577dad469585c0a86ba8537a74",
+  "discrepancy": "Observed SHA is ancestor of live PR #28 head; stacked on live head 3bef89875f2736f371ef46b6c674d52bb0358288",
+  "branch": "vxp/vxp-5-1-beatlink-human-feedback-start-game",
+  "worktree_head": "3bef89875f2736f371ef46b6c674d52bb0358288",
+  "authoritative_gate": "packages/game-engine/src/startPreconditions.ts",
+  "server_methods": ["explainStartGate", "explainCountdownGate", "startCalibration", "startCountdown", "clearDisconnectedPlayers"],
+  "preconditions": [
+    {"id": "room_exists", "check": "Room present in RoomManager"},
+    {"id": "host_permission", "check": "authorizeHost(hostToken) required for start_calibration/submit/countdown"},
+    {"id": "min_connected_players", "check": ">=1 connected player"},
+    {"id": "role_selected", "check": "every connected player.role !== null"},
+    {"id": "ready", "check": "every connected player.ready === true"},
+    {"id": "approved_playable_song", "check": "selectedSongId + beatmap present (catalog demo track)"},
+    {"id": "beatmap_ready", "check": "InternalRoom.beatmap non-null before calibration/countdown"},
+    {"id": "phase_lobby_or_song_select", "check": "startCalibration only from lobby|song_select"},
+    {"id": "phase_calibrating_for_countdown", "check": "startCountdown only from calibrating"},
+    {"id": "disconnected_do_not_block", "check": "connected seats only; ghosts ignored by gate"},
+    {"id": "countdown_not_already_active", "check": "WRONG_PHASE / COUNTDOWN_ALREADY blockers"}
+  ],
+  "human_path_root_cause": {
+    "primary": "Host Start CTA evaluated ALL players including disconnected seats, while server assertCanStart used connected-only. A join/leave ghost soft-locked Start with no reason UI.",
+    "secondary": "game.submit_calibration socket handler was missing (Wave007 regression); countdown still fired via 50ms timeout but calibration save was a silent no-op and failures were silent.",
+    "tertiary": "Disabled Start had no explicit human-readable reason; server rejects returned without room.error."
+  },
+  "phases": ["lobby", "song_select", "calibrating", "countdown", "playing", "results"]
+}

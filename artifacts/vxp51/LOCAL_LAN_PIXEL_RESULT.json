@@ -1,0 +1,23 @@
+{
+  "authentic_pixel_device": true,
+  "pixel_serial": "27211JEGR06194",
+  "pixel_model": "Pixel_6a",
+  "lan_ip": "10.0.0.113",
+  "pixel_api_reachable": false,
+  "pixel_web_reachable": false,
+  "pixel_chrome_join_page_opened": true,
+  "pixel_full_interactive_start_automated": false,
+  "lan_equivalent_browser_start_pass": true,
+  "room_code": "L24CJ",
+  "phase": "playing",
+  "notes": [
+    "pixel_curl_error=Command failed: adb shell curl -s --max-time 5 http://10.0.0.113:3020/health\n/system/bin/sh: curl: inaccessible or not found\n",
+    "pixel_health=",
+    "pixel_web_http=",
+    "room=L24CJ",
+    "pixel_chrome_opened",
+    "pixel_screenshot_join_open=true",
+    "phase=playing round=L24CJ-r0-1789852158628",
+    "pixel_screenshot_during=true"
+  ]
+}

@@ -415,12 +415,65 @@ socket.on(
       },
     );
 
-    socket.on('game.start_calibration', (data: { code: string; hostToken?: string }) => {
-      const code = data.code.toUpperCase();
-      if (!requireHost(code, socket.id, data.hostToken)) return;
-      const room = roomManager.startCalibration(code);
-      if (room) io.to(code).emit('room.state', room);
-    });
+    socket.on(
+      'game.start_calibration',
+      (
+        data: { code: string; hostToken?: string },
+        cb?: (result: { ok: boolean; error?: string; reasonCode?: string }) => void,
+      ) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) {
+          const error = 'Host permission required to start';
+          structuredLog('start_calibration_denied', { code, reason: 'host_auth' });
+          socket.emit('room.error', { error, code: 'HOST_REQUIRED' });
+          cb?.({ ok: false, error, reasonCode: 'HOST_REQUIRED' });
+          return;
+        }
+        const gate = roomManager.explainStartGate(code);
+        const room = roomManager.startCalibration(code);
+        if (!room) {
+          const error = gate.reason ?? 'Cannot start yet';
+          const reasonCode = gate.blockers[0]?.code ?? 'WRONG_PHASE';
+          structuredLog('start_calibration_denied', {
+            code,
+            reason: reasonCode,
+            detail: error,
+          });
+          socket.emit('room.error', { error, code: reasonCode });
+          cb?.({ ok: false, error, reasonCode });
+          return;
+        }
+        io.to(code).emit('room.state', room);
+        cb?.({ ok: true });
+      },
+    );
+
+    socket.on(
+      'game.submit_calibration',
+      (
+        data: { code: string; offsetMs?: number; hostToken?: string },
+        cb?: (result: { ok: boolean; error?: string }) => void,
+      ) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) {
+          const error = 'Host permission required to save calibration';
+          structuredLog('submit_calibration_denied', { code, reason: 'host_auth' });
+          socket.emit('room.error', { error, code: 'HOST_REQUIRED' });
+          cb?.({ ok: false, error });
+          return;
+        }
+        const room = roomManager.submitCalibration(code, data.offsetMs);
+        if (!room) {
+          const error = 'Calibration is not active — start calibration first';
+          structuredLog('submit_calibration_denied', { code, reason: 'not_calibrating' });
+          socket.emit('room.error', { error, code: 'NOT_CALIBRATING' });
+          cb?.({ ok: false, error });
+          return;
+        }
+        io.to(code).emit('room.state', room);
+        cb?.({ ok: true });
+      },
+    );
 
     socket.on(
       'game.submit_player_device_calibration',
@@ -499,6 +552,24 @@ socket.on(
     });
 
     socket.on(
+      'room.clear_disconnected',
+      (data: { code: string; hostToken?: string }, cb?: (result: { ok: boolean; error?: string }) => void) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) {
+          cb?.({ ok: false, error: 'Host permission required' });
+          return;
+        }
+        const room = roomManager.clearDisconnectedPlayers(code);
+        if (!room) {
+          cb?.({ ok: false, error: 'Unable to clear disconnected players' });
+          return;
+        }
+        io.to(code).emit('room.state', room);
+        cb?.({ ok: true });
+      },
+    );
+
+    socket.on(
       'room.update_privacy',
       (data: {
         code: string;
@@ -518,43 +589,68 @@ socket.on(
       },
     );
 
-    socket.on('game.start_countdown', (data: { code: string; hostToken?: string }) => {
-      const code = data.code.toUpperCase();
-      if (!requireHost(code, socket.id, data.hostToken)) return;
-      const room = roomManager.startCountdown(code);
-      if (!room) return;
-      io.to(code).emit('game.countdown', { room, countdown: room.countdown });
-      const interval = setInterval(() => {
-        const updated = roomManager.tickCountdown(code);
-        if (!updated) {
-          clearInterval(interval);
+    socket.on(
+      'game.start_countdown',
+      (
+        data: { code: string; hostToken?: string },
+        cb?: (result: { ok: boolean; error?: string; reasonCode?: string }) => void,
+      ) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) {
+          const error = 'Host permission required to start countdown';
+          structuredLog('start_countdown_denied', { code, reason: 'host_auth' });
+          socket.emit('room.error', { error, code: 'HOST_REQUIRED' });
+          cb?.({ ok: false, error, reasonCode: 'HOST_REQUIRED' });
           return;
         }
-        if (updated.phase === 'playing') {
-          clearInterval(interval);
-          const beatmap = roomManager.getBeatmap(code);
-          io.to(code).emit('game.started', {
-            room: updated,
-            beatmap,
-            startTime: Date.now(),
+        const gate = roomManager.explainCountdownGate(code);
+        const room = roomManager.startCountdown(code);
+        if (!room) {
+          const error = gate.reason ?? 'Cannot start countdown yet';
+          const reasonCode = gate.blockers[0]?.code ?? 'WRONG_PHASE';
+          structuredLog('start_countdown_denied', {
+            code,
+            reason: reasonCode,
+            detail: error,
           });
-          const duration = updated.gameDurationMs;
-          setTimeout(() => {
-            const results = roomManager.endGame(code);
-            const finalRoom = roomManager.getRoom(code);
-            io.to(code).emit('game.ended', {
-              room: roomManager.stripInternal(finalRoom!),
-              results,
-            });
-          }, duration + 500);
-        } else {
-          io.to(code).emit('game.countdown', {
-            room: updated,
-            countdown: updated.countdown,
-          });
+          socket.emit('room.error', { error, code: reasonCode });
+          cb?.({ ok: false, error, reasonCode });
+          return;
         }
-      }, 1000);
-    });
+        cb?.({ ok: true });
+        io.to(code).emit('game.countdown', { room, countdown: room.countdown });
+        const interval = setInterval(() => {
+          const updated = roomManager.tickCountdown(code);
+          if (!updated) {
+            clearInterval(interval);
+            return;
+          }
+          if (updated.phase === 'playing') {
+            clearInterval(interval);
+            const beatmap = roomManager.getBeatmap(code);
+            io.to(code).emit('game.started', {
+              room: updated,
+              beatmap,
+              startTime: Date.now(),
+            });
+            const duration = updated.gameDurationMs;
+            setTimeout(() => {
+              const results = roomManager.endGame(code);
+              const finalRoom = roomManager.getRoom(code);
+              io.to(code).emit('game.ended', {
+                room: roomManager.stripInternal(finalRoom!),
+                results,
+              });
+            }, duration + 500);
+          } else {
+            io.to(code).emit('game.countdown', {
+              room: updated,
+              countdown: updated.countdown,
+            });
+          }
+        }, 1000);
+      },
+    );
 
     socket.on('game.input', (data: { code: string; input: PlayerInputEvent }) => {
       const code = data.code.toUpperCase();
