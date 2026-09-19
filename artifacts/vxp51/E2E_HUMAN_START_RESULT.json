@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "room_code": "B5ZNW",
+  "host_countdown_seen": true,
+  "player_controls_visible": true,
+  "phase": "playing",
+  "selectedSongId": "demo-neon-groove",
+  "round_id": "B5ZNW-r0-1789852073691",
+  "ghost_disconnect_did_not_block_start": true,
+  "evidence_class": "REAL_MULTICLIENT_E2E"
+}

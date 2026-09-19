@@ -29,6 +29,7 @@ import {
   isCallAndResponseWindow,
   nextPredictionSection,
   resolveMediaDescriptor,
+  evaluateStartPreconditions,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -300,9 +301,8 @@ function CalibrationPanel({
           stop();
           onSubmit(average);
         }}
-        disabled={samples.length < 1 && currentOffsetMs === 0}
       >
-        Save Offset & Continue
+        Save Offset & Start
       </button>
       <button
         type="button"
@@ -313,7 +313,7 @@ function CalibrationPanel({
           onSubmit(0);
         }}
       >
-        Use 0 ms & Start Countdown
+        Skip Calibration & Start Countdown
       </button>
     </div>
   );
@@ -340,6 +340,8 @@ export default function HostPage() {
   const [playMode, setPlayMode] = useState<GameModeId>('BeatTap');
   const [hostToken, setHostToken] = useState<string>('');
   const [copied, setCopied] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
+  const [startPending, setStartPending] = useState(false);
   const metronomeRef = useRef<{ stop: () => void } | null>(null);
   const { role, setRole, roles, profile } = useDeviceRole(true);
   const { settings, update } = useAccessibility();
@@ -392,11 +394,21 @@ export default function HostPage() {
         setRoom(r);
         if (r.linkResolveResult) setLinkResult(r.linkResolveResult);
         if (r.pastedLinkUrl) setLinkUrl(r.pastedLinkUrl);
+        if (r.phase === 'calibrating' || r.phase === 'countdown' || r.phase === 'playing') {
+          setStartPending(false);
+          setStartError(null);
+        }
       },
-      onCountdown: (r: RoomState) => setRoom(r),
+      onCountdown: (r: RoomState) => {
+        setRoom(r);
+        setStartPending(false);
+        setStartError(null);
+      },
       onStarted: (r: RoomState, nextBeatmap: Beatmap | null) => {
         setRoom(r);
         setResults(null);
+        setStartPending(false);
+        setStartError(null);
         if (nextBeatmap) setBeatmap(nextBeatmap);
         if (nextBeatmap?.bpm) setBeatmapBpm(nextBeatmap.bpm);
       },
@@ -404,6 +416,7 @@ export default function HostPage() {
       onEnded: (r: RoomState, res: GameResults) => {
         setRoom(r);
         setResults(res);
+        setStartPending(false);
       },
       onPlayerJoined: setRoom,
       onPlayerLeft: setRoom,
@@ -412,6 +425,21 @@ export default function HostPage() {
   );
 
   useRoomEvents(code, handlers());
+
+  useEffect(() => {
+    const onError = (payload: { error?: string; code?: string }) => {
+      const message = payload?.error ?? 'Something went wrong';
+      setStartPending(false);
+      setStartError(message);
+      if (import.meta.env.DEV) {
+        console.warn('[beatlink] room.error', payload);
+      }
+    };
+    socket.on('room.error', onError);
+    return () => {
+      socket.off('room.error', onError);
+    };
+  }, [socket]);
 
   // Host metronome for PLAYABLE_APPROVED catalog rounds (no copyrighted audio files).
   useEffect(() => {
@@ -494,15 +522,44 @@ export default function HostPage() {
 
   function startCalibration() {
     void resumeAudioContext();
-    socket.emit('game.start_calibration', { code, hostToken });
+    setStartError(null);
+    setStartPending(true);
+    socket.emit(
+      'game.start_calibration',
+      { code, hostToken },
+      (result?: { ok?: boolean; error?: string }) => {
+        if (result && result.ok === false) {
+          setStartPending(false);
+          setStartError(result.error ?? 'Cannot start yet');
+        }
+      },
+    );
   }
 
   function submitCalibration(offsetMs: number) {
-    socket.emit('game.submit_calibration', { code, offsetMs, hostToken });
-    // After save, host starts countdown
-    window.setTimeout(() => {
-      socket.emit('game.start_countdown', { code, hostToken });
-    }, 50);
+    setStartError(null);
+    setStartPending(true);
+    socket.emit(
+      'game.submit_calibration',
+      { code, offsetMs, hostToken },
+      (submitResult?: { ok?: boolean; error?: string }) => {
+        if (submitResult && submitResult.ok === false) {
+          setStartPending(false);
+          setStartError(submitResult.error ?? 'Could not save calibration');
+          return;
+        }
+        socket.emit(
+          'game.start_countdown',
+          { code, hostToken },
+          (countdownResult?: { ok?: boolean; error?: string }) => {
+            if (countdownResult && countdownResult.ok === false) {
+              setStartPending(false);
+              setStartError(countdownResult.error ?? 'Could not start countdown');
+            }
+          },
+        );
+      },
+    );
   }
 
   function rematch() {
@@ -542,19 +599,13 @@ export default function HostPage() {
       fallbackBpm: beatmapBpm,
     });
   }, [songs, room?.selectedSongId, displayResult, beatmapBpm]);
-  const canStartCalibration = useMemo(() => {
-    if (!room?.selectedSongId || (room.players?.length ?? 0) < 1) return false;
-    const ready = room.players.every((p) => p.ready && p.role);
-    if (!ready) return false;
-    if (
-      displayResult &&
-      displayResult.playbackStatus !== 'PLAYABLE_APPROVED' &&
-      !room.selectedSongId
-    ) {
-      return false;
-    }
-    return true;
-  }, [room, displayResult]);
+  const startGate = useMemo(() => evaluateStartPreconditions(room), [room]);
+  const canStartCalibration = startGate.ok;
+  const startDisabledReason = startGate.reason;
+  const disconnectedPlayers = useMemo(
+    () => (room?.players ?? []).filter((p) => !p.connected),
+    [room],
+  );
 
   const joinUrl =
     room?.joinQr?.joinUrl ??
@@ -651,13 +702,39 @@ export default function HostPage() {
                     <strong>{p.name}</strong>
                     <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
                       {p.role ? ROLES.find((r) => r.id === p.role)?.label : 'No role'} ·{' '}
-                      {p.ready ? 'Ready' : 'Not ready'}
+                      {!p.connected
+                        ? 'Disconnected'
+                        : p.ready
+                          ? 'Ready'
+                          : 'Not ready'}
                     </div>
                   </div>
                 </div>
               ))}
               {(room?.players.length ?? 0) === 0 && (
                 <p style={{ color: 'var(--muted)' }}>Waiting for players to join…</p>
+              )}
+              {disconnectedPlayers.length > 0 && (
+                <div
+                  className="compliance-banner"
+                  data-testid="host-disconnected-notice"
+                  style={{ marginTop: '0.5rem' }}
+                >
+                  <p style={{ marginBottom: '0.5rem' }}>
+                    {disconnectedPlayers.map((p) => p.name).join(', ')} disconnected — they do not
+                    block Start.
+                  </p>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    data-testid="host-clear-disconnected"
+                    onClick={() =>
+                      socket.emit('room.clear_disconnected', { code, hostToken }, () => undefined)
+                    }
+                  >
+                    Clear disconnected seats
+                  </button>
+                </div>
               )}
               <h3 style={{ marginTop: '0.75rem' }}>
                 Audience ({room?.audience?.length ?? 0})
@@ -847,15 +924,62 @@ export default function HostPage() {
               >
                 Auto-assign teams A/B
               </button>
-              <button
-                className="btn-primary btn-large"
-                onClick={startCalibration}
-                disabled={!canStartCalibration}
-                type="button"
-                data-testid="host-start-calibration"
-              >
-                Start Calibration
-              </button>
+              <div data-testid="host-start-cta" style={{ display: 'grid', gap: '0.5rem' }}>
+                <button
+                  className="btn-primary btn-large"
+                  onClick={startCalibration}
+                  disabled={!canStartCalibration || startPending}
+                  type="button"
+                  data-testid="host-start-calibration"
+                  data-start-state={
+                    startPending
+                      ? 'starting'
+                      : startError
+                        ? 'error'
+                        : canStartCalibration
+                          ? 'enabled'
+                          : 'disabled'
+                  }
+                  aria-describedby={
+                    !canStartCalibration || startError ? 'host-start-reason' : undefined
+                  }
+                >
+                  {startPending ? 'Starting…' : 'Start Game'}
+                </button>
+                <p
+                  id="host-start-reason"
+                  data-testid="host-start-reason"
+                  style={{
+                    fontSize: '0.9rem',
+                    color: startError ? 'var(--danger, #c44)' : 'var(--muted)',
+                    minHeight: '1.25rem',
+                    margin: 0,
+                  }}
+                >
+                  {startError
+                    ? startError
+                    : canStartCalibration
+                      ? 'Ready — calibration opens next, then countdown.'
+                      : startDisabledReason ?? 'Complete party setup to start'}
+                </p>
+                {startError ? (
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    data-testid="host-start-retry"
+                    onClick={() => {
+                      setStartError(null);
+                      if (room?.phase === 'calibrating') {
+                        submitCalibration(room.calibrationOffsetMs ?? 0);
+                      } else {
+                        startCalibration();
+                      }
+                    }}
+                  >
+                    Retry Start
+                  </button>
+                ) : null}
+              </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
                 Flow: song select → calibrate latency → countdown → play (host metronome for approved
                 catalog).

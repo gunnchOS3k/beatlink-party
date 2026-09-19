@@ -1,0 +1,53 @@
+{
+  "schema": "VXP51_START_GAME_GATES",
+  "parent_pr": 28,
+  "parent_head_sha": "3bef89875f2736f371ef46b6c674d52bb0358288",
+  "observed_live_head_claimed": "99d29fb24f5a40577dad469585c0a86ba8537a74",
+  "branch": "vxp/vxp-5-1-beatlink-human-feedback-start-game",
+  "worktree_head_at_stamp": "3bef89875f2736f371ef46b6c674d52bb0358288",
+  "stamped_at": "2026-09-19T21:09:50.242Z",
+  "gates": {
+    "VXP51_HUMAN_PATH_REPRODUCED": true,
+    "VXP51_START_PRECONDITIONS_EXPLICIT": true,
+    "VXP51_START_CTA_VISIBLE_PASS": true,
+    "VXP51_DISABLED_REASON_PASS": true,
+    "VXP51_APPROVED_TRACK_START_PASS": true,
+    "VXP51_HOST_COUNTDOWN_PASS": true,
+    "VXP51_PLAYER_COUNTDOWN_PASS": true,
+    "VXP51_PLAYING_PHASE_PASS": true,
+    "VXP51_MULTICLIENT_SYNC_PASS": true,
+    "VXP51_LOCAL_LAN_PIXEL_JOIN_PASS": false,
+    "VXP51_LOCAL_LAN_START_PASS": false,
+    "VXP51_E2E_COMPLETE_ROUND_PASS": true,
+    "VXP51_HUMAN_FUN_PASS": false,
+    "VXP51_HUMAN_PARTY_VALIDATION_PASS": false,
+    "VXP51_MERGE_AUTHORIZED": false
+  },
+  "notes": {
+    "pixel": "Pixel 6a attached; Chrome join page opened + screenshots. Full on-device role/Ready/Start not automated — Pixel join/start gates remain false. LAN-equivalent second browser context PASSED start path.",
+    "human_fun_merge": "False until Edmund re-tests a real party flow.",
+    "lan_equivalent": {
+      "authentic_pixel_device": true,
+      "pixel_serial": "27211JEGR06194",
+      "pixel_model": "Pixel_6a",
+      "lan_ip": "10.0.0.113",
+      "pixel_api_reachable": false,
+      "pixel_web_reachable": false,
+      "pixel_chrome_join_page_opened": true,
+      "pixel_full_interactive_start_automated": false,
+      "lan_equivalent_browser_start_pass": true,
+      "room_code": "L24CJ",
+      "phase": "playing",
+      "notes": [
+        "pixel_curl_error=Command failed: adb shell curl -s --max-time 5 http://10.0.0.113:3020/health\n/system/bin/sh: curl: inaccessible or not found\n",
+        "pixel_health=",
+        "pixel_web_http=",
+        "room=L24CJ",
+        "pixel_chrome_opened",
+        "pixel_screenshot_join_open=true",
+        "phase=playing round=L24CJ-r0-1789852158628",
+        "pixel_screenshot_during=true"
+      ]
+    }
+  }
+}

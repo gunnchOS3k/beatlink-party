@@ -1,0 +1,17 @@
+{
+  "notes": [
+    "A_not_ready: before ready disabled=true",
+    "A_not_ready: song-select text has reason? true snippet=when they hit the judgment line. Auto-assign teams A/B Start Calibration Flow: song select → calibrate latency → countdown → play (host metronome for approved catalog). End Room",
+    "A: still disabled=true (expected true, no reason UI)",
+    "B_stale_disconnect: before ready disabled=true",
+    "B_stale_disconnect: song-select text has reason? true snippet=when they hit the judgment line. Auto-assign teams A/B Start Calibration Flow: song select → calibrate latency → countdown → play (host metronome for approved catalog). End Room",
+    "B: after ready disabled=false",
+    "B: after ghost join disabled=true",
+    "B: after ghost leave players=[{\"name\":\"Jordan\",\"ready\":true,\"role\":\"beat_tapper\",\"connected\":true},{\"name\":\"Ghost\",\"ready\":false,\"role\":null,\"connected\":false}]",
+    "B: after ghost leave disabled=true",
+    "C_save_stuck: before ready disabled=true",
+    "C_save_stuck: song-select text has reason? true snippet=when they hit the judgment line. Auto-assign teams A/B Start Calibration Flow: song select → calibrate latency → countdown → play (host metronome for approved catalog). End Room",
+    "C: save disabled without samples=true",
+    "C: skip visible=true"
+  ]
+}
