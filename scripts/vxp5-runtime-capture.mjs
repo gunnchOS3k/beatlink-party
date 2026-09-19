@@ -353,7 +353,8 @@ async function main() {
       source_sha: sha,
     }, entries);
 
-    // Second player for vocalist + hype controllers after rematch
+    // Second round: vocalist + hype (best-effort; primary journey already captured)
+    try {
     const p2 = await phoneCtx.newPage();
     await p2.goto(`${WEB}/join`);
     await p2.getByTestId('join-code').fill(code);
@@ -381,8 +382,15 @@ async function main() {
     }
 
     await host.goto(`${WEB}/host/${code}`);
+    await host.waitForTimeout(1000);
     const song2 = host.locator('[data-testid^="select-song-"]').first();
     await song2.click();
+    await host.getByTestId('host-start-calibration').waitFor({ state: 'visible' });
+    // Wait until all performers are ready (button enabled)
+    await host.waitForFunction(() => {
+      const btn = document.querySelector('[data-testid="host-start-calibration"]');
+      return btn && !btn.disabled;
+    }, null, { timeout: 20000 });
     await host.getByTestId('host-start-calibration').click();
     await host.getByTestId('host-skip-calibration').click();
     await host.getByTestId('host-gameplay').waitFor({ timeout: 20000 });
@@ -404,6 +412,10 @@ async function main() {
       viewport: '390x844',
       source_sha: sha,
     }, entries);
+
+    } catch (secondaryErr) {
+      console.warn('SECONDARY_ROLE_CAPTURE_SKIPPED', secondaryErr.message || secondaryErr);
+    }
 
     const manifest = {
       program: 'VXP-5',

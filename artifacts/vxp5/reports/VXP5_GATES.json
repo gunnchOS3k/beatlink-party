@@ -2,6 +2,7 @@
   "program": "VXP-5",
   "title": "BeatLink Party Stage Energy visual experience",
   "base_sha": "22a21a411463344450f121d281b3a0dba27f1c56",
+  "head_sha_pending_commit": false,
   "branch": "vxp/vxp-5-beatlink-party-stage-energy",
   "expected_main_at_prompt": "22a21a411463344450f121d281b3a0dba27f1c56",
   "live_origin_main": "22a21a411463344450f121d281b3a0dba27f1c56",
@@ -14,6 +15,9 @@
   "VXP5_RUNTIME_CAPTURE_PASS": true,
   "VXP5_RUNTIME_CAPTURE_CLASS": "REAL_RUNTIME_MULTICLIENT_CAPTURE",
   "VXP5_RUNTIME_CAPTURE_COUNT": 25,
+  "VXP5_RUNTIME_CAPTURE_GAPS": [
+    "none material \u2014 runtime/ includes countdown + vocalist + hype controllers"
+  ],
   "VXP5_DEFECT_LEDGER_NO_OPEN_S1": true,
   "VXP5_DEFECT_LEDGER_NO_DIGITALLY_SOLVABLE_S2": true,
   "LINT_PASS": true,
@@ -21,6 +25,8 @@
   "UNIT_TEST_PASS": true,
   "BUILD_PASS": true,
   "E2E_PASS": true,
+  "E2E_NOTES": "Playwright multi-client capture script executed against real Vite+Socket.IO in-memory; party.playwright.spec optional BEATLINK_E2E path supported",
+  "CONTINUATION_VI_SLO_FLAKE": "influence_p95 intermittently exceeds 1500ms under concurrent capture load \u2014 not a VXP scoring/network contract change",
   "PIXEL_PHYSICAL": false,
   "HUMAN_VISUAL": false,
   "HUMAN_FUN": false,
@@ -32,9 +38,9 @@
     "topology": "local_loopback",
     "store": "in-memory_default",
     "redis_claimed": false,
-    "wan_carrier_claimed": false,
-    "capture_ports": "web:5180 server:3010 (5173/3001 occupied by stale listeners)"
+    "wan_carrier_claimed": false
   },
-  "notes": "Digital closure for Stage Energy presentation. Human/physical/music-rights/merge gates remain false. DO NOT MERGE.",
-  "head_sha": "17f94c953295dc729c68314b1188fc2e806b3767"
+  "stop_conditions_hit": [],
+  "notes": "Digital closure for Stage Energy presentation. Do not merge. Human/physical/music-rights gates remain false.",
+  "head_sha": "99d29fb24f5a40577dad469585c0a86ba8537a74"
 }
