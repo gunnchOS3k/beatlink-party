@@ -21,6 +21,7 @@ export * from './scoringLedger.js';
 export * from './songSource.js';
 export * from './audienceInfluenceEngine.js';
 export * from './productStateMachine.js';
+export * from './startPreconditions.js';
 export * from './loadHarness.js';
 export * from './networkLoad.js';
 export * from './teams.js';
