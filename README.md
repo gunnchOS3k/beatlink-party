@@ -116,3 +116,11 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for phased delivery beyond MVP.
 ## License
 
 MIT — see [LICENSE](LICENSE). Demo music is generated placeholder content for development only. Commercial release requires proper music and lyric licensing.
+
+## Feedback & Suggestions
+
+Tried this project? File public feedback via the ecosystem hub:
+
+https://github.com/gunnchOS3k/gunnchos-research-portal/blob/main/FEEDBACK.md
+
+Security vulnerabilities: private only — https://github.com/gunnchOS3k/gunnchos-research-portal/blob/main/SECURITY.md
