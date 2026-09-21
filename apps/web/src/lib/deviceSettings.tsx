@@ -121,6 +121,24 @@ export function AccessibilityPanel({
         />
         Larger hit targets
       </label>
+      <div data-testid="feedback-suggestions" style={{ marginTop: '0.75rem' }}>
+        <p className="label">Help / About</p>
+        <a
+          href="https://github.com/gunnchOS3k/gunnchos-research-portal/blob/main/FEEDBACK.md?component=BeatLink%20Party"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Feedback &amp; Suggestions
+        </a>
+        {' · '}
+        <a
+          href="https://github.com/gunnchOS3k/gunnchos-research-portal/blob/main/SECURITY.md"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Security (private)
+        </a>
+      </div>
     </div>
   );
 }
