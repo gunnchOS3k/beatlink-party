@@ -70,7 +70,10 @@ import {
   applyDeviceTimingProfile,
   buildDeviceTimingProfile,
   createDefaultDeviceTimingProfile,
+  evaluateCountdownPreconditions,
+  evaluateStartPreconditions,
   type DeviceTimingProfile,
+  type StartGateResult,
 } from '@beatlink/game-engine';
 import { getBeatmapForSong } from '../beatmaps/store.js';
 import {
@@ -977,15 +980,45 @@ export class RoomManager {
     return this.publish(room);
   }
 
-  startCalibration(code: string): RoomState | null {
+  explainStartGate(code: string): StartGateResult {
     const room = this.getRoom(code);
-    if (
-      !room ||
-      !room.selectedSongId ||
-      !room.beatmap ||
-      !assertCanStart(room) ||
-      (room.phase !== 'lobby' && room.phase !== 'song_select')
-    ) {
+    return evaluateStartPreconditions(room, { requireBeatmap: true });
+  }
+
+  explainCountdownGate(code: string): StartGateResult {
+    const room = this.getRoom(code);
+    return evaluateCountdownPreconditions(room);
+  }
+
+  /**
+   * Drop disconnected performer seats from lobby/song_select so ghosts cannot
+   * confuse the roster. Connected players are untouched.
+   */
+  clearDisconnectedPlayers(code: string): RoomState | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;
+    const kept: Player[] = [];
+    let removed = 0;
+    for (const player of room.players) {
+      if (player.connected) {
+        kept.push(player);
+        continue;
+      }
+      removed += 1;
+      this.playerToRoom.delete(player.id);
+      room.playerTokens.delete(player.id);
+      room.deviceTimingProfiles.delete(player.id);
+    }
+    if (removed === 0) return this.publish(room);
+    room.players = kept;
+    emitTelemetry('disconnect', room.code, { seat: 'player', cleared: removed });
+    return this.publish(room);
+  }
+
+  startCalibration(code: string): RoomState | null {
+    const gate = this.explainStartGate(code);
+    const room = this.getRoom(code);
+    if (!room || !gate.ok || !room.selectedSongId || !room.beatmap) {
       return null;
     }
     if (room.phase === 'lobby') {
@@ -1148,14 +1181,9 @@ export class RoomManager {
   }
 
   startCountdown(code: string): RoomState | null {
+    const gate = this.explainCountdownGate(code);
     const room = this.getRoom(code);
-    if (
-      !room ||
-      !room.selectedSongId ||
-      !room.beatmap ||
-      !assertCanStart(room) ||
-      room.phase !== 'calibrating'
-    ) {
+    if (!room || !gate.ok || !room.selectedSongId || !room.beatmap) {
       return null;
     }
     assertTransition(room.phase, 'countdown');
@@ -1761,14 +1789,6 @@ export class RoomManager {
     room.phase = phase;
     return this.publish(room);
   }
-}
-
-function assertCanStart(room: InternalRoom): boolean {
-  const connectedPlayers = room.players.filter((player) => player.connected);
-  return (
-    connectedPlayers.length > 0 &&
-    connectedPlayers.every((player) => player.ready && player.role !== null)
-  );
 }
 
 export const roomManager = new RoomManager();

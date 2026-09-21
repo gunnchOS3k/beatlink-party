@@ -1,0 +1,461 @@
+{
+  "notes": [
+    "HOST console: debug [vite] connecting...",
+    "HOST console: debug [vite] connected.",
+    "HOST console: info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "room=53RMP",
+    "start disabled (no players): true",
+    "PLAYER console: debug [vite] connecting...",
+    "PLAYER console: info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "PLAYER console: debug [vite] connected.",
+    "start disabled (ready+song): false",
+    "room API phase=song_select selected=demo-neon-groove players=[{\"name\":\"Jordan\",\"ready\":true,\"role\":\"beat_tapper\",\"connected\":true}]",
+    "after start calib snippet: Home BeatLink Party HOST / STAGE Beat Calibration Tap on each click to measure host latency. Offset is stored on the room and beatmap (120 BPM). 0 ms Samples: none yet Start Clicks Tap on Beat Save Offset & Continue Use 0 ms & Start Countdo",
+    "skip calib visible: true",
+    "countdown=true playing=false",
+    "after start API phase=countdown countdown=2",
+    "player tap visible: false"
+  ],
+  "room_before": {
+    "room": {
+      "code": "53RMP",
+      "phase": "song_select",
+      "hostId": "E45mpKXpLtWZF65CAAAp",
+      "players": [
+        {
+          "id": "d6cde940-af70-485d-b9bd-2cc5f154b3a6",
+          "name": "Jordan",
+          "role": "beat_tapper",
+          "ready": true,
+          "connected": true,
+          "score": 0,
+          "accuracy": 0,
+          "streak": 0,
+          "maxStreak": 0,
+          "combo": 1,
+          "teamId": "solo",
+          "color": "#ff6b6b",
+          "deviceTiming": null
+        }
+      ],
+      "audience": [],
+      "selectedSongId": "demo-neon-groove",
+      "pastedLinkUrl": null,
+      "linkResolveResult": null,
+      "gameMode": "BeatTap",
+      "difficulty": "casual",
+      "calibrationOffsetMs": 0,
+      "countdown": null,
+      "gameStartTime": null,
+      "gameDurationMs": 45000,
+      "teamScore": 0,
+      "crowdMeter": 50,
+      "capacityProfile": "party",
+      "rematchRound": 0,
+      "joinQr": {
+        "code": "53RMP",
+        "joinPath": "/join",
+        "joinUrl": "http://localhost:5173/join?code=53RMP",
+        "qrText": "beatlink:join:53RMP|http://localhost:5173/join?code=53RMP",
+        "expiresAt": 1789858914809
+      },
+      "privacy": {
+        "redactDisplayNames": false,
+        "telemetryEnabled": true,
+        "telemetryRetentionMs": 900000,
+        "audienceSandboxByDefault": false
+      },
+      "teamScores": {
+        "A": 0,
+        "B": 0,
+        "solo": 0
+      },
+      "createdAt": 1789851714809,
+      "expiresAt": 1789858914809,
+      "achievementSummary": {
+        "unlocked": 3,
+        "total": 14,
+        "percent": 21.428571428571427,
+        "entries": [
+          {
+            "id": "bl.first_party",
+            "title": "First Party",
+            "description": "Host a party room.",
+            "hidden": false,
+            "unlocked": true,
+            "unlocked_at": "2026-09-19T19:00:52.243Z",
+            "percent": 100,
+            "current": 1,
+            "target": 1
+          },
+          {
+            "id": "bl.beat_tap",
+            "title": "Beat Tap",
+            "description": "Play a Beat Tap round.",
+            "hidden": false,
+            "unlocked": true,
+            "unlocked_at": "2026-09-19T19:01:25.424Z",
+            "percent": 100,
+            "current": 1,
+            "target": 1
+          },
+          {
+            "id": "bl.call_and_response",
+            "title": "Call and Response",
+            "description": "Play a Call and Response round.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.karaoke",
+            "title": "Karaoke Night",
+            "description": "Play a Karaoke Performance round.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.band_cooperation",
+            "title": "Band Cooperation",
+            "description": "Start Band Roles with two different player roles.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.prediction",
+            "title": "Prediction Lock",
+            "description": "Play a Prediction/Trivia round.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.audience",
+            "title": "Crowd Work",
+            "description": "Accept a live audience hype or vote.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.host_recovery",
+            "title": "Host Continuity",
+            "description": "Recover the party after host disconnect/migration.",
+            "hidden": false,
+            "unlocked": true,
+            "unlocked_at": "2026-09-19T19:01:26.053Z",
+            "percent": 100,
+            "current": 1,
+            "target": 1
+          },
+          {
+            "id": "bl.comeback",
+            "title": "Comeback",
+            "description": "Finish a round in first after having been last.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.five_mode",
+            "title": "Five-Mode Session",
+            "description": "Play all five modes in one party session.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.pause_and_breathe",
+            "title": "Pause and Breathe",
+            "description": "Host-pause a live round and resume it.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.hidden_full_house",
+            "title": "???",
+            "description": "Hidden achievement",
+            "hidden": true,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 33.333333333333336,
+            "current": 1,
+            "target": 3
+          },
+          {
+            "id": "bl.first_minutes",
+            "title": "First Minutes",
+            "description": "Complete calibration and a Beat Tap round in one party session.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 50,
+            "current": 1,
+            "target": 2
+          },
+          {
+            "id": "bl.reconnect",
+            "title": "Back Online",
+            "description": "Reconnect a player after a disconnect during a live party.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          }
+        ]
+      }
+    }
+  },
+  "room_after": {
+    "room": {
+      "code": "53RMP",
+      "phase": "countdown",
+      "hostId": "E45mpKXpLtWZF65CAAAp",
+      "players": [
+        {
+          "id": "d6cde940-af70-485d-b9bd-2cc5f154b3a6",
+          "name": "Jordan",
+          "role": "beat_tapper",
+          "ready": true,
+          "connected": true,
+          "score": 0,
+          "accuracy": 0,
+          "streak": 0,
+          "maxStreak": 0,
+          "combo": 1,
+          "teamId": "solo",
+          "color": "#ff6b6b",
+          "deviceTiming": null
+        }
+      ],
+      "audience": [],
+      "selectedSongId": "demo-neon-groove",
+      "pastedLinkUrl": null,
+      "linkResolveResult": null,
+      "gameMode": "BeatTap",
+      "difficulty": "casual",
+      "calibrationOffsetMs": 0,
+      "countdown": 2,
+      "gameStartTime": null,
+      "gameDurationMs": 45000,
+      "teamScore": 0,
+      "crowdMeter": 50,
+      "capacityProfile": "party",
+      "rematchRound": 0,
+      "joinQr": {
+        "code": "53RMP",
+        "joinPath": "/join",
+        "joinUrl": "http://localhost:5173/join?code=53RMP",
+        "qrText": "beatlink:join:53RMP|http://localhost:5173/join?code=53RMP",
+        "expiresAt": 1789858914809
+      },
+      "privacy": {
+        "redactDisplayNames": false,
+        "telemetryEnabled": true,
+        "telemetryRetentionMs": 900000,
+        "audienceSandboxByDefault": false
+      },
+      "teamScores": {
+        "A": 0,
+        "B": 0,
+        "solo": 0
+      },
+      "createdAt": 1789851714809,
+      "expiresAt": 1789858914809,
+      "round_id": "53RMP-r0-1789851721598",
+      "achievementSummary": {
+        "unlocked": 3,
+        "total": 14,
+        "percent": 21.428571428571427,
+        "entries": [
+          {
+            "id": "bl.first_party",
+            "title": "First Party",
+            "description": "Host a party room.",
+            "hidden": false,
+            "unlocked": true,
+            "unlocked_at": "2026-09-19T19:00:52.243Z",
+            "percent": 100,
+            "current": 1,
+            "target": 1
+          },
+          {
+            "id": "bl.beat_tap",
+            "title": "Beat Tap",
+            "description": "Play a Beat Tap round.",
+            "hidden": false,
+            "unlocked": true,
+            "unlocked_at": "2026-09-19T19:01:25.424Z",
+            "percent": 100,
+            "current": 1,
+            "target": 1
+          },
+          {
+            "id": "bl.call_and_response",
+            "title": "Call and Response",
+            "description": "Play a Call and Response round.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.karaoke",
+            "title": "Karaoke Night",
+            "description": "Play a Karaoke Performance round.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.band_cooperation",
+            "title": "Band Cooperation",
+            "description": "Start Band Roles with two different player roles.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.prediction",
+            "title": "Prediction Lock",
+            "description": "Play a Prediction/Trivia round.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.audience",
+            "title": "Crowd Work",
+            "description": "Accept a live audience hype or vote.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.host_recovery",
+            "title": "Host Continuity",
+            "description": "Recover the party after host disconnect/migration.",
+            "hidden": false,
+            "unlocked": true,
+            "unlocked_at": "2026-09-19T19:01:26.053Z",
+            "percent": 100,
+            "current": 1,
+            "target": 1
+          },
+          {
+            "id": "bl.comeback",
+            "title": "Comeback",
+            "description": "Finish a round in first after having been last.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.five_mode",
+            "title": "Five-Mode Session",
+            "description": "Play all five modes in one party session.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.pause_and_breathe",
+            "title": "Pause and Breathe",
+            "description": "Host-pause a live round and resume it.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          },
+          {
+            "id": "bl.hidden_full_house",
+            "title": "???",
+            "description": "Hidden achievement",
+            "hidden": true,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 33.333333333333336,
+            "current": 1,
+            "target": 3
+          },
+          {
+            "id": "bl.first_minutes",
+            "title": "First Minutes",
+            "description": "Complete calibration and a Beat Tap round in one party session.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 50,
+            "current": 1,
+            "target": 2
+          },
+          {
+            "id": "bl.reconnect",
+            "title": "Back Online",
+            "description": "Reconnect a player after a disconnect during a live party.",
+            "hidden": false,
+            "unlocked": false,
+            "unlocked_at": "",
+            "percent": 0,
+            "current": 0,
+            "target": 1
+          }
+        ]
+      }
+    }
+  },
+  "countdown": true,
+  "playing": false,
+  "playerTap": false
+}

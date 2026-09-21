@@ -1,0 +1,33 @@
+{
+  "schema": "accepted_main_recovery.v1",
+  "generated_at_utc": "2026-09-21T14:36:59Z",
+  "repo": "beatlink-party",
+  "original_pr": 29,
+  "recovery_branch": "recovery/pr29-accepted-main-convergence",
+  "merge_authorized": false,
+  "method": "git merge --no-ff <exact-missing-child-tip> onto current origin/main",
+  "history_rewrite": false,
+  "force_push": false,
+  "main_sha": "0da1b51c0604cb465ee89db5aaba795919e573df",
+  "missing_child_sha": "3fd2a2acf1afb0d44d6eb81f4b31dee323183f72",
+  "merge_base": "3bef89875f2736f371ef46b6c674d52bb0358288",
+  "commits_missing_before": 2,
+  "recovery_branch_sha": "3f5d069c94765168e7e737ae9ff3e6243160cedb",
+  "child_tip_is_ancestor_of_recovery": true,
+  "diff_summary": {
+    "files_changed": 19,
+    "insertions": 1331,
+    "deletions": 92,
+    "shortstat": "19 files changed, 1331 insertions(+), 92 deletions(-)"
+  },
+  "duplicate_work_check": "child_tip_not_ancestor_of_main_before_recovery; recovery_tree_equals_tip_tree; main_unique_content_preserved",
+  "conflicts": "none",
+  "ci": {
+    "status": "pass",
+    "command": "make test after pnpm install",
+    "detail": "31 files / 151 tests passed",
+    "updated_at_utc": "2026-09-21T14:38:59Z",
+    "github_ci": "will_run_on_draft_pr"
+  },
+  "owner_landing_note": "DO NOT MERGE until owner approval. Prefer normal merge commit (no squash/rebase)."
+}
