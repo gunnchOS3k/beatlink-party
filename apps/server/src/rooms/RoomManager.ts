@@ -70,7 +70,6 @@ import {
   applyDeviceTimingProfile,
   buildDeviceTimingProfile,
   createDefaultDeviceTimingProfile,
-  assertCanStartRoom,
   evaluateCountdownPreconditions,
   evaluateStartPreconditions,
   type DeviceTimingProfile,
@@ -1790,10 +1789,6 @@ export class RoomManager {
     room.phase = phase;
     return this.publish(room);
   }
-}
-
-function assertCanStart(room: InternalRoom): boolean {
-  return assertCanStartRoom(room);
 }
 
 export const roomManager = new RoomManager();
