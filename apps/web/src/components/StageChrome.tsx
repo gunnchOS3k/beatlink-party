@@ -7,6 +7,7 @@ import {
   useAccessibility,
   useDeviceRole,
 } from '../lib/deviceSettings';
+import { PortalReturnLink } from './PortalReturnLink';
 
 /** Player-facing product name — Stage Energy is an internal design label only. */
 export const PRODUCT_NAME = 'BeatLink Party';
@@ -87,6 +88,7 @@ export function SurfaceShell({
       data-surface={surface}
       data-testid={`surface-${surface}`}
     >
+      <PortalReturnLink />
       {connected !== undefined ? (
         <NetworkStatus
           connected={connected}
