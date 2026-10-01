@@ -151,6 +151,20 @@ button:disabled {
   z-index: 1;
 }
 
+.portal-return {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.75rem;
+  color: inherit;
+  text-decoration: underline;
+}
+.portal-return:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
 .brand-mark {
   font-family: var(--font-display);
   font-weight: 800;
