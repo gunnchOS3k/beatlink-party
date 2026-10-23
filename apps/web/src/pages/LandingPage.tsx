@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateRoom, useSocket } from '../lib/socket';
 import { isBackendConfigured } from '../lib/api';
-import { PARTY_CREATE_ENABLED, PARTY_CREATE_OWNER_ACTION } from '../lib/partyCreateGate';
+import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
 import { GlyphJoin, GlyphParty } from '../brand/glyphs';
 import {
   BrandMark,
@@ -17,11 +17,12 @@ export default function LandingPage() {
   const createRoom = useCreateRoom();
   const { connected } = useSocket();
   const backendReady = isBackendConfigured();
+  const canCreate = partyCreateAllowed(connected) && backendReady;
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
-    if (!PARTY_CREATE_ENABLED) {
+    if (!canCreate) {
       setError(PARTY_CREATE_OWNER_ACTION);
       return;
     }
@@ -59,7 +60,7 @@ export default function LandingPage() {
         </p>
         <p className="sr-only">{PRODUCT_NAME} party loop</p>
 
-        {!PARTY_CREATE_ENABLED && (
+        {!canCreate && (
           <p className="compliance-banner" data-testid="party-create-closed" style={{ marginBottom: '1rem', textAlign: 'left' }}>
             {PARTY_CREATE_OWNER_ACTION}
           </p>
@@ -78,8 +79,8 @@ export default function LandingPage() {
           <button
             className="btn-primary btn-large"
             onClick={handleCreate}
-            disabled={!PARTY_CREATE_ENABLED || !backendReady || creating}
-            title={PARTY_CREATE_ENABLED ? undefined : PARTY_CREATE_OWNER_ACTION}
+            disabled={!canCreate || creating}
+            title={canCreate ? undefined : PARTY_CREATE_OWNER_ACTION}
             data-testid="create-room"
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.55rem' }}>

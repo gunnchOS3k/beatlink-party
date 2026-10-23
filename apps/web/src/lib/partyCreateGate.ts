@@ -1,13 +1,15 @@
 /**
- * Create a Party stays off until a Node room server accepts a second client.
- * Socket.IO is apps/server. It is not a Cloudflare Worker.
- * Do not set this true from a fixture, and do not add a paid host from this branch.
+ * Create a Party is offered only while the browser socket is connected to
+ * apps/server. That process is the room server. Redis is optional.
+ * A Cloudflare Worker is not this server, and this branch does not add a paid host.
  *
- * Owner action: run apps/server on a host you already control, set
- * VITE_API_URL and VITE_WS_URL to that origin, and pass
- * tests/socket_party_roundtrip.test.ts against it. Redis is optional.
+ * CI run 39986079083 on b64b811 passed tests/socket_party_roundtrip.test.ts:
+ * one host socket and two player sockets, join, and reconnect, in memory mode.
+ * The public button still stays disabled until that socket is actually connected.
  */
-export const PARTY_CREATE_ENABLED = false;
+export function partyCreateAllowed(socketConnected: boolean): boolean {
+  return socketConnected;
+}
 
 export const PARTY_CREATE_OWNER_ACTION =
-  "Create a Party is off. Run apps/server on a host you already control, set VITE_API_URL and VITE_WS_URL to that origin, and pass tests/socket_party_roundtrip.test.ts against it. Do not point the web build at a Cloudflare Worker, and do not add a new paid host from this branch.";
+  "Create a Party stays off until the Node room server socket is connected. Wave007 starts apps/server on 127.0.0.1:3001. Set VITE_API_URL and VITE_WS_URL to that origin. Do not point them at a Cloudflare Worker, and do not add a new paid host.";

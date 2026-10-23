@@ -12,7 +12,7 @@ import type {
 } from '@beatlink/shared';
 import { GAME_MODE_IDS, MAX_PERFORMERS, ROLES } from '@beatlink/shared';
 import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
-import { PARTY_CREATE_ENABLED, PARTY_CREATE_OWNER_ACTION } from '../lib/partyCreateGate';
+import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
 import { startCalibrationClicks, startHostMetronome, resumeAudioContext } from '../lib/hostAudio';
 import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
 import {
@@ -374,7 +374,7 @@ export default function HostPage() {
       } else {
         socket.emit('room.subscribe', { code: upper });
       }
-    } else if (!code && !PARTY_CREATE_ENABLED) {
+    } else if (!code && !partyCreateAllowed(socket.connected)) {
       setCreateError(PARTY_CREATE_OWNER_ACTION);
     } else if (!code) {
       createRoom()
