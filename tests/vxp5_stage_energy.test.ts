@@ -73,6 +73,7 @@ describe('VXP-5 Stage Energy digital gates', () => {
   it('landing leads with Create a Party / Join a Party', () => {
     const landing = readFileSync(join(ROOT, 'apps/web/src/pages/LandingPage.tsx'), 'utf8');
     expect(landing).toMatch(/Create a Party/);
+    expect(landing).toMatch(/!PARTY_CREATE_ENABLED/);
     expect(landing).toMatch(/Join a Party/);
     expect(landing).toMatch(/PartyLoop|party-loop/);
     expect(landing.indexOf('Create a Party')).toBeLessThan(landing.indexOf('Join a Party'));

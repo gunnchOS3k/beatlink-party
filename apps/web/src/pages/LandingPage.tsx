@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateRoom, useSocket } from '../lib/socket';
 import { isBackendConfigured } from '../lib/api';
+import { PARTY_CREATE_ENABLED, PARTY_CREATE_OWNER_ACTION } from '../lib/partyCreateGate';
 import { GlyphJoin, GlyphParty } from '../brand/glyphs';
 import {
   BrandMark,
@@ -20,6 +21,10 @@ export default function LandingPage() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
+    if (!PARTY_CREATE_ENABLED) {
+      setError(PARTY_CREATE_OWNER_ACTION);
+      return;
+    }
     if (!backendReady) {
       setError(
         'BeatLink could not reach the room server. Configure VITE_API_URL and VITE_WS_URL at build time, or run the dev server on your network.',
@@ -54,6 +59,12 @@ export default function LandingPage() {
         </p>
         <p className="sr-only">{PRODUCT_NAME} party loop</p>
 
+        {!PARTY_CREATE_ENABLED && (
+          <p className="compliance-banner" data-testid="party-create-closed" style={{ marginBottom: '1rem', textAlign: 'left' }}>
+            {PARTY_CREATE_OWNER_ACTION}
+          </p>
+        )}
+
         {error && (
           <div
             className="compliance-banner"
@@ -67,7 +78,8 @@ export default function LandingPage() {
           <button
             className="btn-primary btn-large"
             onClick={handleCreate}
-            disabled={!backendReady || creating}
+            disabled={!PARTY_CREATE_ENABLED || !backendReady || creating}
+            title={PARTY_CREATE_ENABLED ? undefined : PARTY_CREATE_OWNER_ACTION}
             data-testid="create-room"
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.55rem' }}>
