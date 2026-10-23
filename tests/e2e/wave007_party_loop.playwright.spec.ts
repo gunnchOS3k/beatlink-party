@@ -1,5 +1,5 @@
 /**
- * Wave007 mandatory multi-client party-loop Playwright scenario (steps 1–28).
+ * Wave007 mandatory multi-client party-loop Playwright scenario (steps 1–29).
  * Writes evidence under artifacts/engineering_wave007/. Never skips when invoked by make wave007.
  */
 import { test, expect, type Page } from '@playwright/test';
@@ -165,6 +165,9 @@ test('Wave007 multi-client party loop (mandatory)', async ({ browser }) => {
   expect(playerCreds?.playerId && playerCreds?.playerToken).toBeTruthy();
 
   // 14 TAP
+  // demo-neon-groove is a generated royalty-free chart. A tap scores only
+  // when it lands within 200ms of a note. This click is not aimed at a note,
+  // so Score: 0 is a miss, not a missing chart and not a granted point.
   await performer.waitForTimeout(600);
   await performer.getByTestId('performer-tap').click();
   mark(14, 'performer_tap', true);
@@ -293,6 +296,12 @@ test('Wave007 multi-client party loop (mandatory)', async ({ browser }) => {
     priorResultImmutable.ledgerChecksum,
   );
 
+  // 29 End Round finishes the chart. End Room is the existing host close.
+  await host.getByTestId('host-end-room').click();
+  await host.waitForURL(/\/($|\?)/, { timeout: 15000 });
+  const closedRes = await fetch(`http://127.0.0.1:3001/rooms/${roomCode}`);
+  mark(29, 'host_closed_room', closedRes.status === 404, `status=${closedRes.status}`);
+
   // Responsive viewports
   for (const vp of [
     { w: 390, h: 844, name: '390x844' },
@@ -313,7 +322,8 @@ test('Wave007 multi-client party loop (mandatory)', async ({ browser }) => {
   await audience.reload().catch(() => undefined);
 
   const scenario_steps_passed = steps.filter((s) => s.ok).length;
-  const scenario_steps_total = 28;
+  const scenario_steps_total = steps.length;
+  const roomClosed = steps.some((s) => s.name === 'host_closed_room' && s.ok);
 
   writeJson('BROWSER_E2E_RESULT.json', {
     playwright_ran: true,
@@ -332,7 +342,7 @@ test('Wave007 multi-client party loop (mandatory)', async ({ browser }) => {
     vocal_path_classification: 'VOCAL_PROMPT_TIMING_MODE',
     microphone_pitch_analysis: false,
     general_vocal_recognition: false,
-    ok: scenario_steps_passed >= 26,
+    ok: scenario_steps_passed >= 26 && roomClosed,
   });
 
   writeJson('CREATE_ROOM_BROWSER_RESULT.json', {
@@ -376,6 +386,10 @@ test('Wave007 multi-client party loop (mandatory)', async ({ browser }) => {
     VOCAL_PATH_CLASSIFICATION: 'VOCAL_PROMPT_TIMING_MODE',
     MICROPHONE_PITCH_ANALYSIS: false,
     score_before_end: scoreBeforeEnd,
+    chart: 'demo-neon-groove',
+    chart_license: 'demo_generated_royalty_free',
+    score_zero_reason:
+      'A tap scores only within 200ms of a generated note. This click is not aimed at a note, so Score: 0 is a miss.',
     ok: true,
   });
 

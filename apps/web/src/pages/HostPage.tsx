@@ -987,7 +987,7 @@ export default function HostPage() {
                 Flow: song select → calibrate latency → countdown → play (host metronome for approved
                 catalog).
               </p>
-              <button className="btn-secondary btn-large" onClick={endRoom} type="button">
+              <button className="btn-secondary btn-large" onClick={endRoom} type="button" data-testid="host-end-room">
                 End Room
               </button>
             </div>
@@ -1131,7 +1131,7 @@ export default function HostPage() {
           >
             Play Again / Next Song
           </button>
-          <button className="btn-secondary btn-large" onClick={endRoom} type="button">
+          <button className="btn-secondary btn-large" onClick={endRoom} type="button" data-testid="host-end-room">
             End Room
           </button>
           <Link className="btn-secondary btn-large" to="/">
