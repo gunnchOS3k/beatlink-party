@@ -9,6 +9,7 @@ import { loadCatalog, getBeatmapForSong } from './beatmaps/store.js';
 import { getProviderAuthStatus, resolveLink } from './music/linkResolver.js';
 import { roomManager } from './rooms/RoomManager.js';
 import { createRoomStoreFromEnv } from './rooms/store/index.js';
+import { loopbackBindHost } from './net/loopbackBind.mjs';
 
 if (process.env.BEATLINK_TELEMETRY === '1') {
   registerTelemetrySink((event) => {
@@ -164,9 +165,10 @@ async function main() {
   process.on('SIGTERM', () => cleanShutdown('SIGTERM'));
   process.on('SIGINT', () => cleanShutdown('SIGINT'));
 
-  httpServer.listen(PORT, '0.0.0.0', () => {
+  const bindHost = loopbackBindHost(process.env.BEATLINK_BIND_HOST);
+  httpServer.listen(PORT, bindHost, () => {
     console.log(
-      `BeatLink Party server running on http://0.0.0.0:${PORT} (roomStore=${roomStoreBackend})`,
+      `BeatLink Party server running on http://${bindHost}:${PORT} (roomStore=${roomStoreBackend})`,
     );
   });
 }
