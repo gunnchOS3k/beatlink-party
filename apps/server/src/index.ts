@@ -10,6 +10,14 @@ import { getProviderAuthStatus, resolveLink } from './music/linkResolver.js';
 import { roomManager } from './rooms/RoomManager.js';
 import { createRoomStoreFromEnv } from './rooms/store/index.js';
 import { loopbackBindHost } from './net/loopbackBind.mjs';
+import {
+  createRoomHttp,
+  disconnectRoomHttp,
+  endRoomHttp,
+  joinRoomHttp,
+} from './rooms/roomHttp.mjs';
+
+const httpParties = new Map();
 
 if (process.env.BEATLINK_TELEMETRY === '1') {
   registerTelemetrySink((event) => {
@@ -46,7 +54,23 @@ app.post('/rooms', (req, res) => {
     gameMode: body.gameMode,
     difficulty: body.difficulty,
   });
-  res.json({ code: room.code, room });
+  const party = createRoomHttp(httpParties, { code: room.code, hostId: room.hostId });
+  res.json({ code: room.code, room, party: party.body.party });
+});
+
+app.post('/rooms/:code/join', (req, res) => {
+  const result = joinRoomHttp(httpParties, req.params.code, String(req.body?.memberId ?? ''));
+  res.status(result.status).json(result.body);
+});
+
+app.post('/rooms/:code/disconnect', (req, res) => {
+  const result = disconnectRoomHttp(httpParties, req.params.code, String(req.body?.memberId ?? ''));
+  res.status(result.status).json(result.body);
+});
+
+app.post('/rooms/:code/end', (req, res) => {
+  const result = endRoomHttp(httpParties, req.params.code, String(req.body?.hostId ?? ''));
+  res.status(result.status).json(result.body);
 });
 
 app.get('/rooms/:code', (req, res) => {
