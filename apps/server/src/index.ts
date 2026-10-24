@@ -18,6 +18,7 @@ import {
 } from './rooms/roomHttp.mjs';
 
 const httpParties = new Map();
+const httpHostSessions = new Map();
 
 if (process.env.BEATLINK_TELEMETRY === '1') {
   registerTelemetrySink((event) => {
@@ -54,8 +55,8 @@ app.post('/rooms', (req, res) => {
     gameMode: body.gameMode,
     difficulty: body.difficulty,
   });
-  const party = createRoomHttp(httpParties, { code: room.code, hostId: room.hostId });
-  res.json({ code: room.code, room, party: party.body.party });
+  const party = createRoomHttp(httpParties, httpHostSessions, { code: room.code, hostId: room.hostId });
+  res.json({ code: room.code, room, party: party.body.party, hostSession: party.body.hostSession });
 });
 
 app.post('/rooms/:code/join', (req, res) => {
@@ -69,7 +70,7 @@ app.post('/rooms/:code/disconnect', (req, res) => {
 });
 
 app.post('/rooms/:code/end', (req, res) => {
-  const result = endRoomHttp(httpParties, req.params.code, String(req.body?.hostId ?? ''));
+  const result = endRoomHttp(httpParties, httpHostSessions, req.params.code, String(req.body?.hostId ?? ''));
   res.status(result.status).json(result.body);
 });
 
