@@ -12,6 +12,7 @@ import type {
 } from '@beatlink/shared';
 import { GAME_MODE_IDS, MAX_PERFORMERS, ROLES } from '@beatlink/shared';
 import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
+import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
 import { startCalibrationClicks, startHostMetronome, resumeAudioContext } from '../lib/hostAudio';
 import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
 import {
@@ -373,6 +374,8 @@ export default function HostPage() {
       } else {
         socket.emit('room.subscribe', { code: upper });
       }
+    } else if (!code && !partyCreateAllowed(socket.connected)) {
+      setCreateError(PARTY_CREATE_OWNER_ACTION);
     } else if (!code) {
       createRoom()
         .then(({ code: c, hostToken: token }) => {
@@ -984,7 +987,7 @@ export default function HostPage() {
                 Flow: song select → calibrate latency → countdown → play (host metronome for approved
                 catalog).
               </p>
-              <button className="btn-secondary btn-large" onClick={endRoom} type="button">
+              <button className="btn-secondary btn-large" onClick={endRoom} type="button" data-testid="host-end-room">
                 End Room
               </button>
             </div>
@@ -1128,7 +1131,7 @@ export default function HostPage() {
           >
             Play Again / Next Song
           </button>
-          <button className="btn-secondary btn-large" onClick={endRoom} type="button">
+          <button className="btn-secondary btn-large" onClick={endRoom} type="button" data-testid="host-end-room">
             End Room
           </button>
           <Link className="btn-secondary btn-large" to="/">

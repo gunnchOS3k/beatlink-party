@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateRoom, useSocket } from '../lib/socket';
 import { isBackendConfigured } from '../lib/api';
+import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
 import { GlyphJoin, GlyphParty } from '../brand/glyphs';
 import {
   BrandMark,
@@ -16,10 +17,15 @@ export default function LandingPage() {
   const createRoom = useCreateRoom();
   const { connected } = useSocket();
   const backendReady = isBackendConfigured();
+  const canCreate = partyCreateAllowed(connected) && backendReady;
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
+    if (!canCreate) {
+      setError(PARTY_CREATE_OWNER_ACTION);
+      return;
+    }
     if (!backendReady) {
       setError(
         'BeatLink could not reach the room server. Configure VITE_API_URL and VITE_WS_URL at build time, or run the dev server on your network.',
@@ -54,6 +60,12 @@ export default function LandingPage() {
         </p>
         <p className="sr-only">{PRODUCT_NAME} party loop</p>
 
+        {!canCreate && (
+          <p className="compliance-banner" data-testid="party-create-closed" style={{ marginBottom: '1rem', textAlign: 'left' }}>
+            {PARTY_CREATE_OWNER_ACTION}
+          </p>
+        )}
+
         {error && (
           <div
             className="compliance-banner"
@@ -67,7 +79,8 @@ export default function LandingPage() {
           <button
             className="btn-primary btn-large"
             onClick={handleCreate}
-            disabled={!backendReady || creating}
+            disabled={!canCreate || creating}
+            title={canCreate ? undefined : PARTY_CREATE_OWNER_ACTION}
             data-testid="create-room"
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.55rem' }}>
