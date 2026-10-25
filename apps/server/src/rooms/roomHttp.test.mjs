@@ -6,6 +6,7 @@ import {
   disconnectRoomHttp,
   endRoomHttp,
   joinRoomHttp,
+  readPartyHttp,
   resetAuthority,
   roomAuthority,
   setAuthorityClock,
@@ -23,6 +24,13 @@ test('host and member sessions stay out of the room and expire together', () => 
   assert.equal(joined.status, 200);
   assert.equal(joined.body.hostSession, undefined);
   assert.equal(JSON.stringify(joined.body).includes(created.body.hostSession), false);
+  assert.equal(readPartyHttp('room1', '').status, 403);
+  assert.equal(readPartyHttp('room1', 'host-1').status, 403);
+  const seenByHost = readPartyHttp('room1', created.body.hostSession);
+  const seenByMember = readPartyHttp('room1', joined.body.memberSession);
+  assert.equal(seenByHost.status, 200);
+  assert.equal(JSON.stringify(seenByHost.body).includes(created.body.hostSession), false);
+  assert.deepEqual(seenByHost.body.party.members.map((member) => member.id), seenByMember.body.party.members.map((member) => member.id));
   assert.notEqual(joined.body.memberSession, joined.body.party.members[1].id);
   assert.equal(joined.body.party.members.some((member) => member.id === 'host-1'), true);
   assert.equal(disconnectRoomHttp('room1', 'host-1').status, 403);
@@ -56,6 +64,8 @@ test('host and member sessions stay out of the room and expire together', () => 
   assert.equal(entry.includes('const httpHostSessions'), false);
   assert.equal(entry.includes('req.body?.hostId'), false);
   assert.equal(entry.includes('loopbackBindHost'), true);
+  assert.equal(entry.includes('readPartyHttp'), true);
+  assert.equal(entry.includes("header.startsWith('Bearer ')"), true);
   assert.equal(manager.includes('roomAuthority.parties'), true);
   assert.equal(manager.includes('private parties'), false);
   assert.equal(manager.includes('roomAuthority.hostSessions.set'), true);

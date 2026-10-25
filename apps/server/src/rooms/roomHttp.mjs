@@ -108,6 +108,23 @@ export function disconnectRoomHttp(code, presentedSession) {
   return { status: 200, body: { party: publicParty(next) } };
 }
 
+export function readPartyHttp(code, presentedSession) {
+  const key = String(code || '').toUpperCase();
+  const party = partyAt(key);
+  if (!party) return { status: 404, body: { error: 'Room not found' } };
+  if (expired(key)) {
+    invalidateAuthority(key);
+    return { status: 410, body: { error: 'Room expired' } };
+  }
+  const session = String(presentedSession || '');
+  const hostMatch = session && session === roomAuthority.hostSessions.get(key);
+  const member = roomAuthority.memberSessions.get(session);
+  if (!hostMatch && (!member || member.code !== key)) {
+    return { status: 403, body: { error: 'Session required' } };
+  }
+  return { status: 200, body: { party: publicParty(party) } };
+}
+
 export function endRoomHttp(code, presentedHostSession) {
   const key = String(code || '').toUpperCase();
   const party = partyAt(key);

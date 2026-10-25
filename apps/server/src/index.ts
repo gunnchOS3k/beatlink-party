@@ -16,6 +16,7 @@ import {
   endRoomHttp,
   joinRoomHttp,
   publicParty,
+  readPartyHttp,
 } from './rooms/roomHttp.mjs';
 
 if (process.env.BEATLINK_TELEMETRY === '1') {
@@ -66,6 +67,13 @@ app.post('/rooms/:code/join', (req, res) => {
 
 app.post('/rooms/:code/disconnect', (req, res) => {
   const result = disconnectRoomHttp(req.params.code, String(req.body?.session ?? ''));
+  res.status(result.status).json(result.body);
+});
+
+app.get('/rooms/:code/party', (req, res) => {
+  const header = String(req.get('authorization') || '');
+  const session = header.startsWith('Bearer ') ? header.slice(7) : '';
+  const result = readPartyHttp(req.params.code, session);
   res.status(result.status).json(result.body);
 });
 
