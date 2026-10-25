@@ -21,6 +21,7 @@ import {
   nextPredictionSection,
 } from '@beatlink/game-engine';
 import { useJoinRoom, useRoomEvents, useSocket } from '../lib/socket';
+import { joinGuestParty } from '../lib/partySession';
 import {
   AccessibilityPanel,
   DeviceRolePicker,
@@ -168,6 +169,15 @@ export default function PlayerPage() {
     const playerToken = parsed?.roomCode === code ? parsed.playerToken : undefined;
 
     try {
+      const storedMember = sessionStorage.getItem('beatlink_member');
+      const parsedMember = storedMember ? JSON.parse(storedMember) : null;
+      if (parsedMember?.code !== code) {
+        const joined = await joinGuestParty(code);
+        sessionStorage.setItem(
+          'beatlink_member',
+          JSON.stringify({ code, memberId: joined.memberId, memberSession: joined.memberSession }),
+        );
+      }
       const result = await joinRoom(code, name.trim(), playerId, playerToken);
       setPlayer(result.player);
       setRoom(result.room);

@@ -15,6 +15,7 @@ import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
 import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
 import { startCalibrationClicks, startHostMetronome, resumeAudioContext } from '../lib/hostAudio';
 import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
+import { endHostParty } from '../lib/partySession';
 import {
   AccessibilityPanel,
   DeviceRolePicker,
@@ -584,12 +585,14 @@ export default function HostPage() {
   }
 
   function endRoom() {
-    socket.emit('room.end', { code, hostToken }, (result?: { ok?: boolean; error?: string }) => {
-      if (result && result.ok === false) {
-        setCreateError(result.error ?? 'Failed to end room');
+    void endHostParty(code).then((ended) => {
+      if (!ended.ok) {
+        setCreateError(ended.error ?? 'Failed to end room');
         return;
       }
-      window.location.href = '/';
+      socket.emit('room.end', { code, hostToken }, () => {
+        window.location.href = '/';
+      });
     });
   }
 
