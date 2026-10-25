@@ -10,15 +10,13 @@ import { getProviderAuthStatus, resolveLink } from './music/linkResolver.js';
 import { roomManager } from './rooms/RoomManager.js';
 import { createRoomStoreFromEnv } from './rooms/store/index.js';
 import { loopbackBindHost } from './net/loopbackBind.mjs';
+import { roomAuthority } from './rooms/roomHttp.mjs';
 import {
-  createRoomHttp,
   disconnectRoomHttp,
   endRoomHttp,
   joinRoomHttp,
+  publicParty,
 } from './rooms/roomHttp.mjs';
-
-const httpParties = new Map();
-const httpHostSessions = new Map();
 
 if (process.env.BEATLINK_TELEMETRY === '1') {
   registerTelemetrySink((event) => {
@@ -50,27 +48,31 @@ app.post('/rooms', (req, res) => {
     gameMode?: GameModeId;
     difficulty?: DifficultyId;
   };
-  const room = roomManager.createRoom('http-' + Date.now(), {
+  const created = roomManager.createRoom('http-' + Date.now(), {
     publicOrigin: body.publicOrigin,
     gameMode: body.gameMode,
     difficulty: body.difficulty,
   });
-  const party = createRoomHttp(httpParties, httpHostSessions, { code: room.code, hostId: room.hostId });
-  res.json({ code: room.code, room, party: party.body.party, hostSession: party.body.hostSession });
+  const hostSession = created.hostToken;
+  const { hostToken: _hostSession, ...room } = created;
+  void _hostSession;
+  res.json({ code: room.code, room, party: publicParty(roomAuthority.parties.get(room.code)), hostSession });
 });
 
 app.post('/rooms/:code/join', (req, res) => {
-  const result = joinRoomHttp(httpParties, req.params.code, String(req.body?.memberId ?? ''));
+  const result = joinRoomHttp(req.params.code);
   res.status(result.status).json(result.body);
 });
 
 app.post('/rooms/:code/disconnect', (req, res) => {
-  const result = disconnectRoomHttp(httpParties, req.params.code, String(req.body?.memberId ?? ''));
+  const result = disconnectRoomHttp(req.params.code, String(req.body?.session ?? ''));
   res.status(result.status).json(result.body);
 });
 
 app.post('/rooms/:code/end', (req, res) => {
-  const result = endRoomHttp(httpParties, httpHostSessions, req.params.code, String(req.body?.hostId ?? ''));
+  const hostSession = String(req.body?.hostSession ?? '');
+  const result = endRoomHttp(req.params.code, hostSession);
+  if (result.status === 200) roomManager.shutdownRoom(req.params.code, { hostToken: hostSession, reason: 'host_end' });
   res.status(result.status).json(result.body);
 });
 

@@ -87,8 +87,8 @@ import {
   createParty,
   disconnectMember,
   endParty,
-  type PartyRecord,
 } from './partyLifecycle.mjs';
+import { invalidateAuthority, invalidateMember, roomAuthority } from './roomHttp.mjs';
 
 const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
 const MAX_PLAYERS = MAX_PERFORMERS;
@@ -123,7 +123,6 @@ interface InternalRoom extends RoomState {
 export class RoomManager {
   /** Live in-process room objects (Maps/Sets). Snapshots sync to `store`. */
   private rooms = new Map<string, InternalRoom>();
-  private parties = new Map<string, PartyRecord>();
   private store: RoomStore;
   private playerToRoom = new Map<string, string>();
   private audienceToRoom = new Map<string, string>();
@@ -178,7 +177,7 @@ export class RoomManager {
   private dropRoom(code: string): void {
     const key = code.toUpperCase();
     this.rooms.delete(key);
-    this.parties.delete(key);
+    invalidateAuthority(key);
     this.store.delete(key);
     this.sessionModes.delete(key);
     this.rankFloor.delete(key);
@@ -242,7 +241,9 @@ export class RoomManager {
     };
     this.commit(room);
     this.socketToHostRoom.set(hostSocketId, code);
-    this.parties.set(code, createParty({ code, hostId: hostSocketId }));
+    roomAuthority.parties.set(code, createParty({ code, hostId: hostSocketId }));
+    roomAuthority.hostSessions.set(code, room.hostToken);
+    roomAuthority.expiresAt.set(code, expiresAt);
     this.sessionModes.set(code, new Set());
     this.rankFloor.set(code, new Map());
     this.achievements.reportEvent('party_started', 1);
@@ -427,9 +428,9 @@ export class RoomManager {
     room.playerTokens.set(player.id, playerToken);
     this.playerToRoom.set(player.id, room.code);
     this.socketToPlayer.set(socketId, player.id);
-    const party = this.parties.get(room.code) ?? createParty({ code: room.code, hostId: room.hostId });
+    const party = roomAuthority.parties.get(room.code) ?? createParty({ code: room.code, hostId: room.hostId });
     const nextParty = addMember(party, player.id);
-    if (nextParty) this.parties.set(room.code, nextParty);
+    if (nextParty) roomAuthority.parties.set(room.code, nextParty);
     emitTelemetry('player_join', room.code, { playerCount: room.players.length });
     return { room: this.publish(room), player, playerToken };
   }
@@ -811,9 +812,10 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     const player = room.players.find((p) => p.id === playerId);
-    const party = disconnectMember(this.parties.get(code), playerId);
+    invalidateMember(code, playerId);
+    const party = disconnectMember(roomAuthority.parties.get(code), playerId);
     const removed = Boolean(party && !party.members.some((member) => member.id === playerId));
-    if (party) this.parties.set(code, party);
+    if (party) roomAuthority.parties.set(code, party);
     if (removed && player) {
       room.players = room.players.filter((member) => member.id !== playerId);
       this.playerToRoom.delete(playerId);
@@ -831,9 +833,9 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     if (room.hostId !== hostSocketId) return null;
-    const party = this.parties.get(room.code);
+    const party = roomAuthority.parties.get(room.code);
     if (party && !endParty(party, hostSocketId)) return null;
-    this.parties.delete(room.code);
+    roomAuthority.parties.delete(room.code);
     return this.shutdownRoom(code, { reason: 'host_end', hostSocketId });
   }
 
