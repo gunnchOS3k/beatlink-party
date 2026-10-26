@@ -18,6 +18,19 @@ import {
   publicParty,
   readPartyHttp,
 } from './rooms/roomHttp.mjs';
+import {
+  endGame,
+  guestPayload,
+  openGameSessionOnRoom,
+  publishRematchOrExit,
+  disconnectGuest,
+  publishResult,
+  reconnectGuest,
+  redeemInvitationOnRoom,
+  rematchGame,
+  startGame,
+  submitRuntimeRaceResult,
+} from './rooms/gameSessionContract.mjs';
 
 if (process.env.BEATLINK_TELEMETRY === '1') {
   registerTelemetrySink((event) => {
@@ -82,6 +95,68 @@ app.post('/rooms/:code/end', (req, res) => {
   const result = endRoomHttp(req.params.code, hostSession);
   if (result.status === 200) roomManager.shutdownRoom(req.params.code, { hostToken: hostSession, reason: 'host_end' });
   res.status(result.status).json(result.body);
+});
+
+app.post('/game-sessions', (req, res) => {
+  const body = (req.body ?? {}) as { applicationId?: string; hostSession?: string; hostId?: string };
+  if (body.hostSession || body.hostId) {
+    return res.status(400).json({ error: 'Host credentials are server-issued' });
+  }
+  const opened = openGameSessionOnRoom(String(body.applicationId ?? ''));
+  if ('error' in opened) return res.status(opened.status).json({ error: opened.error });
+  return res.status(200).json({
+    invitation: opened.invitation,
+    hostSession: opened.hostSession,
+    session: opened.session,
+  });
+});
+
+app.post('/game-sessions/:code/redeem', (req, res) => {
+  const redeemed = redeemInvitationOnRoom(String(req.body?.invitation ?? ''));
+  if ('error' in redeemed) return res.status(redeemed.status).json({ error: redeemed.error });
+  if (redeemed.payload.roomCode !== req.params.code.toUpperCase()) {
+    return res.status(404).json({ error: 'Invitation is for a different room' });
+  }
+  const visible = guestPayload(req.params.code);
+  return res.status(200).json({
+    memberId: redeemed.memberId,
+    memberSession: redeemed.memberSession,
+    payload: visible.status === 200 ? visible.payload : redeemed.payload,
+  });
+});
+
+app.post('/game-sessions/:code/runtime-result', (req, res) => {
+  const submitted = submitRuntimeRaceResult({
+    ...(req.body ?? {}),
+    roomCode: String(req.params.code || '').toUpperCase(),
+  });
+  if ('error' in submitted) return res.status(submitted.status).json({ error: submitted.error });
+  return res.status(200).json({ result: submitted.result });
+});
+
+app.post('/game-sessions/:code/result', (req, res) => {
+  const published = publishResult(String(req.body?.hostSession ?? ''), {
+    runtimeDigest: typeof req.body?.runtimeDigest === 'string' ? req.body.runtimeDigest : '',
+  });
+  if ('error' in published) return res.status(published.status).json({ error: published.error });
+  return res.status(200).json({ event: published.event });
+});
+
+app.post('/game-sessions/:code/:action', (req, res) => {
+  const action = req.params.action;
+  const presented = String(req.body?.session ?? '');
+  const outcome =
+    action === 'start' ? startGame(presented)
+    : action === 'rematch' ? rematchGame(presented)
+    : action === 'end' ? endGame(presented)
+    : action === 'disconnect' ? disconnectGuest(presented)
+    : action === 'reconnect' ? reconnectGuest(presented)
+    : action === 'rematch-or-exit'
+      ? publishRematchOrExit(presented, req.body?.choice === 'rematch' ? 'rematch' : 'exit')
+      : null;
+  if (!outcome) return res.status(404).json({ error: 'Unknown game session action' });
+  if ('error' in outcome) return res.status(outcome.status).json({ error: outcome.error });
+  return res.status(200).json(outcome);
 });
 
 app.get('/rooms/:code', (req, res) => {

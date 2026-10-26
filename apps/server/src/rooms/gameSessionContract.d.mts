@@ -14,6 +14,31 @@ export type PublicGameSession = {
   hostId: string;
   phase: GameSessionPhase;
   memberId: string | null;
+  guestConnected: boolean;
+};
+
+export type RuntimeSourceLog = {
+  resultsPath: boolean;
+  hostLapCompleted: boolean;
+  guestLapCompleted: boolean;
+  hostCheckpoint: boolean;
+  guestCheckpoint: boolean;
+};
+
+export type RuntimeRaceResult = {
+  applicationId: 'pedestrian-pursuit';
+  roomCode: string;
+  courseId: string;
+  hostMemberId: string;
+  guestMemberId: string;
+  lapsCompleted: { host: number; guest: number };
+  checkpointCrossings: { host: number; guest: number };
+  drivenMsec: number;
+  finishOrder: string[];
+  bothFinished: true;
+  producedBy: 'pedestrian-pursuit-race-runtime';
+  sourceLog: RuntimeSourceLog;
+  runtimeDigest: string;
 };
 
 export type SharedEventView = {
@@ -22,7 +47,7 @@ export type SharedEventView = {
   applicationId: 'pedestrian-pursuit';
   roomCode: string;
   choice: RematchOrExitChoice | null;
-  result: Record<string, string> | null;
+  result: RuntimeRaceResult | null;
   acknowledgements: { host: boolean; guest: boolean };
 };
 
@@ -46,7 +71,7 @@ export type OpenGameSessionResult =
 
 export type RedeemInvitationResult =
   | { status: 200; memberId: string; memberSession: string; payload: GuestView }
-  | { status: 404 | 409; error: string };
+  | { status: 403 | 404 | 409; error: string };
 
 export type HostActionResult =
   | { status: 200; session: PublicGameSession }
@@ -54,7 +79,15 @@ export type HostActionResult =
 
 export type PublishResult =
   | { status: 200; event: SharedEventView }
-  | { status: 400 | 403 | 404 | 409; error: string };
+  | { status: 400 | 403 | 404 | 409 | 422; error: string };
+
+export type RuntimeSubmitResult =
+  | { status: 200; result: RuntimeRaceResult }
+  | { status: 404 | 422; error: string };
+
+export type GuestConnectionResult =
+  | { status: 200; payload: GuestView }
+  | { status: 403 | 410; error: string };
 
 export type AcknowledgeResult =
   | { status: 200; event: SharedEventView; bothAcknowledged: boolean }
@@ -62,14 +95,40 @@ export type AcknowledgeResult =
 
 export function resetGameSessions(): void;
 
+export function runtimeRaceDigest(result: {
+  applicationId: string;
+  roomCode: string;
+  courseId: string;
+  hostMemberId: string;
+  guestMemberId: string;
+  lapsCompleted: { host: number; guest: number };
+  checkpointCrossings: { host: number; guest: number };
+  drivenMsec: number;
+  finishOrder: string[];
+  bothFinished: boolean;
+  producedBy: string;
+  sourceLog: RuntimeSourceLog;
+}): string;
+
 export function openGameSession(input: {
   applicationId: string;
   roomCode: string;
+  hostId?: string;
+  hostSession?: string;
 }): OpenGameSessionResult;
+
+export function openGameSessionOnRoom(applicationId: string): OpenGameSessionResult | { status: 502; error: string };
 
 export function guestPayload(roomCode: string): { status: 200; payload: GuestView } | { status: 404; error: string };
 
-export function redeemInvitation(invitation: string): RedeemInvitationResult;
+export function redeemInvitation(
+  invitation: string,
+  roomMember?: { memberId: string; memberSession: string },
+): RedeemInvitationResult;
+
+export function redeemInvitationOnRoom(
+  invitation: string,
+): RedeemInvitationResult | { status: 403 | 502; error: string };
 
 export function startGame(presentedSession: string): HostActionResult;
 
@@ -77,9 +136,15 @@ export function rematchGame(presentedSession: string): HostActionResult;
 
 export function endGame(presentedSession: string): HostActionResult;
 
+export function disconnectGuest(memberSession: string): GuestConnectionResult;
+
+export function reconnectGuest(memberSession: string): GuestConnectionResult;
+
+export function submitRuntimeRaceResult(result: RuntimeRaceResult): RuntimeSubmitResult;
+
 export function publishResult(
   presentedSession: string,
-  result: Record<string, string>,
+  packet: { runtimeDigest?: string },
 ): PublishResult;
 
 export function publishRematchOrExit(
