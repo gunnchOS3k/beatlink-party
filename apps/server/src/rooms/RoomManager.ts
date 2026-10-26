@@ -494,6 +494,8 @@ export class RoomManager {
     player.connected = true;
     this.socketToPlayer.set(socketId, player.id);
     this.playerToRoom.set(player.id, room.code);
+    const restored = addMember(roomAuthority.parties.get(room.code), player.id);
+    if (restored) roomAuthority.parties.set(room.code, restored);
     this.achievements.reportEvent('player_reconnected', 1);
     pulsePartyPace('disconnect_reconnect', playerId);
     presentAvFeedback('disconnect_warn', 'Player reconnected');
@@ -817,16 +819,8 @@ export class RoomManager {
     const player = room.players.find((p) => p.id === playerId);
     invalidateMember(code, playerId);
     const party = disconnectMember(roomAuthority.parties.get(code), playerId);
-    const removed = Boolean(party && !party.members.some((member) => member.id === playerId));
     if (party) roomAuthority.parties.set(code, party);
-    if (removed && player) {
-      room.players = room.players.filter((member) => member.id !== playerId);
-      this.playerToRoom.delete(playerId);
-      room.playerTokens.delete(playerId);
-      room.deviceTimingProfiles.delete(playerId);
-    } else if (player) {
-      player.connected = false;
-    }
+    if (player) player.connected = false;
     this.socketToPlayer.delete(socketId);
     emitTelemetry('disconnect', room.code, { seat: 'player' });
     return this.publish(room);
