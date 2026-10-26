@@ -428,7 +428,10 @@ export class RoomManager {
     room.playerTokens.set(player.id, playerToken);
     this.playerToRoom.set(player.id, room.code);
     this.socketToPlayer.set(socketId, player.id);
-    const party = roomAuthority.parties.get(room.code) ?? createParty({ code: room.code, hostId: room.hostId });
+    const storedParty = roomAuthority.parties.get(room.code);
+    const hostId = room.hostId;
+    const party =
+      storedParty ?? (hostId !== null ? createParty({ code: room.code, hostId }) : undefined);
     const nextParty = addMember(party, player.id);
     if (nextParty) roomAuthority.parties.set(room.code, nextParty);
     emitTelemetry('player_join', room.code, { playerCount: room.players.length });
