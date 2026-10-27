@@ -503,11 +503,12 @@ export default function PlayerPage() {
                   <p>
                     Lock before <strong>{target.label}</strong> starts
                   </p>
-                  <div className="role-grid">
+                  <div className="role-grid" data-testid="prediction-choices">
                     {choices.map((choice) => (
                       <button
                         key={choice}
                         className="btn-secondary btn-large"
+                        data-testid={`prediction-choice-${choice.replace(/\s+/g, '-').toLowerCase()}`}
                         onClick={() => handlePrediction(target.id, choice)}
                       >
                         {choice}

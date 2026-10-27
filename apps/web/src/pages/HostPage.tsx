@@ -910,6 +910,7 @@ export default function HostPage() {
                     value={room?.gameMode ?? playMode}
                     onChange={(e) => setRoomMode(e.target.value as GameModeId)}
                     style={{ width: '100%' }}
+                    data-testid="host-game-mode"
                   >
                     {GAME_MODE_IDS.map((id) => (
                       <option key={id} value={id}>
