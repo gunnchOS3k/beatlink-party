@@ -435,6 +435,7 @@ export type TelemetryEventName =
   | 'event_lifecycle'
   | 'event_scale_sim'
   | 'content_path'
+  | 'source_eligibility_router'
   | 'rc_packaging'
   | 'rc_update'
   | 'rc_rollback'

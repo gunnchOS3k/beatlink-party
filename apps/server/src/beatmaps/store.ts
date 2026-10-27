@@ -9,7 +9,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const contentRoot = join(__dirname, '../../../../content');
 
 let catalog: SongCatalogEntry[] = [];
+/** Versioned beatmap cache — charts are loaded once per beatmap id, not regenerated each play. */
+const BEATMAP_CACHE_VERSION = 1;
 const beatmapCache = new Map<string, Beatmap>();
+
+function cacheKey(beatmapId: string): string {
+  return `v${BEATMAP_CACHE_VERSION}:${beatmapId}`;
+}
 
 export function loadCatalog(): SongCatalogEntry[] {
   if (catalog.length === 0) {
@@ -39,8 +45,9 @@ export function getSongById(id: string): SongCatalogEntry | undefined {
 }
 
 export function getBeatmap(beatmapId: string): Beatmap | null {
-  if (beatmapCache.has(beatmapId)) {
-    return beatmapCache.get(beatmapId)!;
+  const key = cacheKey(beatmapId);
+  if (beatmapCache.has(key)) {
+    return structuredClone(beatmapCache.get(key)!);
   }
 
   const song = loadCatalog().find((s) => s.beatmapId === beatmapId);
@@ -51,16 +58,21 @@ export function getBeatmap(beatmapId: string): Beatmap | null {
     const parsed = JSON.parse(raw);
     const validation = validateBeatmap(parsed);
     if (validation.success && validation.data) {
-      beatmapCache.set(beatmapId, validation.data as Beatmap);
-      return validation.data as Beatmap;
+      beatmapCache.set(key, validation.data as Beatmap);
+      return structuredClone(validation.data as Beatmap);
     }
   } catch {
-    // fall through to generated
+    // fall through to generated once, then cache
   }
 
   const generated = createDemoBeatmap(beatmapId, song.id, song.bpm, song.durationMs);
-  beatmapCache.set(beatmapId, generated as Beatmap);
-  return generated as Beatmap;
+  beatmapCache.set(key, generated as Beatmap);
+  return structuredClone(generated as Beatmap);
+}
+
+/** Cache size for tests — proves charts are reused across selectSong calls. */
+export function beatmapCacheSize(): number {
+  return beatmapCache.size;
 }
 
 export function getBeatmapForSong(songId: string): Beatmap | null {

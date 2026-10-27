@@ -464,6 +464,21 @@ export default function PlayerPage() {
 
         <div className={`feedback ${feedbackClass}`}>{feedback}</div>
 
+        <p
+          className="label"
+          style={{ textAlign: 'center', marginBottom: '0.5rem' }}
+          data-testid="active-mode-banner"
+        >
+          {room.gameMode === 'BeatTap' && 'Mode · Beat Tap — hit the judgment line'}
+          {room.gameMode === 'CallAndResponse' && 'Mode · Call & Response — wait for the echo window'}
+          {room.gameMode === 'KaraokePerformance' &&
+            'Mode · Karaoke Performance — phrase timing only (no pitch analysis)'}
+          {room.gameMode === 'BandRoles' &&
+            'Mode · Band Roles — stay in your lane; cover all three seats for Band locked'}
+          {room.gameMode === 'PredictionTrivia' &&
+            'Mode · Prediction Trivia — lock the next section before it starts'}
+        </p>
+
         {room.gameMode === 'CallAndResponse' && beatmap && (
           <p style={{ textAlign: 'center', marginBottom: '0.75rem' }}>
             {isCallAndResponseWindow(beatmap.sections, gameTimeMs).phase === 'call'

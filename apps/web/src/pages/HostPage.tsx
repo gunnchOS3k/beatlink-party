@@ -201,13 +201,17 @@ function ConnectProviderCta({
         </p>
       ) : (
         <p style={{ fontSize: '0.9rem' }}>
-          Provider auth path is available as <strong>PLAYABLE_AUTHORIZED_PLATFORM</strong>. Embed
-          preview may appear above when a source id is present. Gameplay still uses the approved
-          catalog metronome path when a catalog match exists.
+          Provider auth path is available as <strong>PLAYABLE_AUTHORIZED_PLATFORM</strong>. Official
+          embed preview may appear above when a source id is present — embed ≠ rhythm-sync or
+          audio-extraction rights. Gameplay uses the approved catalog (path A/D) when a match
+          exists; otherwise pick a catalog alternative below.
         </p>
       )}
+      <p style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+        Source eligibility: link recognition alone is not full gameplay (paths E/F).
+      </p>
       <ul style={{ color: 'var(--muted)', fontSize: '0.85rem', paddingLeft: '1.25rem' }}>
-        {result.fallbackOptions.slice(0, 3).map((opt) => (
+        {result.fallbackOptions.slice(0, 5).map((opt) => (
           <li key={opt}>{opt}</li>
         ))}
       </ul>

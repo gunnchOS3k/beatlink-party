@@ -1,4 +1,5 @@
 import type { LinkResolveResult, MusicPlatform, PlaybackStatus, ProviderAuthStatus } from '@beatlink/shared';
+import { resolveSourceEligibilityRouter } from '@beatlink/game-engine';
 import { loadCatalog } from '../beatmaps/store.js';
 
 const YOUTUBE_REGEX =
@@ -181,7 +182,7 @@ function buildResult(partial: {
     RIGHTS_EXPIRED: 'Rights attestation expired — renew attestation or pick an approved catalog track.',
   };
 
-  return {
+  const base: LinkResolveResult = {
     platform: partial.platform,
     sourceId: partial.sourceId,
     title: partial.title,
@@ -195,6 +196,19 @@ function buildResult(partial: {
     matchedCatalogId: partial.matchedCatalogId,
     message: partial.message ?? messages[partial.playbackStatus],
     fallbackOptions,
+  };
+  // A–F eligibility: metadata/embed recognition alone is never full gameplay.
+  const route = resolveSourceEligibilityRouter({
+    linkResolve: base,
+    catalogAlternatives: loadCatalog(),
+  });
+  const altLines = route.alternatives.map(
+    (a) => `Catalog alternative [path ${route.letter}→A]: ${a.title} (${a.songId})`,
+  );
+  return {
+    ...base,
+    message: route.playable ? base.message : route.message,
+    fallbackOptions: [...altLines, ...fallbackOptions],
   };
 }
 

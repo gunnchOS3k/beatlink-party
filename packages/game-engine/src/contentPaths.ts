@@ -238,3 +238,132 @@ export function assertAnalysisKaraokeEligible(decision: ContentPathDecision): {
   }
   return { ok: true, reason: 'Eligible rights-cleared path.' };
 }
+
+/**
+ * Source eligibility router letters A–F (MUSIC_COMPLIANCE).
+ * Link recognition alone is never full gameplay — unsupported links get catalog alternatives.
+ */
+export type SourceEligibilityLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+
+export interface SourceEligibilityAlternative {
+  songId: string;
+  title: string;
+  reason: string;
+}
+
+export interface SourceEligibilityRoute {
+  letter: SourceEligibilityLetter;
+  label: string;
+  ok: boolean;
+  /** True only when catalog / attested audio can drive a real performance. */
+  playable: boolean;
+  decision: ContentPathDecision;
+  alternatives: SourceEligibilityAlternative[];
+  message: string;
+}
+
+const LETTER_LABEL: Record<SourceEligibilityLetter, string> = {
+  A: 'Approved catalog (PD / RF / synthetic / demo / CC)',
+  B: 'Creator-attested upload',
+  C: 'Licensed music pack',
+  D: 'Link matched to approved catalog (play catalog audio only)',
+  E: 'Platform metadata / official embed reference (not gameplay stream)',
+  F: 'Unsupported or blocked — offer lawful catalog alternatives',
+};
+
+function letterForPath(path: ContentPathKind, playbackStatus: PlaybackStatus): SourceEligibilityLetter {
+  switch (path) {
+    case 'royalty_free':
+    case 'public_domain':
+    case 'synthetic_original':
+    case 'demo_generated':
+    case 'creative_commons':
+      return 'A';
+    case 'creator_owned':
+    case 'creator_upload_attested':
+      return 'B';
+    case 'licensed_pack':
+      return 'C';
+    case 'link_catalog_match':
+      return 'D';
+    case 'blocked_rip_attempt':
+      return playbackStatus === 'METADATA_ONLY' || playbackStatus === 'NEEDS_LICENSE'
+        ? 'E'
+        : 'F';
+    default:
+      return 'F';
+  }
+}
+
+export function resolveSourceEligibilityRouter(input: {
+  catalogEntry?: SongCatalogEntry | null;
+  attestation?: RightsAttestation | null;
+  linkResolve?: LinkResolveResult | null;
+  creatorUpload?: {
+    trackId: string;
+    attestorId: string;
+    ownsOrLicensed: boolean;
+    nowMs?: number;
+    ttlMs?: number | null;
+  };
+  claimedRipUrl?: string | null;
+  nowMs?: number;
+  /** Lawful catalog alternatives when the selected path is not playable. */
+  catalogAlternatives?: SongCatalogEntry[];
+}): SourceEligibilityRoute {
+  const decision = resolveContentPath(input);
+  let letter = letterForPath(decision.path, decision.playbackStatus);
+  // METADATA_ONLY platform links without a catalog match are path E, not playable.
+  if (
+    input.linkResolve &&
+    !input.linkResolve.matchedCatalogId &&
+    (input.linkResolve.playbackStatus === 'METADATA_ONLY' ||
+      input.linkResolve.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM')
+  ) {
+    letter = 'E';
+  }
+  const playable =
+    decision.ok &&
+    (decision.playbackStatus === 'PLAYABLE_APPROVED' ||
+      decision.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM') &&
+    letter !== 'E' &&
+    letter !== 'F';
+  const alternatives: SourceEligibilityAlternative[] = [];
+  if (!playable && input.catalogAlternatives?.length) {
+    for (const song of input.catalogAlternatives.slice(0, 5)) {
+      if (
+        song.license === 'demo_generated' ||
+        song.license === 'synthetic_original' ||
+        song.license === 'public_domain' ||
+        song.license === 'royalty_free' ||
+        song.license === 'creative_commons'
+      ) {
+        alternatives.push({
+          songId: song.id,
+          title: song.title,
+          reason: 'Lawful approved-catalog alternative — not a rip of the pasted link.',
+        });
+      }
+    }
+  }
+  if (!playable && letter !== 'E') {
+    letter = letter === 'A' || letter === 'B' || letter === 'C' || letter === 'D' ? letter : 'F';
+  }
+  const route: SourceEligibilityRoute = {
+    letter,
+    label: LETTER_LABEL[letter],
+    ok: decision.ok,
+    playable,
+    decision,
+    alternatives,
+    message: playable
+      ? decision.message
+      : `${decision.message} Link recognition alone is not gameplay — choose a catalog alternative.`,
+  };
+  emitTelemetry('source_eligibility_router', 'RIGHTS', {
+    letter: route.letter,
+    playable: route.playable,
+    altCount: route.alternatives.length,
+  });
+  return route;
+}

@@ -39,6 +39,22 @@ The link resolver does **not**:
 | Official platform playback | Future | Per-platform SDK + license |
 | Public-domain / royalty-free | Yes | Safe for demos |
 
+## Source eligibility router (A–F)
+
+Implemented by `resolveSourceEligibilityRouter` in `packages/game-engine/src/contentPaths.ts`.
+**Link recognition alone is not full gameplay.** Unsupported / metadata-only links must offer lawful catalog alternatives.
+
+| Letter | Meaning | Playable performance? |
+|--------|---------|------------------------|
+| **A** | Approved catalog (PD / RF / synthetic / demo / CC) | Yes — catalog audio + versioned beatmap cache |
+| **B** | Creator-attested upload | Yes when attestation is valid |
+| **C** | Licensed music pack | Yes when pack gate passes |
+| **D** | Link matched to approved catalog | Yes — play **catalog** audio only, never the pasted stream |
+| **E** | Platform metadata / official embed reference | No — YouTube/Spotify/Apple are not rip permission |
+| **F** | Unsupported or blocked | No — return catalog alternatives |
+
+YouTube may only be used under official player/embed rules when explicitly authorized; embed ≠ rhythm-sync or audio-extraction rights. Spotify is never a game-streaming content path under this policy.
+
 ## Playback Status Values
 
 - `PLAYABLE_APPROVED` — matched to internal catalog; safe to play

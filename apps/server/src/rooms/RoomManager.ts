@@ -1410,6 +1410,8 @@ export class RoomManager {
           streak: tap.streak,
           meta: {
             role: player.role,
+            bandCoverage:
+              room.gameMode === 'BandRoles' && this.bandCoverageSeated(room),
             responseMatched:
               room.gameMode === 'CallAndResponse' &&
               responseMatchedForCallAndResponse(
@@ -1491,6 +1493,8 @@ export class RoomManager {
           meta: {
             role: player.role,
             noRecording: true,
+            bandCoverage:
+              room.gameMode === 'BandRoles' && this.bandCoverageSeated(room),
             responseMatched:
               room.gameMode === 'CallAndResponse' &&
               responseMatchedForCallAndResponse(
@@ -1623,7 +1627,27 @@ export class RoomManager {
       }
       const event = findNearestHypeEvent(room.beatmap.hypeEvents, gameTimeMs, 300);
       const targetTime = event?.timeMs ?? gameTimeMs;
-      const result = scoreHypeAction(gameTimeMs, targetTime, player.streak);
+      const hype = scoreHypeAction(gameTimeMs, targetTime, player.streak);
+      // BandRoles must go through scoreForMode so role + coverage bonuses apply.
+      const modeScore = scoreForMode({
+        modeId: room.gameMode,
+        difficulty: room.difficulty,
+        grade: hype.grade,
+        basePoints: hype.points,
+        streak: hype.streak,
+        meta: {
+          role: player.role,
+          bandCoverage:
+            room.gameMode === 'BandRoles' && this.bandCoverageSeated(room),
+        },
+      });
+      const result = {
+        ...hype,
+        points: modeScore.points,
+        message:
+          room.gameMode === 'BandRoles' ? modeScore.message : hype.message,
+        crowdBoost: modeScore.crowdBoost,
+      };
       Object.assign(player, updatePlayerStats(player, result));
       room.teamScore += result.points;
       room.teamScores = recomputeTeamScores(room.players);
@@ -1760,6 +1784,16 @@ export class RoomManager {
   /** @deprecated Prefer rematch() — keeps seats; still supported for host UI. */
   replay(code: string): RoomState | null {
     return this.rematch(code);
+  }
+
+  /** True when Beat Tapper, Vocalist, and Hype Captain seats are all filled. */
+  private bandCoverageSeated(room: InternalRoom): boolean {
+    const roles = new Set(
+      room.players.map((p) => p.role).filter((role): role is NonNullable<typeof role> => Boolean(role)),
+    );
+    return (
+      roles.has('beat_tapper') && roles.has('vocalist') && roles.has('hype_captain')
+    );
   }
 
   private noteModeRound(room: InternalRoom): void {
