@@ -628,9 +628,22 @@ export default function PlayerPage() {
     );
   }
 
-  if (room?.phase === 'results' && results) {
-    const myResult = results.players.find((p) => p.id === player?.id);
-    const myAwards = results.awards.filter((a) => a.playerId === player?.id);
+  if (room?.phase === 'results') {
+    // Reconnect may arrive after game.ended — fall back to seated player stats on room.state.
+    const myResult =
+      results?.players.find((p) => p.id === player?.id) ??
+      (player
+        ? {
+            id: player.id,
+            name: player.name,
+            role: player.role,
+            teamId: player.teamId,
+            score: player.score,
+            accuracy: player.accuracy,
+            maxStreak: player.maxStreak,
+          }
+        : undefined);
+    const myAwards = results?.awards.filter((a) => a.playerId === player?.id) ?? [];
     return (
       <div className="page page-player stack" data-testid="player-results">
         <div className="panel" style={{ textAlign: 'center' }}>
@@ -639,7 +652,7 @@ export default function PlayerPage() {
             {myResult?.score ?? 0}
           </div>
           <p data-testid="performer-ledger-checksum">
-            Ledger: {results.ledgerChecksum ?? 'n/a'}
+            Ledger: {results?.ledgerChecksum ?? 'n/a'}
           </p>
           <p>Accuracy: {myResult?.accuracy ?? 0}% · Best streak: {myResult?.maxStreak ?? 0}</p>
         </div>
