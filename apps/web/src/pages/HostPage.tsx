@@ -1087,25 +1087,25 @@ export default function HostPage() {
         </div>
       )}
 
-      {room?.phase === 'results' && results && (
+      {room?.phase === 'results' && (
         <div className="stack" data-testid="host-results">
           <div className="stage" style={{ textAlign: 'center' }}>
             <h2 style={{ fontFamily: 'var(--font-display)' }}>Celebration</h2>
             <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--se-success-lime)' }}>
-              {results.teamScore}
+              {results?.teamScore ?? 0}
             </div>
             <p data-testid="host-results-meta">
-              Team Score · Crowd {results.crowdMeter}% · Round {(room?.rematchRound ?? 0) + 1}
+              Team Score · Crowd {results?.crowdMeter ?? 0}% · Round {(room?.rematchRound ?? 0) + 1}
             </p>
             <p data-testid="host-ledger-checksum" style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
-              Ledger: {results.ledgerChecksum ?? 'n/a'}
+              Ledger: {results?.ledgerChecksum ?? 'n/a'}
             </p>
           </div>
 
           <div className="grid-2">
             <div className="panel">
               <h3>Individual Scores</h3>
-              {results.players.map((p) => (
+              {(results?.players ?? []).map((p) => (
                 <div key={p.id} className="player-card">
                   <div>
                     <strong>{p.name}</strong>
@@ -1119,7 +1119,7 @@ export default function HostPage() {
             <div className="panel">
               <h3>Awards</h3>
               <div className="stack">
-                {results.awards.map((a) => (
+                {(results?.awards ?? []).map((a) => (
                   <div key={a.id} className="award-card">
                     <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>{a.label}</div>
                     <div>{a.playerName}</div>

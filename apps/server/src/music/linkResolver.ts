@@ -205,9 +205,13 @@ function buildResult(partial: {
   const altLines = route.alternatives.map(
     (a) => `Catalog alternative [path ${route.letter}→A]: ${a.title} (${a.songId})`,
   );
+  // Preserve provider-specific wording (tests/Host UI); append eligibility when not playable.
+  const message = route.playable
+    ? base.message
+    : `${base.message} Link recognition alone is not gameplay — choose a catalog alternative.`;
   return {
     ...base,
-    message: route.playable ? base.message : route.message,
+    message,
     fallbackOptions: [...altLines, ...fallbackOptions],
   };
 }
