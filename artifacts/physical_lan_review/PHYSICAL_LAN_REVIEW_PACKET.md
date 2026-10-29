@@ -6,7 +6,7 @@
 
 | Field | Value |
 |---|---|
-| Source SHA | `19512d3e64815bd9d99c047876a550cc1c920d21` (base tip; replace with tested build hash after FF) |
+| Source SHA | `4bc443adfec811874780f9d3a587d7cc210a9aa0` (candidate; fill tested build hash at session) |
 | Tested package / web build hash | _pending_ |
 | Server bind | LAN + TLS? _pending_ (require secure origin for mic grant) |
 | Host device / OS | _pending_ |
