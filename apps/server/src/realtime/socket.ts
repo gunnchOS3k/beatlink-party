@@ -5,6 +5,7 @@ import type {
   LinkResolveResult,
   PlayerInputEvent,
 } from '@beatlink/shared';
+import type { DirectHttpsLobbyAttachInput } from '@beatlink/game-engine';
 import { roomManager } from '../rooms/RoomManager.js';
 import { resolveLink } from '../music/linkResolver.js';
 
@@ -422,6 +423,48 @@ socket.on(
         if (!requireHost(code, socket.id, data.hostToken)) return;
         const room = roomManager.setResolvedLink(code, data.url, data.result);
         if (room) io.to(code).emit('room.state', room);
+      },
+    );
+
+    socket.on(
+      'room.attach_direct_https',
+      (
+        data: {
+          code: string;
+          hostToken?: string;
+          attach: DirectHttpsLobbyAttachInput;
+        },
+        cb?: (result: {
+          ok: boolean;
+          error?: string;
+          scoredPlayAllowed?: boolean;
+          selectSongId?: string | null;
+          message?: string;
+          room?: unknown;
+        }) => void,
+      ) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) {
+          cb?.({ ok: false, error: 'Host auth required' });
+          return;
+        }
+        if (!data.attach?.url || !data.attach.composition || !data.attach.soundRecording) {
+          cb?.({ ok: false, error: 'url, composition, and soundRecording are required' });
+          return;
+        }
+        const attached = roomManager.attachDirectHttps(code, data.attach);
+        if (!attached) {
+          cb?.({ ok: false, error: 'Unable to attach direct HTTPS on room' });
+          return;
+        }
+        io.to(code).emit('room.state', attached.room);
+        cb?.({
+          ok: true,
+          scoredPlayAllowed: attached.attach.scoredPlayAllowed,
+          selectSongId: attached.attach.selectSongId,
+          message: attached.attach.message,
+          room: attached.room,
+        });
       },
     );
 

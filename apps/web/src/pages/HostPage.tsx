@@ -967,7 +967,35 @@ export default function HostPage() {
                 </p>
               )}
 
-              <DirectHttpsWorkflowPanel />
+              <DirectHttpsWorkflowPanel
+                attachEnabled={Boolean(code && hostToken)}
+                onAttachToLobby={async (payload) => {
+                  if (!code) return null;
+                  return await new Promise((resolve) => {
+                    socket.emit(
+                      'room.attach_direct_https',
+                      { code, hostToken, attach: payload },
+                      (res?: {
+                        ok?: boolean;
+                        error?: string;
+                        scoredPlayAllowed?: boolean;
+                        message?: string;
+                      }) => {
+                        if (!res?.ok) {
+                          setCreateError(res?.error ?? 'Direct HTTPS lobby attach failed');
+                          resolve(null);
+                          return;
+                        }
+                        setLinkResult(null);
+                        resolve({
+                          scoredPlayAllowed: Boolean(res.scoredPlayAllowed),
+                          message: res.message ?? '',
+                        });
+                      },
+                    );
+                  });
+                }}
+              />
 
               <div className="row" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
                 <label style={{ flex: 1, minWidth: 140 }}>

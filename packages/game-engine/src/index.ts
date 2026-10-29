@@ -47,4 +47,5 @@ export * from './visualPackHarness.js';
 export * from './linkCapability.js';
 export * from './linkProviders.js';
 export * from './directHttpsMedia.js';
+export * from './directHttpsLobbyAttach.js';
 export * from './rightsLayers.js';

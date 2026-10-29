@@ -67,4 +67,33 @@ describe('startPreconditions', () => {
     });
     expect(ok.ok).toBe(true);
   });
+
+  it('denies scored start when direct HTTPS is attached without sync authorization', () => {
+    const gate = evaluateStartPreconditions({
+      phase: 'lobby',
+      selectedSongId: null,
+      players: [jordan],
+      linkResolveResult: {
+        platform: 'direct_https',
+        capabilityState: 'DIRECT_AUDIO_RIGHTS_VERIFIED',
+        matchedCatalogId: null,
+      },
+    });
+    expect(gate.ok).toBe(false);
+    expect(gate.blockers.some((b) => b.code === 'LINK_SYNC_DENIED')).toBe(true);
+  });
+
+  it('allows start when catalog song is selected even if a non-sync link snapshot exists', () => {
+    const gate = evaluateStartPreconditions({
+      phase: 'song_select',
+      selectedSongId: 'demo-neon-groove',
+      players: [jordan],
+      linkResolveResult: {
+        platform: 'youtube',
+        capabilityState: 'OFFICIAL_EMBED_AVAILABLE',
+        matchedCatalogId: null,
+      },
+    });
+    expect(gate.ok).toBe(true);
+  });
 });

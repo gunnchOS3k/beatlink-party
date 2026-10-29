@@ -159,12 +159,17 @@
       ],
       "tests": [
         "tests/linkResolver.test.ts",
-        "tests/direct_https_sync_eligible.test.ts"
+        "tests/direct_https_sync_eligible.test.ts",
+        "tests/direct_https_lobby_attach.test.ts",
+        "packages/game-engine/src/startPreconditions.test.ts"
       ],
       "automated_evidence": [
         "packages/game-engine/src/directHttpsMedia.ts",
         "packages/game-engine/src/rightsLayers.ts",
-        "packages/game-engine/src/creatorBinaryIngest.ts"
+        "packages/game-engine/src/creatorBinaryIngest.ts",
+        "packages/game-engine/src/directHttpsLobbyAttach.ts",
+        "apps/server/src/rooms/RoomManager.ts",
+        "apps/web/src/components/DirectHttpsWorkflowPanel.tsx"
       ],
       "native_physical": {
         "status": "not_applicable",
@@ -173,13 +178,14 @@
       },
       "art_status": "not_applicable",
       "limitations": [
-        "Creator must attach attestation + hash; auto-publish remains false"
+        "Creator must attach attestation + hash; auto-publish remains false",
+        "2026-10-29 isolated slice: destination SSRF host policy + lobby attach/deny for syncEligible=false + hash-matched launch catalog select; browser E2E journey and durable scored-result persistence still open; HUMAN/RC2/V1 remain false."
       ],
       "severity": "blocker",
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "in_progress",
-      "notes": "Negative regression: playback ok + syncEligible false + hash/grid/charts \u2192 gameplay denied."
+      "notes": "Negative regression: playback ok + syncEligible false denies scored lobby attach. Positive: syncEligible + launch asset hash selects catalog beatmap. Browser production UI journey + five-mode residual still required before complete."
     },
     {
       "req_id": "BL-LINK-006",

@@ -70,12 +70,14 @@ import {
   applyDeviceTimingProfile,
   buildDeviceTimingProfile,
   createDefaultDeviceTimingProfile,
+  buildDirectHttpsLobbyAttach,
   evaluateCountdownPreconditions,
   evaluateStartPreconditions,
   type DeviceTimingProfile,
+  type DirectHttpsLobbyAttachInput,
   type StartGateResult,
 } from '@beatlink/game-engine';
-import { getBeatmapForSong } from '../beatmaps/store.js';
+import { findSongIdByAssetSha256, getBeatmapForSong } from '../beatmaps/store.js';
 import {
   InMemoryRoomStore,
   deserializeRoom,
@@ -1004,6 +1006,44 @@ export class RoomManager {
       }
     }
     return this.publish(room);
+  }
+
+  /**
+   * Attach a direct-HTTPS evaluation to the lobby.
+   * Scored song selection requires GAMEPLAY_SYNC_AUTHORIZED + matching launch/catalog hash.
+   * syncEligible=false never selects a beatmap (playback/preview message only).
+   */
+  attachDirectHttps(
+    code: string,
+    input: DirectHttpsLobbyAttachInput,
+  ): { room: RoomState; attach: ReturnType<typeof buildDirectHttpsLobbyAttach> } | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;
+
+    const hashMatchedId = findSongIdByAssetSha256(input.contentSha256 ?? null);
+    const matchedCatalogId = input.matchedCatalogId ?? hashMatchedId;
+    const attach = buildDirectHttpsLobbyAttach({
+      ...input,
+      matchedCatalogId,
+    });
+
+    room.pastedLinkUrl = input.url;
+    room.linkResolveResult = attach.linkResolve;
+
+    if (attach.scoredPlayAllowed && attach.selectSongId) {
+      const selected = this.selectSong(code, attach.selectSongId);
+      if (!selected) {
+        // Keep the honest link snapshot even if beatmap lookup failed.
+        return {
+          room: this.publish(room)!,
+          attach: { ...attach, scoredPlayAllowed: false, selectSongId: null },
+        };
+      }
+      return { room: selected, attach };
+    }
+
+    // Deny scored attach: peers see the snapshot; independently chosen catalog songs stay.
+    return { room: this.publish(room)!, attach };
   }
 
   explainStartGate(code: string): StartGateResult {

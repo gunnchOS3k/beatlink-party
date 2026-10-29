@@ -87,3 +87,13 @@ export function getBeatmapForSong(songId: string): Beatmap | null {
   if (!song) return null;
   return getBeatmap(song.beatmapId);
 }
+
+/** Match authorized project-owned launch/catalog audio by immutable content hash. */
+export function findSongIdByAssetSha256(sha256: string | null | undefined): string | null {
+  if (!sha256 || !/^[a-f0-9]{64}$/i.test(sha256)) return null;
+  const needle = sha256.toLowerCase();
+  const hit = loadCatalog().find(
+    (s) => typeof s.assetSha256 === 'string' && s.assetSha256.toLowerCase() === needle,
+  );
+  return hit?.id ?? null;
+}

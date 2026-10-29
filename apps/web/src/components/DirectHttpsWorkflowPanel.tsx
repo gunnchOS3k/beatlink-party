@@ -23,7 +23,33 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-export function DirectHttpsWorkflowPanel() {
+export type DirectHttpsAttachPayload = {
+  url: string;
+  mimeType?: string | null;
+  contentSha256?: string | null;
+  composition: {
+    basis: 'creator_attested';
+    syncAuthorized: boolean;
+    adaptationAuthorized: boolean;
+    attributionText: string;
+  };
+  soundRecording: {
+    basis: 'creator_attested';
+    reproductionAuthorized: boolean;
+    attributionText: string;
+  };
+  beatGridReady: boolean;
+  chartsReady: boolean;
+};
+
+export function DirectHttpsWorkflowPanel(props: {
+  /** When provided, host can attach the evaluation to the live lobby. */
+  onAttachToLobby?: (payload: DirectHttpsAttachPayload) => Promise<{
+    scoredPlayAllowed: boolean;
+    message: string;
+  } | null>;
+  attachEnabled?: boolean;
+}) {
   const [url, setUrl] = useState('');
   const [hash, setHash] = useState('');
   const [syncAuthorized, setSyncAuthorized] = useState(true);
@@ -34,6 +60,7 @@ export function DirectHttpsWorkflowPanel() {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
   const [ingestResult, setIngestResult] = useState<Record<string, unknown> | null>(null);
+  const [attachMessage, setAttachMessage] = useState<string | null>(null);
 
   async function onPickFile(file: File | null) {
     if (!file) return;
@@ -65,31 +92,67 @@ export function DirectHttpsWorkflowPanel() {
     }
   }
 
+  function buildAttachPayload(): DirectHttpsAttachPayload {
+    return {
+      url: url || 'https://cdn.example.com/owned/track.wav',
+      contentSha256: hash || null,
+      composition: {
+        basis: 'creator_attested',
+        syncAuthorized,
+        adaptationAuthorized,
+        attributionText: 'Host-attested composition',
+      },
+      soundRecording: {
+        basis: 'creator_attested',
+        reproductionAuthorized,
+        attributionText: 'Host-attested sound recording',
+      },
+      beatGridReady,
+      chartsReady,
+    };
+  }
+
   async function onEvaluate() {
     setBusy(true);
     setResult(null);
+    setAttachMessage(null);
     try {
       const decision = await evaluateDirectHttps({
-        url: url || 'https://cdn.example.com/owned/track.wav',
-        contentSha256: hash || null,
-        composition: {
-          basis: 'creator_attested',
-          syncAuthorized,
-          adaptationAuthorized,
-          attributionText: 'Host-attested composition',
-        },
-        soundRecording: {
-          basis: 'creator_attested',
-          reproductionAuthorized,
-          attributionText: 'Host-attested sound recording',
-        },
-        beatGridReady,
-        chartsReady,
+        ...buildAttachPayload(),
         probe: Boolean(url),
       });
       setResult(decision);
     } catch (err) {
       setResult({ error: err instanceof Error ? err.message : String(err) });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onAttach() {
+    if (!props.onAttachToLobby) return;
+    setBusy(true);
+    setAttachMessage(null);
+    try {
+      // Re-evaluate so attach uses current attestation; server re-checks syncEligible.
+      const decision = await evaluateDirectHttps({
+        ...buildAttachPayload(),
+        probe: Boolean(url),
+      });
+      setResult(decision);
+      const attached = await props.onAttachToLobby(buildAttachPayload());
+      if (!attached) {
+        setAttachMessage('Could not attach to lobby (host/room required).');
+      } else if (!attached.scoredPlayAllowed) {
+        setAttachMessage(
+          attached.message ||
+            'Attached for preview only — scored gameplay denied (syncEligible/hash/catalog gate).',
+        );
+      } else {
+        setAttachMessage(attached.message || 'Attached for scored lobby play.');
+      }
+    } catch (err) {
+      setAttachMessage(err instanceof Error ? err.message : String(err));
     } finally {
       setBusy(false);
     }
@@ -174,15 +237,36 @@ export function DirectHttpsWorkflowPanel() {
         </label>
       </div>
 
-      <button
-        type="button"
-        className="btn-secondary"
-        disabled={busy}
-        onClick={() => void onEvaluate()}
-        data-testid="direct-https-evaluate"
-      >
-        {busy ? 'Working…' : 'Evaluate (rights + hash + grid/charts)'}
-      </button>
+      <div className="row" style={{ gap: '0.5rem', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          className="btn-secondary"
+          disabled={busy}
+          onClick={() => void onEvaluate()}
+          data-testid="direct-https-evaluate"
+        >
+          {busy ? 'Working…' : 'Evaluate (rights + hash + grid/charts)'}
+        </button>
+        {props.onAttachToLobby ? (
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={busy || props.attachEnabled === false}
+            onClick={() => void onAttach()}
+            data-testid="direct-https-attach-lobby"
+          >
+            Attach to lobby
+          </button>
+        ) : null}
+      </div>
+      {attachMessage ? (
+        <p
+          data-testid="direct-https-attach-message"
+          style={{ fontSize: '0.85rem', color: 'var(--muted)', margin: 0 }}
+        >
+          {attachMessage}
+        </p>
+      ) : null}
 
       {ingestResult ? (
         <pre

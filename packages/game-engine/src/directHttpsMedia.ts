@@ -28,6 +28,58 @@ export const DIRECT_AUDIO_MIME = [
 /** Default: refuse automatic redirects (open-redirect / host-swap abuse). */
 export const DIRECT_HTTPS_MAX_REDIRECTS = 0;
 
+/**
+ * Block loopback / link-local / RFC1918 / metadata hostnames and IP literals.
+ * Literal IP checks cover common SSRF shapes; hostname labels cover localhost/.local.
+ * Callers that resolve DNS must re-check the resolved address before fetch.
+ */
+export function isBlockedDirectHttpsDestination(hostname: string): boolean {
+  const host = hostname.trim().toLowerCase().replace(/\.$/, '');
+  if (!host) return true;
+  if (
+    host === 'localhost' ||
+    host === 'localhost.localdomain' ||
+    host.endsWith('.localhost') ||
+    host.endsWith('.local') ||
+    host === 'metadata.google.internal' ||
+    host === 'metadata' ||
+    host === '0.0.0.0' ||
+    host === '::' ||
+    host === '::1' ||
+    host === '0:0:0:0:0:0:0:1' ||
+    host === '[::1]'
+  ) {
+    return true;
+  }
+
+  // IPv4 literal (also handles :port stripped by URL.hostname)
+  const v4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (v4) {
+    const octets = v4.slice(1).map((n) => Number(n));
+    if (octets.some((n) => n > 255)) return true;
+    const [a, b] = octets as [number, number, number, number];
+    if (a === 127) return true; // loopback
+    if (a === 10) return true; // RFC1918
+    if (a === 0) return true;
+    if (a === 169 && b === 254) return true; // link-local / cloud metadata
+    if (a === 192 && b === 168) return true; // RFC1918
+    if (a === 172 && b >= 16 && b <= 31) return true; // RFC1918
+    if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT / shared address space
+    return false;
+  }
+
+  // IPv6 literals commonly appear without brackets in URL.hostname
+  if (host.includes(':')) {
+    if (host === '::1' || host.startsWith('fe80:') || host.startsWith('fc') || host.startsWith('fd')) {
+      return true;
+    }
+    // Unique-local / link-local prefixes
+    if (/^(fc|fd)[0-9a-f]{0,2}:/i.test(host) || /^fe80:/i.test(host)) return true;
+  }
+
+  return false;
+}
+
 export interface DirectHttpsMediaInput {
   url: string;
   /** Declared MIME when known (upload / HEAD). */
@@ -109,6 +161,10 @@ export function validateDirectHttpsUrlPolicy(
       blockers.push('Credentials in URL are rejected.');
     } else if (u.hash) {
       blockers.push('URL fragments are not part of the media identity — strip #… before evaluate.');
+    } else if (isBlockedDirectHttpsDestination(u.hostname)) {
+      blockers.push(
+        'Destination host is blocked (loopback, link-local, private, or metadata). Direct HTTPS must not target internal networks.',
+      );
     } else {
       urlOk = true;
       normalizedUrl = u.toString();

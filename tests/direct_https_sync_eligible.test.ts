@@ -65,6 +65,23 @@ describe('evaluateDirectHttpsMedia syncEligible gate', () => {
     expect(creds.blockers.join(' ')).toMatch(/credential/i);
   });
 
+  it('rejects loopback, link-local, and private destination hosts', () => {
+    for (const raw of [
+      'https://127.0.0.1/owned.wav',
+      'https://localhost/owned.wav',
+      'https://192.168.1.10/owned.wav',
+      'https://10.0.0.5/owned.wav',
+      'https://169.254.169.254/latest/meta-data.wav',
+      'https://nas.local/owned.wav',
+    ]) {
+      const policy = validateDirectHttpsUrlPolicy(raw);
+      expect(policy.ok).toBe(false);
+      expect(policy.blockers.join(' ').toLowerCase()).toMatch(/blocked|loopback|private|link-local|internal/);
+    }
+    const publicOk = validateDirectHttpsUrlPolicy('https://cdn.example.com/owned/track.wav');
+    expect(publicOk.urlOk).toBe(true);
+  });
+
   it('probe refuses redirects when maxRedirects=0', async () => {
     const fetchImpl = async () => {
       throw new TypeError('Failed to fetch: redirect');
