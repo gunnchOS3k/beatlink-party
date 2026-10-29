@@ -138,7 +138,6 @@ function synthSong({ bpm, durationMs, motifHz, style, phrasePitches }) {
     const progress = t / (durationMs / 1000);
     const section = sectionOf(progress);
     const sGain = sectionGain(section);
-    const beat = Math.floor(t / beatSec);
     const phase = (t % beatSec) / beatSec;
     const bar = Math.floor(t / barSec);
     const root = motif[bar % motif.length];
