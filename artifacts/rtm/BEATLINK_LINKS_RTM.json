@@ -48,7 +48,7 @@
       "art_status": "not_applicable",
       "limitations": [],
       "severity": "high",
-      "sha": "b5c7482a559677d53074a596d318608594cbb820",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "Keep regression: credentials \u2260 gameplay sync."
@@ -80,7 +80,7 @@
         "Requires live browser smoke against youtube.com iframe_api"
       ],
       "severity": "medium",
-      "sha": "b5c7482a559677d53074a596d318608594cbb820",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "in_progress",
       "notes": "Cached rejected promise cleared on failure + reconnect."
@@ -111,7 +111,7 @@
         "MusicKit/Web Playback SDK remains EXTERNAL"
       ],
       "severity": "medium",
-      "sha": "b5c7482a559677d53074a596d318608594cbb820",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "metadata/embed \u2260 gameplay"
@@ -142,7 +142,7 @@
         "Official widget deep integration pending \u2014 scaffolds \u2260 complete support"
       ],
       "severity": "low",
-      "sha": "b5c7482a559677d53074a596d318608594cbb820",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "Honest SCAFFOLD classification preserved."
@@ -176,7 +176,7 @@
         "Creator must attach attestation + hash; auto-publish remains false"
       ],
       "severity": "blocker",
-      "sha": "b5c7482a559677d53074a596d318608594cbb820",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "in_progress",
       "notes": "Negative regression: playback ok + syncEligible false + hash/grid/charts \u2192 gameplay denied."
@@ -205,7 +205,7 @@
       "art_status": "not_applicable",
       "limitations": [],
       "severity": "high",
-      "sha": "b5c7482a559677d53074a596d318608594cbb820",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "CC sync/adaptation caveats surface in rightsLayers findings."
@@ -241,7 +241,7 @@
         "Exact-head CI/Wave007 pending after PR tip advances"
       ],
       "severity": "high",
-      "sha": "b5c7482a559677d53074a596d318608594cbb820",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "BETA/RC/LAUNCH/human commercial remain false."
@@ -271,7 +271,7 @@
       "art_status": "not_applicable",
       "limitations": [],
       "severity": "blocker",
-      "sha": "b5c7482a559677d53074a596d318608594cbb820",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "independent_review_status=not_started on all rows."
