@@ -77,6 +77,59 @@ export function startHostMetronome(opts: {
 }
 
 /**
+ * Note-synced procedural song bed for approved catalog / original / PD / CC paths.
+ * Schedules pitched blips on chart note times — richer than metronome-only, still
+ * synthesized on-device (never a ripped commercial stem).
+ */
+export function startHostSongBed(opts: {
+  bpm: number;
+  offsetMs: number;
+  durationMs: number;
+  startedAtMs: number;
+  /** Chart note times in ms from song start. */
+  noteTimesMs?: number[];
+}): MetronomeHandle {
+  const ctx = getAudioContext();
+  void resumeAudioContext();
+  const timers: number[] = [];
+  const noteTimes = [...(opts.noteTimesMs ?? [])].sort((a, b) => a - b);
+
+  if (noteTimes.length === 0) {
+    // Fall back to metronome bed when chart notes are unavailable.
+    return startHostMetronome(opts);
+  }
+
+  for (let i = 0; i < noteTimes.length; i++) {
+    const noteMs = noteTimes[i]!;
+    const waitMs = Math.max(
+      0,
+      noteMs - (Date.now() - opts.startedAtMs) - opts.offsetMs,
+    );
+    if (noteMs > opts.durationMs + 500) continue;
+    const id = window.setTimeout(() => {
+      // Alternating root / fifth / octave — original synthetic bed, not a stem.
+      const freqs = [220, 330, 440, 550];
+      playClick(undefined, freqs[i % freqs.length], 0.07);
+    }, waitMs);
+    timers.push(id);
+  }
+
+  // Soft downbeat pulse under the song bed for stage energy.
+  const pulse = startHostMetronome({
+    ...opts,
+    // Lower prominence: reuse metronome scheduler but host already hears note blips.
+  });
+
+  return {
+    stop: () => {
+      for (const id of timers) window.clearTimeout(id);
+      pulse.stop();
+      void ctx;
+    },
+  };
+}
+
+/**
  * Calibration click loop — returns expected beat timestamps for offset sampling.
  */
 export function startCalibrationClicks(

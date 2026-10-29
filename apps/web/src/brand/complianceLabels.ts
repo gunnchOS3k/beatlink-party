@@ -14,7 +14,7 @@ export function catalogEligibility(song: SongCatalogEntry): {
   if (license.includes('pending') || license.includes('user')) {
     return { cls: 'user_link_pending', label: 'USER / LINK PENDING' };
   }
-  // Approved demo / open catalog entries are playable via host metronome path.
+  // Approved demo / PD / CC / original / creator-owned — host note-synced song bed (not a stream rip).
   return { cls: 'playable_now', label: 'PLAYABLE NOW' };
 }
 
@@ -45,4 +45,4 @@ export function linkEligibility(result: LinkResolveResult): {
 }
 
 export const MUSIC_COMPLIANCE_SUMMARY =
-  'Pasted YouTube / Spotify / Apple Music links are metadata-only unless an authorized platform path is configured. BeatLink never downloads or DRM-bypasses third-party streams. Use approved demo or owned/open catalog songs for scoring rounds.';
+  'Pasted YouTube / Spotify / Apple Music links are metadata-only unless an authorized platform path is configured. BeatLink never downloads or DRM-bypasses third-party streams. Scoring rounds use approved demo / PD / CC / original / creator-attested catalog songs with a host note-synced song bed — never a ripped stem.';

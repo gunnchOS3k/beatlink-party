@@ -4,7 +4,13 @@ import type { LinkResolveResult, PlaybackStatus, SongCatalogEntry } from '@beatl
  * Authorized / local media only.
  * Providers never rip, download, or copy copyrighted audio streams.
  */
-export type MediaKind = 'procedural_metronome' | 'catalog_approved' | 'authorized_embed' | 'metadata_only';
+export type MediaKind =
+  | 'procedural_metronome'
+  /** Lawful catalog / original synthetic song bed synced to beatmap notes (not a stream rip). */
+  | 'procedural_song_bed'
+  | 'catalog_approved'
+  | 'authorized_embed'
+  | 'metadata_only';
 
 export interface MediaDescriptor {
   kind: MediaKind;
@@ -55,6 +61,33 @@ export class ProceduralMetronomeProvider implements MediaProvider {
   }
 }
 
+/**
+ * Authorized original / PD / CC / demo catalog song bed.
+ * Host synthesizes a note-synced musical bed — never a ripped commercial stem.
+ */
+export class ProceduralSongBedProvider implements MediaProvider {
+  readonly id = 'procedural_song_bed';
+
+  resolve(input: MediaResolveInput): MediaDescriptor {
+    const entry = input.catalogEntry;
+    if (!entry) {
+      return new ProceduralMetronomeProvider().resolve(input);
+    }
+    return {
+      kind: 'procedural_song_bed',
+      songId: entry.id,
+      title: entry.title,
+      artist: entry.artist,
+      bpm: entry.bpm,
+      durationMs: entry.durationMs,
+      playbackStatus: 'PLAYABLE_APPROVED',
+      embed: null,
+      message:
+        'Authorized catalog song bed — host Web Audio synthesizes note-synced tones from the beatmap (no streaming rip, no DRM bypass).',
+    };
+  }
+}
+
 /** User-authorized catalog / official embed metadata only. */
 export class AuthorizedCatalogEmbedProvider implements MediaProvider {
   readonly id = 'authorized_catalog_embed';
@@ -65,7 +98,7 @@ export class AuthorizedCatalogEmbedProvider implements MediaProvider {
 
     if (entry && (!link || link.playbackStatus === 'PLAYABLE_APPROVED')) {
       return {
-        kind: 'catalog_approved',
+        kind: 'procedural_song_bed',
         songId: entry.id,
         title: entry.title,
         artist: entry.artist,
@@ -73,7 +106,8 @@ export class AuthorizedCatalogEmbedProvider implements MediaProvider {
         durationMs: entry.durationMs,
         playbackStatus: 'PLAYABLE_APPROVED',
         embed: null,
-        message: 'Approved demo catalog entry — procedural playback path.',
+        message:
+          'Approved catalog entry — procedural song bed synced to chart notes (lawful original/PD/CC/demo path).',
       };
     }
 
@@ -112,7 +146,8 @@ export class AuthorizedCatalogEmbedProvider implements MediaProvider {
 
 export function selectMediaProvider(input: MediaResolveInput): MediaProvider {
   if (input.catalogEntry && (!input.linkResult || input.linkResult.playbackStatus === 'PLAYABLE_APPROVED')) {
-    return new ProceduralMetronomeProvider();
+    // Prefer note-synced song bed over metronome-only for catalog performances.
+    return new ProceduralSongBedProvider();
   }
   if (input.linkResult) return new AuthorizedCatalogEmbedProvider();
   return new ProceduralMetronomeProvider();

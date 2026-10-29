@@ -7,6 +7,7 @@ import type { LinkResolveResult, PlaybackStatus, SongCatalogEntry } from '@beatl
 import {
   AuthorizedCatalogEmbedProvider,
   ProceduralMetronomeProvider,
+  ProceduralSongBedProvider,
   selectMediaProvider,
   type MediaDescriptor,
   type MediaResolveInput,
@@ -18,6 +19,7 @@ export type SongSourceKind =
   | 'authorized_platform_playback'
   | 'provider_reference_only'
   | 'procedural_fixture'
+  | 'procedural_song_bed'
   | 'user_attested_upload'
   | 'blocked';
 
@@ -133,8 +135,8 @@ export function resolveSongSource(input: SongSourceResolveInput): SongSource {
   let canGameplayStream = false;
   let canCacheMedia = false;
 
-  if (media.kind === 'catalog_approved') {
-    kind = 'approved_catalog';
+  if (media.kind === 'catalog_approved' || media.kind === 'procedural_song_bed') {
+    kind = media.kind === 'procedural_song_bed' ? 'procedural_song_bed' : 'approved_catalog';
     canGameplayStream = media.playbackStatus === 'PLAYABLE_APPROVED';
     canCacheMedia = false;
   } else if (media.kind === 'procedural_metronome') {
@@ -253,5 +255,6 @@ export function songSourceFromLinkResult(
 export {
   AuthorizedCatalogEmbedProvider,
   ProceduralMetronomeProvider,
+  ProceduralSongBedProvider,
   createRightsAttestation,
 };

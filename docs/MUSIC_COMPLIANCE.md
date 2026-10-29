@@ -33,11 +33,13 @@ The link resolver does **not**:
 
 | Path | MVP | Notes |
 |------|-----|-------|
-| Internal approved catalog | Yes | Demo generated tracks |
-| Creator-owned uploads | Planned | User confirms rights |
+| Internal approved catalog | Yes | Demo / synthetic song bed synced to chart notes |
+| Creator-owned uploads | Stub | `POST /content/creator-ingest` — attestation metadata only |
 | Licensed music packs | Future | Requires label deals |
 | Official platform playback | Future | Per-platform SDK + license |
-| Public-domain / royalty-free | Yes | Safe for demos |
+| Public-domain / royalty-free | Yes | Offline launch catalog + song beds |
+
+LAN phone/TV bind (local-dev only): see [LAN_PARTY_PHONE_TV.md](LAN_PARTY_PHONE_TV.md).
 
 ## Source eligibility router (A–F)
 

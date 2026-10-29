@@ -13,7 +13,12 @@ import type {
 import { GAME_MODE_IDS, MAX_PERFORMERS, ROLES } from '@beatlink/shared';
 import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
 import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
-import { startCalibrationClicks, startHostMetronome, resumeAudioContext } from '../lib/hostAudio';
+import {
+  startCalibrationClicks,
+  startHostMetronome,
+  startHostSongBed,
+  resumeAudioContext,
+} from '../lib/hostAudio';
 import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
 import { endHostParty } from '../lib/partySession';
 import {
@@ -32,6 +37,9 @@ import {
   nextPredictionSection,
   resolveMediaDescriptor,
   evaluateStartPreconditions,
+  upcomingSyncedNotes,
+  openModePlayableSession,
+  buildModeStageVisual,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -449,27 +457,37 @@ export default function HostPage() {
     };
   }, [socket]);
 
-  // Host metronome for PLAYABLE_APPROVED catalog rounds (no copyrighted audio files).
+  // Host song bed for PLAYABLE_APPROVED catalog rounds (note-synced synth; no copyrighted stems).
   useEffect(() => {
     metronomeRef.current?.stop();
     metronomeRef.current = null;
     if (room?.phase !== 'playing') return;
     const playback = room.linkResolveResult?.playbackStatus;
-    const canMetronome =
+    const canPlay =
       playback === 'PLAYABLE_APPROVED' ||
       (!room.linkResolveResult && Boolean(room.selectedSongId));
-    if (!canMetronome) return;
+    if (!canPlay) return;
 
     const song = songs.find((s) => s.id === room.selectedSongId);
     const bpm = song?.bpm ?? beatmapBpm;
     const startedAt = room.gameStartTime ?? Date.now();
+    const noteTimesMs = beatmap?.notes.map((n) => n.timeMs) ?? [];
     void resumeAudioContext();
-    metronomeRef.current = startHostMetronome({
-      bpm,
-      offsetMs: room.calibrationOffsetMs ?? 0,
-      durationMs: room.gameDurationMs,
-      startedAtMs: startedAt,
-    });
+    metronomeRef.current =
+      noteTimesMs.length > 0
+        ? startHostSongBed({
+            bpm,
+            offsetMs: room.calibrationOffsetMs ?? 0,
+            durationMs: room.gameDurationMs,
+            startedAtMs: startedAt,
+            noteTimesMs,
+          })
+        : startHostMetronome({
+            bpm,
+            offsetMs: room.calibrationOffsetMs ?? 0,
+            durationMs: room.gameDurationMs,
+            startedAtMs: startedAt,
+          });
     return () => {
       metronomeRef.current?.stop();
       metronomeRef.current = null;
@@ -483,6 +501,7 @@ export default function HostPage() {
     room?.linkResolveResult,
     songs,
     beatmapBpm,
+    beatmap,
   ]);
 
   useEffect(() => {
@@ -992,8 +1011,8 @@ export default function HostPage() {
                 ) : null}
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
-                Flow: song select → calibrate latency → countdown → play (host metronome for approved
-                catalog).
+                Flow: song select → calibrate latency → countdown → play (host note-synced song bed
+                for approved catalog).
               </p>
               <button className="btn-secondary btn-large" onClick={endRoom} type="button" data-testid="host-end-room">
                 End Room
@@ -1031,7 +1050,7 @@ export default function HostPage() {
           <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '0.75rem' }}>
             Media: {mediaDescriptor.kind} — {mediaDescriptor.message}
           </p>
-          <p style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+          <p style={{ textAlign: 'center', marginBottom: '0.5rem' }} data-testid="host-mode-stage-line">
             {activeMode.label}
             {room.gameMode === 'CallAndResponse' && beatmap
               ? ` · ${isCallAndResponseWindow(beatmap.sections, gameTimeMs).phase}`
@@ -1039,11 +1058,56 @@ export default function HostPage() {
             {room.gameMode === 'PredictionTrivia' && beatmap
               ? ` · next: ${nextPredictionSection(beatmap.sections, gameTimeMs)?.label ?? '—'}`
               : ''}
+            {room.gameMode === 'KaraokePerformance' ? ' · phrase prompts (pitch only if mic consented)' : ''}
+            {room.gameMode === 'BandRoles' ? ' · band lanes live' : ''}
+            {room.gameMode === 'BeatTap' ? ' · note-synced song bed' : ''}
           </p>
-          <div className="beat-lane">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} className="beat-bar" style={{ animationDelay: `${i * 0.05}s` }} />
-            ))}
+          {beatmap && selectedSong && (
+            <p
+              className="label"
+              style={{ textAlign: 'center', marginBottom: '0.5rem' }}
+              data-testid="host-song-session"
+            >
+              {(() => {
+                const session = openModePlayableSession({
+                  modeId: room.gameMode,
+                  catalogEntry: selectedSong,
+                  beatmap,
+                  difficulty: room.difficulty,
+                });
+                const visual = buildModeStageVisual(session, beatmap, gameTimeMs, room.crowdMeter);
+                return `${visual.headline} · cue: ${visual.activeCueLabel ?? '—'} · ${session.audioKind}`;
+              })()}
+            </p>
+          )}
+          <div className="beat-lane" data-testid="host-synced-note-lane">
+            {beatmap
+              ? upcomingSyncedNotes(
+                  beatmap.notes.map((n) => ({
+                    noteId: n.id,
+                    timeMs: n.timeMs,
+                    lane: n.type === 'hold' ? 'hold' : n.type === 'swipe' ? 'swipe' : 'tap',
+                    label: n.type,
+                  })),
+                  gameTimeMs,
+                  1800,
+                )
+                  .slice(0, 16)
+                  .map((cue, i) => (
+                    <div
+                      key={cue.noteId}
+                      className="beat-bar"
+                      data-lane={cue.lane}
+                      style={{
+                        animationDelay: `${i * 0.04}s`,
+                        opacity: Math.max(0.35, 1 - (cue.timeMs - gameTimeMs) / 1800),
+                      }}
+                      title={cue.label}
+                    />
+                  ))
+              : Array.from({ length: 16 }).map((_, i) => (
+                  <div key={i} className="beat-bar" style={{ animationDelay: `${i * 0.05}s` }} />
+                ))}
           </div>
           <div className="row" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div>

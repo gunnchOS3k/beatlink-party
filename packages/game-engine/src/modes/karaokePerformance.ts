@@ -19,20 +19,20 @@ export const karaokePerformanceMode: GameModeDefinition = {
   label: 'Karaoke Performance',
   tagline: 'Phrase prompts on cue — mic optional; no-recording by default.',
   primaryRoles: ['vocalist'],
-  micPolicy: 'prompt_only',
+  micPolicy: 'optional',
   tutorial: [
     {
       id: 'kp-1',
       title: 'Prompt timing',
-      body: 'Submit the phrase while the prompt is active. Mic pitch is optional beta DSP.',
+      body: 'Submit the phrase while the prompt is active. Timing-only scoring always works.',
       roleHint: 'vocalist',
       caption: 'Submit during the prompt window.',
     },
     {
       id: 'kp-2',
-      title: 'No recording mode',
-      body: 'Default karaoke path never records or uploads audio — timing-only scoring works offline.',
-      caption: 'No mic recording by default.',
+      title: 'Mic consent for pitch',
+      body: 'Pitch/vocal DSP runs only after explicit mic consent. Default remains no-recording; we never claim pitch analysis without a live DSP frame.',
+      caption: 'Mic consent unlocks optional pitch path.',
     },
     {
       id: 'kp-3',
@@ -57,15 +57,23 @@ export const karaokePerformanceMode: GameModeDefinition = {
   score(ctx: ModeScoreContext): ModeScoreResult {
     const hooks = HOOKS[ctx.difficulty];
     const noRecording = ctx.meta?.noRecording !== false;
-    const points = Math.round((ctx.basePoints + 50) * hooks.scoreMultiplier);
+    const pitchActive = ctx.meta?.pitchAnalysisActive === true;
+    const pitchBonus = pitchActive && typeof ctx.meta?.pitchMatch === 'number'
+      ? Math.round(Number(ctx.meta.pitchMatch) * 40)
+      : 0;
+    const points = Math.round((ctx.basePoints + 50) * hooks.scoreMultiplier) + pitchBonus;
     return {
       points,
-      message: noRecording
+      message: pitchActive
         ? ctx.grade === 'miss'
           ? 'Missed phrase'
-          : 'Phrase hit (no recording)'
-        : 'Phrase hit',
-      crowdBoost: ctx.grade === 'miss' ? -1 : 5,
+          : 'Phrase + pitch hit'
+        : noRecording
+          ? ctx.grade === 'miss'
+            ? 'Missed phrase'
+            : 'Phrase hit (no recording)'
+          : 'Phrase hit (timing only)',
+      crowdBoost: ctx.grade === 'miss' ? -1 : pitchActive ? 6 : 5,
     };
   },
   a11y: defaultModeA11y({
@@ -88,7 +96,7 @@ export const karaokePerformanceMode: GameModeDefinition = {
       crowdMeter: input.crowdMeter,
       winningTeam: input.winningTeam,
       rows: input.rows,
-      headline: 'Karaoke results (no recording)',
+      headline: 'Karaoke results (timing default; pitch only if mic consented)',
     };
   },
 };

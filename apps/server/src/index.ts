@@ -3,13 +3,17 @@ import cors from 'cors';
 import { createServer } from 'node:http';
 import type { DifficultyId, GameModeId } from '@beatlink/shared';
 import { registerTelemetrySink } from '@beatlink/shared';
-import { createDefaultProviderBundle, listGameModes } from '@beatlink/game-engine';
+import {
+  createDefaultProviderBundle,
+  ingestCreatorOwnedStub,
+  listGameModes,
+} from '@beatlink/game-engine';
 import { setupRealtime } from './realtime/socket.js';
 import { loadCatalog, getBeatmapForSong } from './beatmaps/store.js';
 import { getProviderAuthStatus, resolveLink } from './music/linkResolver.js';
 import { roomManager } from './rooms/RoomManager.js';
 import { createRoomStoreFromEnv } from './rooms/store/index.js';
-import { loopbackBindHost } from './net/loopbackBind.mjs';
+import { isPartyLanBindEnabled, loopbackBindHost } from './net/loopbackBind.mjs';
 import { roomAuthority } from './rooms/roomHttp.mjs';
 import {
   disconnectRoomHttp,
@@ -53,7 +57,59 @@ app.get('/health', (_req, res) => {
     status: 'ok',
     service: 'beatlink-party',
     roomStore: roomStoreBackend,
+    partyLan: isPartyLanBindEnabled(),
   });
+});
+
+/**
+ * Creator-owned ingest stub — metadata + rights attestation only.
+ * Never accepts streaming rips, lyric scrapes, or DRM bypass.
+ */
+app.post('/content/creator-ingest', (req, res) => {
+  const body = (req.body ?? {}) as {
+    trackId?: string;
+    title?: string;
+    artist?: string;
+    attestorId?: string;
+    ownsOrLicensed?: boolean;
+    durationMs?: number;
+    bpm?: number;
+    pitchHintHz?: number | null;
+    claimedSourceUrl?: string | null;
+    ripIntentSignals?: string[];
+    declaredLicense?: string;
+  };
+  if (!body.trackId || !body.title || !body.artist || !body.attestorId) {
+    return res.status(400).json({
+      error: 'trackId, title, artist, and attestorId are required',
+      honesty: {
+        ripPerformed: false,
+        lyricsScraped: false,
+        drmCircumvented: false,
+        commercialLicenseClaimed: false,
+        audioBinaryStored: false,
+      },
+    });
+  }
+  const result = ingestCreatorOwnedStub({
+    trackId: String(body.trackId),
+    title: String(body.title),
+    artist: String(body.artist),
+    attestorId: String(body.attestorId),
+    ownsOrLicensed: Boolean(body.ownsOrLicensed),
+    durationMs: body.durationMs,
+    bpm: body.bpm,
+    pitchHintHz: body.pitchHintHz ?? null,
+    claimedSourceUrl: body.claimedSourceUrl ?? null,
+    ripIntentSignals: body.ripIntentSignals,
+    declaredLicense: body.declaredLicense as
+      | 'creator_owned'
+      | 'creative_commons'
+      | 'public_domain'
+      | 'licensed_pack'
+      | undefined,
+  });
+  return res.status(result.ok ? 200 : 422).json(result);
 });
 
 app.post('/rooms', (req, res) => {
@@ -277,9 +333,15 @@ async function main() {
 
   const bindHost = loopbackBindHost(process.env.BEATLINK_BIND_HOST);
   httpServer.listen(PORT, bindHost, () => {
+    const lan = isPartyLanBindEnabled();
     console.log(
-      `BeatLink Party server running on http://${bindHost}:${PORT} (roomStore=${roomStoreBackend})`,
+      `BeatLink Party server running on http://${bindHost}:${PORT} (roomStore=${roomStoreBackend}, partyLan=${lan})`,
     );
+    if (lan && bindHost !== '127.0.0.1' && bindHost !== '::1') {
+      console.warn(
+        '[beatlink] SECURITY: BEATLINK_PARTY_LAN enabled — server reachable on local Wi-Fi. Use only on trusted private networks for phone/TV party testing. Do not expose to the public internet. See docs/LAN_PARTY_PHONE_TV.md',
+      );
+    }
   });
 }
 
