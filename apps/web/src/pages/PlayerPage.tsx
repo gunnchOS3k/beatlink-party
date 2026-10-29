@@ -20,8 +20,9 @@ import {
   isCallAndResponseWindow,
   nextPredictionSection,
   LiveGetUserMediaAdapter,
-  openLiveMicPipeline,
-  synthesizeKaraokeTone,
+  microphonePitchAnalysisClaim,
+  startLiveMicContinuousAnalysis,
+  type LiveMicContinuousHandle,
 } from '@beatlink/game-engine';
 import { useJoinRoom, useRoomEvents, useSocket } from '../lib/socket';
 import { joinGuestParty } from '../lib/partySession';
@@ -68,13 +69,15 @@ export default function PlayerPage() {
   const [hostOffer, setHostOffer] = useState(false);
   const [deviceCalibStatus, setDeviceCalibStatus] = useState<string | null>(null);
   const [deviceCalibBusy, setDeviceCalibBusy] = useState(false);
-  /** Karaoke mic: default no-recording; pitch claim only after consent + DSP frame. */
+  /** Karaoke mic: default no-recording; pitch claim only during continuous live DSP. */
   const [micConsent, setMicConsent] = useState<'prompt' | 'granted' | 'denied' | 'no_recording'>(
     'no_recording',
   );
   const [pitchAnalysisActive, setPitchAnalysisActive] = useState(false);
   const [lastPitchHz, setLastPitchHz] = useState<number | null>(null);
   const micAdapterRef = useRef<LiveGetUserMediaAdapter | null>(null);
+  const liveAnalysisRef = useRef<LiveMicContinuousHandle | null>(null);
+  const lastPitchMatchRef = useRef<number | null>(null);
   const inputSeqRef = useRef(0);
   const playerIdRef = useRef<string | undefined>(undefined);
   playerIdRef.current = player?.id;
@@ -145,6 +148,14 @@ export default function PlayerPage() {
     }, 50);
     return () => clearInterval(id);
   }, [joined, room?.phase, gameStartTime]);
+
+  useEffect(() => {
+    return () => {
+      liveAnalysisRef.current?.stop();
+      liveAnalysisRef.current = null;
+      micAdapterRef.current?.stopTracks();
+    };
+  }, []);
 
   useEffect(() => {
     if (!beatmap || !player) return;
@@ -277,59 +288,76 @@ export default function PlayerPage() {
     sendInput('swipe', { noteId: note?.id });
   }
 
+  function stopLiveKaraokeAnalysis() {
+    liveAnalysisRef.current?.stop();
+    liveAnalysisRef.current = null;
+    lastPitchMatchRef.current = null;
+    setPitchAnalysisActive(false);
+    setLastPitchHz(null);
+  }
+
   async function requestKaraokeMicConsent() {
     if (!micAdapterRef.current) {
       micAdapterRef.current = new LiveGetUserMediaAdapter();
     }
     const adapter = micAdapterRef.current;
     adapter.allowEphemeralCapture();
+    stopLiveKaraokeAnalysis();
     const state = await adapter.request();
     if (state === 'granted') {
       setMicConsent('granted');
-      // Honest path: run one ephemeral DSP frame (synthetic tone probe in CI-safe browsers
-      // without a real stream analyzer yet). Live stream tracks are stopped after permission.
-      const pipeline = openLiveMicPipeline({
-        preferNoRecording: false,
-        targetPitchHz: currentPrompt ? 220 : 196,
+      // Genuine continuous path only: live mic PCM → DSP → phrase scoring.
+      // Never authorize pitchAnalysisActive from a synthetic tone probe.
+      const stream = adapter.getStream();
+      const targetHz = currentPrompt ? 220 : 196;
+      const handle =
+        stream != null
+          ? startLiveMicContinuousAnalysis(stream, {
+              targetPitchHz: targetHz,
+              intervalMs: 100,
+              onFrame: (frame) => {
+                lastPitchMatchRef.current = frame.score.pitchMatch;
+                setLastPitchHz(frame.features.pitchHz || null);
+              },
+            })
+          : null;
+      const claim = microphonePitchAnalysisClaim({
+        micConsent: 'granted',
+        continuousLive: handle?.live === true,
       });
-      const perm = await pipeline.start();
-      if (perm === 'granted') {
-        const tone = synthesizeKaraokeTone({
-          durationMs: 400,
-          pitchHz: 220,
-          phraseWindowsMs: [{ startMs: 0, endMs: 400 }],
-        });
-        const frame = pipeline.ingestSyntheticPcm(tone);
+      if (handle && claim) {
+        liveAnalysisRef.current = handle;
         setPitchAnalysisActive(true);
-        setLastPitchHz(frame.features.pitchHz || null);
       } else {
+        // Permission alone is not a pitch claim — keep timing-only honesty.
+        handle?.stop();
         setPitchAnalysisActive(false);
-        setMicConsent(perm === 'denied' ? 'denied' : 'prompt');
+        setLastPitchHz(null);
       }
-      pipeline.stop();
     } else if (state === 'denied') {
       setMicConsent('denied');
-      setPitchAnalysisActive(false);
-      setLastPitchHz(null);
+      stopLiveKaraokeAnalysis();
     } else {
       setMicConsent(state === 'no_recording' ? 'no_recording' : 'prompt');
-      setPitchAnalysisActive(false);
+      stopLiveKaraokeAnalysis();
     }
   }
 
   function disableKaraokeMic() {
+    stopLiveKaraokeAnalysis();
     micAdapterRef.current?.enableNoRecordingMode();
     micAdapterRef.current?.stopTracks();
     setMicConsent('no_recording');
-    setPitchAnalysisActive(false);
-    setLastPitchHz(null);
   }
 
   function handleVocal() {
     sendInput('vocal_phrase', {
       promptId: currentPrompt?.id,
-      // Client honesty flag — pitch claim only when consent + DSP path is active.
+      // Client honesty flag — true only while continuous consented mic DSP is live.
       pitchAnalysisActive,
+      ...(pitchAnalysisActive && lastPitchMatchRef.current != null
+        ? { pitchMatch: lastPitchMatchRef.current }
+        : {}),
     });
   }
 
@@ -535,7 +563,7 @@ export default function PlayerPage() {
           {room.gameMode === 'CallAndResponse' && 'Mode · Call & Response — wait for the echo window'}
           {room.gameMode === 'KaraokePerformance' &&
             (pitchAnalysisActive
-              ? 'Mode · Karaoke — timing + consented mic pitch path'
+              ? 'Mode · Karaoke — timing + consented live mic pitch path'
               : 'Mode · Karaoke — phrase timing (pitch off until mic consent)')}
           {room.gameMode === 'BandRoles' &&
             'Mode · Band Roles — stay in your lane; cover all three seats for Band locked'}
@@ -629,7 +657,7 @@ export default function PlayerPage() {
                 data-testid="karaoke-mic-consent"
                 onClick={() => void requestKaraokeMicConsent()}
               >
-                Allow mic (pitch path)
+                Allow mic (live pitch DSP)
               </button>
               <button
                 className="btn-secondary"
@@ -663,8 +691,8 @@ export default function PlayerPage() {
               {pitchAnalysisActive
                 ? `VOCAL_TIMING+PITCH_PATH — MICROPHONE_PITCH_ANALYSIS=true (consent=${micConsent}${
                     lastPitchHz != null ? ` · lastHz≈${Math.round(lastPitchHz)}` : ''
-                  }) · GENERAL_VOCAL_RECOGNITION=false · no audio stored · ephemeral DSP only`
-                : `VOCAL_PROMPT_TIMING_MODE — MICROPHONE_PITCH_ANALYSIS=false · mic=${micConsent} · GENERAL_VOCAL_RECOGNITION=false. No audio stored. No fake pitch meter.`}
+                  }) · GENERAL_VOCAL_RECOGNITION=false · no audio stored · continuous live DSP only (never synthetic tone)`
+                : `VOCAL_PROMPT_TIMING_MODE — MICROPHONE_PITCH_ANALYSIS=false · mic=${micConsent} · GENERAL_VOCAL_RECOGNITION=false. No audio stored. Pitch off until continuous consented mic DSP.`}
             </p>
           </div>
         )}

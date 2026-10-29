@@ -1484,6 +1484,16 @@ export class RoomManager {
           gameTimeMs,
           player.streak,
         );
+        // Pitch bonus only when client reports continuous live DSP (never synthetic probe).
+        const pitchAnalysisActive =
+          input.type === 'vocal_phrase' && input.pitchAnalysisActive === true;
+        const pitchMatchRaw = input.pitchMatch;
+        const pitchMatch =
+          pitchAnalysisActive &&
+          typeof pitchMatchRaw === 'number' &&
+          Number.isFinite(pitchMatchRaw)
+            ? Math.min(1, Math.max(0, pitchMatchRaw))
+            : undefined;
         const modeScore = scoreForMode({
           modeId: room.gameMode,
           difficulty: room.difficulty,
@@ -1492,7 +1502,10 @@ export class RoomManager {
           streak: vocal.streak,
           meta: {
             role: player.role,
-            noRecording: true,
+            // Fallback tap / timing-only remains no-recording; live pitch path is ephemeral DSP only.
+            noRecording: !pitchAnalysisActive,
+            pitchAnalysisActive,
+            ...(pitchMatch != null ? { pitchMatch } : {}),
             bandCoverage:
               room.gameMode === 'BandRoles' && this.bandCoverageSeated(room),
             responseMatched:

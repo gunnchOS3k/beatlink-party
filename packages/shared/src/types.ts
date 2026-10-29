@@ -381,6 +381,13 @@ export interface PlayerInputEvent {
   sectionId?: string;
   /** PredictionTrivia — chosen section id or label (case-insensitive match). */
   predictionChoice?: string;
+  /**
+   * Karaoke honesty: true only while continuous consented mic DSP is live.
+   * Synthetic tone probes must never set this.
+   */
+  pitchAnalysisActive?: boolean;
+  /** Karaoke pitch match 0..1 from ephemeral live DSP (discarded after score). */
+  pitchMatch?: number;
   /** Client event identity for server idempotency (Wave007). */
   event_id?: string;
   idempotency_key?: string;

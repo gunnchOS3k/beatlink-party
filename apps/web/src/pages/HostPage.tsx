@@ -472,15 +472,21 @@ export default function HostPage() {
     const bpm = song?.bpm ?? beatmapBpm;
     const startedAt = room.gameStartTime ?? Date.now();
     const noteTimesMs = beatmap?.notes.map((n) => n.timeMs) ?? [];
+    const phraseWindowsMs =
+      beatmap?.vocalPrompts.map((p) => ({
+        startMs: p.timeMs,
+        durationMs: p.durationMs,
+      })) ?? [];
     void resumeAudioContext();
     metronomeRef.current =
-      noteTimesMs.length > 0
+      noteTimesMs.length > 0 || phraseWindowsMs.length > 0
         ? startHostSongBed({
             bpm,
             offsetMs: room.calibrationOffsetMs ?? 0,
             durationMs: room.gameDurationMs,
             startedAtMs: startedAt,
             noteTimesMs,
+            phraseWindowsMs,
           })
         : startHostMetronome({
             bpm,

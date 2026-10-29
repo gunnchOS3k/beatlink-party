@@ -208,6 +208,103 @@ export function detectOnset(
   };
 }
 
+export interface LiveMicContinuousOptions {
+  targetPitchHz?: number;
+  intervalMs?: number;
+  onFrame: (frame: LiveMicFrame) => void;
+}
+
+export interface LiveMicContinuousHandle {
+  /** True only while a live MediaStream is feeding DSP (never synthetic tone). */
+  readonly live: true;
+  stop(): void;
+}
+
+/**
+ * Continuous consented mic path: MediaStream PCM → AnalyserNode → DSP features.
+ * Never records, uploads, or retains PCM beyond the current analysis tick.
+ * Returns null when Web Audio is unavailable — callers must keep pitch claims false.
+ */
+export function startLiveMicContinuousAnalysis(
+  stream: MediaStream,
+  options: LiveMicContinuousOptions,
+): LiveMicContinuousHandle | null {
+  const AudioCtx =
+    typeof globalThis !== 'undefined'
+      ? (globalThis as typeof globalThis & {
+          AudioContext?: typeof AudioContext;
+          webkitAudioContext?: typeof AudioContext;
+        }).AudioContext ??
+        (globalThis as typeof globalThis & { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext
+      : undefined;
+  if (!AudioCtx) return null;
+
+  const tracks = stream.getAudioTracks();
+  if (!tracks.length || tracks.every((t) => t.readyState === 'ended')) return null;
+
+  const ctx = new AudioCtx();
+  const source = ctx.createMediaStreamSource(stream);
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 2048;
+  analyser.smoothingTimeConstant = 0.2;
+  source.connect(analyser);
+
+  const targetPitchHz = options.targetPitchHz ?? 220;
+  const intervalMs = Math.max(50, options.intervalMs ?? 100);
+  const buf = new Float32Array(analyser.fftSize);
+  let stopped = false;
+
+  const tick = () => {
+    if (stopped) return;
+    analyser.getFloatTimeDomainData(buf);
+    // Copy then discard — do not retain analyser buffer beyond this frame.
+    const pcm = Float32Array.from(buf);
+    const score = scoreKaraokeDsp(pcm, {
+      targetPitchHz,
+      sampleRate: ctx.sampleRate || 48000,
+      window: { startMs: 0, endMs: (pcm.length / (ctx.sampleRate || 48000)) * 1000 },
+    });
+    options.onFrame({
+      features: score.features,
+      score,
+      recording: false,
+      pcmRetained: false,
+    });
+  };
+
+  void ctx.resume().catch(() => undefined);
+  tick();
+  const timer = setInterval(tick, intervalMs);
+
+  return {
+    live: true,
+    stop() {
+      if (stopped) return;
+      stopped = true;
+      clearInterval(timer);
+      try {
+        source.disconnect();
+        analyser.disconnect();
+      } catch {
+        /* already torn down */
+      }
+      void ctx.close().catch(() => undefined);
+    },
+  };
+}
+
+/**
+ * Honesty helper: synthetic PCM probes never authorize a MICROPHONE_PITCH_ANALYSIS claim.
+ * Pitch is active only while continuous live analysis is running on a consented stream.
+ */
+export function microphonePitchAnalysisClaim(opts: {
+  micConsent: MicPermissionState;
+  continuousLive: boolean;
+}): boolean {
+  return opts.micConsent === 'granted' && opts.continuousLive === true;
+}
+
 /**
  * Build a synthetic MediaStream-like stub for Node/CI tests.
  * Does not require browser getUserMedia; tracks are stoppable no-ops.

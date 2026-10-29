@@ -76,10 +76,27 @@ export function startHostMetronome(opts: {
   };
 }
 
+/** Soft sustained tone for original / PD / CC phrase beds — still synthesized locally. */
+function playSustain(frequency: number, durationSec = 0.28, gain = 0.08): void {
+  const ctx = getAudioContext();
+  const t = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const amp = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.value = frequency;
+  amp.gain.setValueAtTime(0.0001, t);
+  amp.gain.exponentialRampToValueAtTime(gain, t + 0.02);
+  amp.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.05, durationSec));
+  osc.connect(amp);
+  amp.connect(ctx.destination);
+  osc.start(t);
+  osc.stop(t + durationSec + 0.02);
+}
+
 /**
- * Note-synced procedural song bed for approved catalog / original / PD / CC paths.
- * Schedules pitched blips on chart note times — richer than metronome-only, still
- * synthesized on-device (never a ripped commercial stem).
+ * Note-synced original song bed for approved catalog / original / PD / CC paths.
+ * Schedules pitched note attacks + optional phrase sustains from vocal prompt windows.
+ * Synthesized on-device only — never a ripped commercial stem / DRM / lyric scrape.
  */
 export function startHostSongBed(opts: {
   bpm: number;
@@ -88,16 +105,22 @@ export function startHostSongBed(opts: {
   startedAtMs: number;
   /** Chart note times in ms from song start. */
   noteTimesMs?: number[];
+  /** Optional karaoke phrase windows for soft sustained pads (rights-cleared prompts only). */
+  phraseWindowsMs?: Array<{ startMs: number; durationMs: number }>;
 }): MetronomeHandle {
   const ctx = getAudioContext();
   void resumeAudioContext();
   const timers: number[] = [];
   const noteTimes = [...(opts.noteTimesMs ?? [])].sort((a, b) => a - b);
+  const phrases = [...(opts.phraseWindowsMs ?? [])].sort((a, b) => a.startMs - b.startMs);
 
-  if (noteTimes.length === 0) {
+  if (noteTimes.length === 0 && phrases.length === 0) {
     // Fall back to metronome bed when chart notes are unavailable.
     return startHostMetronome(opts);
   }
+
+  // Original triad motif across the chart — not a commercial melody rip.
+  const motif = [196, 247, 294, 330, 392, 330, 294, 247];
 
   for (let i = 0; i < noteTimes.length; i++) {
     const noteMs = noteTimes[i]!;
@@ -107,9 +130,25 @@ export function startHostSongBed(opts: {
     );
     if (noteMs > opts.durationMs + 500) continue;
     const id = window.setTimeout(() => {
-      // Alternating root / fifth / octave — original synthetic bed, not a stem.
-      const freqs = [220, 330, 440, 550];
-      playClick(undefined, freqs[i % freqs.length], 0.07);
+      playClick(undefined, motif[i % motif.length], 0.06);
+      // Light fifth harmony — original arrangement depth beyond single-click beds.
+      if (i % 2 === 0) playClick(undefined, motif[i % motif.length]! * 1.5, 0.04);
+    }, waitMs);
+    timers.push(id);
+  }
+
+  for (let i = 0; i < phrases.length; i++) {
+    const phrase = phrases[i]!;
+    const waitMs = Math.max(
+      0,
+      phrase.startMs - (Date.now() - opts.startedAtMs) - opts.offsetMs,
+    );
+    if (phrase.startMs > opts.durationMs + 500) continue;
+    const id = window.setTimeout(() => {
+      const root = motif[i % motif.length]!;
+      const dur = Math.min(0.9, Math.max(0.18, phrase.durationMs / 1000));
+      playSustain(root, dur, 0.07);
+      playSustain(root * 1.25, dur * 0.85, 0.045);
     }, waitMs);
     timers.push(id);
   }
@@ -117,7 +156,6 @@ export function startHostSongBed(opts: {
   // Soft downbeat pulse under the song bed for stage energy.
   const pulse = startHostMetronome({
     ...opts,
-    // Lower prominence: reuse metronome scheduler but host already hears note blips.
   });
 
   return {

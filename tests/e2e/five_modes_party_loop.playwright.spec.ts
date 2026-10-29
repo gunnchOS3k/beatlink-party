@@ -1,7 +1,8 @@
 /**
  * Sibling Wave007 free Playwright: one real browser party cycles all five
  * registered modes with authentic UI inputs (no synthetic player masquerading).
- * Karaoke remains timing-only — no pitch analysis claim.
+ * Karaoke default remains timing-only — MICROPHONE_PITCH_ANALYSIS=false until
+ * continuous consented live mic DSP (never a synthetic tone probe claim).
  */
 import { test, expect, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -265,7 +266,9 @@ test('Five-mode browser party loop (authentic inputs)', async ({ browser }) => {
     const banner = await p1.page.getByTestId('active-mode-banner').innerText();
     expect(banner.length).toBeGreaterThan(0);
     if (mode === 'KaraokePerformance') {
-      expect(banner).toMatch(/timing only|no pitch analysis/i);
+      // Off-state contract: phrase timing with pitch off until mic consent.
+      expect(banner).toMatch(/phrase timing/i);
+      expect(banner).toMatch(/pitch off until mic consent/i);
       await expect(p1.page.getByTestId('vocal-path-truth')).toContainText('VOCAL_PROMPT_TIMING_MODE');
       await expect(p1.page.getByTestId('vocal-path-truth')).toContainText(
         'MICROPHONE_PITCH_ANALYSIS=false',
