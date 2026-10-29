@@ -4,6 +4,10 @@
  * No AV separation, no audio extraction, no hidden players.
  */
 import { useEffect, useId, useRef, useState } from 'react';
+import {
+  loadYouTubeIframeApi,
+  resetYouTubeIframeApiLoadCache,
+} from '../lib/youtubeIframeApiLoad';
 
 export type YtPlayerState =
   | 'unstarted'
@@ -57,37 +61,7 @@ interface YtPlayerHandle {
   destroy: () => void;
 }
 
-let apiLoadPromise: Promise<void> | null = null;
-
-function loadYouTubeIframeApi(): Promise<void> {
-  if (typeof window === 'undefined') return Promise.reject(new Error('no window'));
-  if (window.YT?.Player) return Promise.resolve();
-  if (apiLoadPromise) return apiLoadPromise;
-  apiLoadPromise = new Promise((resolve, reject) => {
-    const prior = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => {
-      prior?.();
-      resolve();
-    };
-    const existing = document.querySelector('script[data-beatlink-yt-api]');
-    if (existing) return;
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    tag.async = true;
-    tag.dataset.beatlinkYtApi = '1';
-    tag.onerror = () => reject(new Error('YouTube IFrame API failed to load'));
-    document.head.appendChild(tag);
-    // If API already present mid-load
-    const poll = window.setInterval(() => {
-      if (window.YT?.Player) {
-        window.clearInterval(poll);
-        resolve();
-      }
-    }, 50);
-    window.setTimeout(() => window.clearInterval(poll), 15_000);
-  });
-  return apiLoadPromise;
-}
+export { loadYouTubeIframeApi, resetYouTubeIframeApiLoadCache };
 
 export interface YouTubeOfficialPlayerProps {
   videoId: string;
@@ -120,7 +94,6 @@ export function YouTubeOfficialPlayer({
         if (cancelled || !window.YT?.Player) return;
         const mount = document.getElementById(containerId);
         if (!mount) return;
-        // Visible player: explicit non-zero dimensions; no display:none / opacity:0 hacks.
         player = new window.YT.Player(containerId, {
           videoId,
           width: '100%',
@@ -129,7 +102,6 @@ export function YouTubeOfficialPlayer({
             playsinline: 1,
             rel: 0,
             modestbranding: 1,
-            // Origin helps some embed policies; keep player visible in host UI.
           },
           events: {
             onReady: () => {
@@ -170,13 +142,13 @@ export function YouTubeOfficialPlayer({
       }
       playerRef.current = null;
     };
-    // reconnectKey forces remount after error recovery.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional reconnect remount
   }, [videoId, height, containerId, reconnectKey]);
 
   function reconnect() {
     setErrorCode(null);
     setState('loading');
+    resetYouTubeIframeApiLoadCache();
     setReconnectKey((k) => k + 1);
   }
 
@@ -217,11 +189,11 @@ export function YouTubeOfficialPlayer({
           Seek 0
         </button>
         {state === 'error' ? (
-          <button type="button" className="btn" onClick={reconnect}>
+          <button type="button" className="btn" data-testid="youtube-reconnect" onClick={reconnect}>
             Reconnect
           </button>
         ) : null}
-        <span style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>
+        <span style={{ color: 'var(--muted)', fontSize: '0.8rem' }} data-testid="youtube-state">
           state={state}
           {errorCode != null ? ` error=${errorCode}` : ''}
         </span>
@@ -229,6 +201,7 @@ export function YouTubeOfficialPlayer({
       <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
         Host hearing uses the official visible embed. Multiplayer scoring still requires catalog
         match or rights-verified direct HTTPS + beat grid — never YouTube audio extraction.
+        Metadata/embed ≠ gameplay.
       </p>
     </div>
   );

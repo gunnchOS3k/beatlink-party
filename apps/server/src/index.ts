@@ -8,9 +8,13 @@ import { registerTelemetrySink } from '@beatlink/shared';
 import {
   createDefaultProviderBundle,
   defaultCreatorDraftStore,
+  evaluateDirectHttpsMedia,
   ingestCreatorOwnedBinary,
   ingestCreatorOwnedStub,
   listGameModes,
+  probeDirectHttpsMedia,
+  type CompositionRightsClaim,
+  type SoundRecordingRightsClaim,
 } from '@beatlink/game-engine';
 import { setupRealtime } from './realtime/socket.js';
 import { loadCatalog, getBeatmapForSong } from './beatmaps/store.js';
@@ -464,6 +468,72 @@ app.post('/songs/resolve-link', async (req, res) => {
       error: err instanceof Error ? err.message : 'Failed to resolve link',
     });
   }
+});
+
+/**
+ * Authorized direct HTTPS evaluate — import/hash/rights/analysis/charts gate.
+ * Requires attestation payload. URL paste alone never elevates gameplay.
+ * Redirects refused by default (maxRedirects=0).
+ */
+app.post('/songs/evaluate-direct-https', async (req, res) => {
+  const body = (req.body ?? {}) as {
+    url?: string;
+    mimeType?: string | null;
+    contentSha256?: string | null;
+    composition?: CompositionRightsClaim;
+    soundRecording?: SoundRecordingRightsClaim;
+    beatGridReady?: boolean;
+    chartsReady?: boolean;
+    ripIntentSignals?: string[];
+    probe?: boolean;
+  };
+  if (!body.url || !body.composition || !body.soundRecording) {
+    return res.status(400).json({
+      error: 'url, composition, and soundRecording attestation are required',
+      capabilityState: 'BLOCKED_OR_UNSUPPORTED',
+      autoPublish: false,
+    });
+  }
+
+  let probe = null as Awaited<ReturnType<typeof probeDirectHttpsMedia>> | null;
+  if (body.probe !== false) {
+    probe = await probeDirectHttpsMedia(String(body.url), { maxRedirects: 0 });
+  }
+
+  const decision = evaluateDirectHttpsMedia({
+    url: String(body.url),
+    mimeType: body.mimeType ?? probe?.mimeType ?? null,
+    contentSha256: body.contentSha256 ?? null,
+    composition: body.composition,
+    soundRecording: body.soundRecording,
+    beatGridReady: Boolean(body.beatGridReady),
+    chartsReady: Boolean(body.chartsReady),
+    ripIntentSignals: body.ripIntentSignals,
+  });
+
+  const blockers = [...decision.blockers, ...(probe && !probe.ok ? probe.blockers : [])];
+  return res.status(decision.ok && (!probe || probe.ok) ? 200 : 422).json({
+    ...decision,
+    blockers,
+    probe,
+    gameplaySyncAuthorized: decision.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED',
+    autoPublish: false,
+    commercialEligible: false,
+    workflow: [
+      'import',
+      'hash',
+      'decode',
+      'rights',
+      'analysis',
+      'charts',
+      'preview',
+      'scored_play',
+    ],
+    message:
+      decision.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED'
+        ? decision.message
+        : `${decision.message} Prefer /content/creator-ingest-binary for local WAV hash/decode/charts; no auto-publish.`,
+  });
 });
 
 async function main() {

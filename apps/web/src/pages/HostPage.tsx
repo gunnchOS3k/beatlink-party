@@ -32,6 +32,7 @@ import { BrandMark } from '../components/StageChrome';
 import { roleGlyph } from '../brand/glyphs';
 import { catalogEligibility, linkEligibility } from '../brand/complianceLabels';
 import { YouTubeOfficialPlayer } from '../components/YouTubeOfficialPlayer';
+import { DirectHttpsWorkflowPanel } from '../components/DirectHttpsWorkflowPanel';
 import {
   getGameMode,
   isCallAndResponseWindow,
@@ -965,6 +966,8 @@ export default function HostPage() {
                   Shared with peers: {room.pastedLinkUrl}
                 </p>
               )}
+
+              <DirectHttpsWorkflowPanel />
 
               <div className="row" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
                 <label style={{ flex: 1, minWidth: 140 }}>

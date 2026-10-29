@@ -2,6 +2,10 @@
 
 Machine-readable: [`artifacts/rtm/BEATLINK_LINKS_RTM.json`](../../artifacts/rtm/BEATLINK_LINKS_RTM.json)
 
-Shared PVS under `thursday-open-lab-hub`: **not present** — this local RTM uses schema `beatlink.requirements_traceability_matrix.v1` (id / summary / claim / verification / evidence / blockers / next).
+**Contract:** `GUNNCHOS3K_PVS@1.0.0`  
+**Pinned source:** gunnchos-site `45b456617002569c33a5a27fe30d5cf8be5a7032` (or newer green)  
+**Schema:** [`docs/quality/schemas/requirements_to_evidence_matrix.schema.json`](../quality/schemas/requirements_to_evidence_matrix.schema.json)
 
-Tokens: BETA / RC / LAUNCH / HUMAN_COMMERCIAL = **false**.
+CI validates the RTM with `scripts/validate_links_rtm.py` (Draft 2020-12 JSON Schema). Every row keeps `independent_review_status: not_started`.
+
+Honesty: `HUMAN` / `RC2` / `V1` = **false** (BETA/RC/LAUNCH/human commercial remain false).

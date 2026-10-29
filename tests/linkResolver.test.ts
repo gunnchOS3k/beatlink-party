@@ -175,8 +175,31 @@ describe('link capability state machine', () => {
       beatGridReady: true,
       chartsReady: true,
     });
+    expect(decision.syncEligible).toBe(true);
     expect(decision.capabilityState).toBe('GAMEPLAY_SYNC_AUTHORIZED');
     expect(decision.ok).toBe(true);
+  });
+
+  it('denies GAMEPLAY_SYNC when rights.ok but syncEligible is false', () => {
+    const decision = evaluateDirectHttpsMedia({
+      url: 'https://cdn.example.com/a.wav',
+      contentSha256: 'b'.repeat(64),
+      composition: {
+        basis: 'licensed',
+        syncAuthorized: false,
+        adaptationAuthorized: false,
+      },
+      soundRecording: {
+        basis: 'licensed',
+        reproductionAuthorized: true,
+      },
+      beatGridReady: true,
+      chartsReady: true,
+    });
+    expect(decision.rightsOk).toBe(true);
+    expect(decision.syncEligible).toBe(false);
+    expect(decision.capabilityState).toBe('DIRECT_AUDIO_RIGHTS_VERIFIED');
+    expect(decision.capabilityState).not.toBe('GAMEPLAY_SYNC_AUTHORIZED');
   });
 
   it('provider matrix marks all adapters gameplaySyncViaApiKey=false', () => {

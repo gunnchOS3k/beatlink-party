@@ -1,0 +1,8 @@
+{
+  "contract_id": "GUNNCHOS3K_PVS",
+  "contract_version": "1.0.0",
+  "contract_source_repo": "gunnchOS3k/gunnchos-site",
+  "contract_source_sha": "45b456617002569c33a5a27fe30d5cf8be5a7032",
+  "schema_path": "docs/quality/schemas/requirements_to_evidence_matrix.schema.json",
+  "notes": "Vendored schema pin for BeatLink CI. Prefer newer green gunnchos-site SHA when available."
+}
