@@ -29,8 +29,13 @@
       "owner": "beatlink-party",
       "expected_behavior": "Link capability states are separate from provider API credentials; YOUTUBE_API_KEY never grants GAMEPLAY_SYNC_AUTHORIZED.",
       "verification_method": "unit_test",
-      "layers": [1, 2],
-      "tests": ["tests/linkResolver.test.ts"],
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/linkResolver.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/linkCapability.ts",
         "tests/linkResolver.test.ts"
@@ -43,30 +48,39 @@
       "art_status": "not_applicable",
       "limitations": [],
       "severity": "high",
-      "sha": "51dc56fe93b63bbfe951b007b19473756c773849",
+      "sha": "b5c7482a559677d53074a596d318608594cbb820",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "Keep regression: credentials ≠ gameplay sync."
+      "notes": "Keep regression: credentials \u2260 gameplay sync."
     },
     {
       "req_id": "BL-LINK-002",
       "owner": "beatlink-party",
       "expected_behavior": "YouTube official IFrame API visible player exposes load/buffer/error/reconnect; rejected API-load promise does not poison retry.",
       "verification_method": "unit_test + browser smoke",
-      "layers": [2, 5],
-      "tests": ["tests/youtube_iframe_api_retry.test.ts"],
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/youtube_iframe_api_retry.test.ts"
+      ],
       "automated_evidence": [
         "apps/web/src/components/YouTubeOfficialPlayer.tsx"
       ],
       "native_physical": {
         "status": "not_run",
-        "platforms": ["browser"],
+        "platforms": [
+          "browser"
+        ],
         "notes": "Live YouTube network smoke still required for buffer/reconnect UX."
       },
       "art_status": "not_applicable",
-      "limitations": ["Requires live browser smoke against youtube.com iframe_api"],
+      "limitations": [
+        "Requires live browser smoke against youtube.com iframe_api"
+      ],
       "severity": "medium",
-      "sha": "51dc56fe93b63bbfe951b007b19473756c773849",
+      "sha": "b5c7482a559677d53074a596d318608594cbb820",
       "independent_review_status": "not_started",
       "cursor_complete_status": "in_progress",
       "notes": "Cached rejected promise cleared on failure + reconnect."
@@ -76,8 +90,13 @@
       "owner": "beatlink-party",
       "expected_behavior": "Spotify/Apple Music metadata/embed/deep-link remain distinct from gameplay sync; API credentials enrich metadata only.",
       "verification_method": "unit_test",
-      "layers": [1, 2],
-      "tests": ["tests/linkResolver.test.ts"],
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/linkResolver.test.ts"
+      ],
       "automated_evidence": [
         "apps/server/src/music/linkResolver.ts",
         "packages/game-engine/src/linkProviders.ts"
@@ -88,20 +107,27 @@
         "notes": "Metadata/embed classification only."
       },
       "art_status": "not_applicable",
-      "limitations": ["MusicKit/Web Playback SDK remains EXTERNAL"],
+      "limitations": [
+        "MusicKit/Web Playback SDK remains EXTERNAL"
+      ],
       "severity": "medium",
-      "sha": "51dc56fe93b63bbfe951b007b19473756c773849",
+      "sha": "b5c7482a559677d53074a596d318608594cbb820",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "metadata/embed ≠ gameplay"
+      "notes": "metadata/embed \u2260 gameplay"
     },
     {
       "req_id": "BL-LINK-004",
       "owner": "beatlink-party",
-      "expected_behavior": "SoundCloud/Bandcamp/Vimeo/Audius are embed/listen-first scaffolds — not complete gameplay support.",
+      "expected_behavior": "SoundCloud/Bandcamp/Vimeo/Audius are embed/listen-first scaffolds \u2014 not complete gameplay support.",
       "verification_method": "unit_test",
-      "layers": [1, 2],
-      "tests": ["tests/linkResolver.test.ts"],
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/linkResolver.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/linkProviders.ts",
         "tests/linkResolver.test.ts"
@@ -112,9 +138,11 @@
         "notes": "Scaffold adapters only."
       },
       "art_status": "not_applicable",
-      "limitations": ["Official widget deep integration pending — scaffolds ≠ complete support"],
+      "limitations": [
+        "Official widget deep integration pending \u2014 scaffolds \u2260 complete support"
+      ],
       "severity": "low",
-      "sha": "51dc56fe93b63bbfe951b007b19473756c773849",
+      "sha": "b5c7482a559677d53074a596d318608594cbb820",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "Honest SCAFFOLD classification preserved."
@@ -124,7 +152,11 @@
       "owner": "beatlink-party",
       "expected_behavior": "Direct HTTPS WAV/MP3/OGG preferred gameplay route requires rights + hash + beat grid + charts; GAMEPLAY_SYNC_AUTHORIZED requires rights.syncEligible (not rights.ok alone). URL paste alone cannot attest. Redirects refused by default.",
       "verification_method": "unit_test",
-      "layers": [1, 2, 3],
+      "layers": [
+        1,
+        2,
+        3
+      ],
       "tests": [
         "tests/linkResolver.test.ts",
         "tests/direct_https_sync_eligible.test.ts"
@@ -144,18 +176,23 @@
         "Creator must attach attestation + hash; auto-publish remains false"
       ],
       "severity": "blocker",
-      "sha": "51dc56fe93b63bbfe951b007b19473756c773849",
+      "sha": "b5c7482a559677d53074a596d318608594cbb820",
       "independent_review_status": "not_started",
       "cursor_complete_status": "in_progress",
-      "notes": "Negative regression: playback ok + syncEligible false + hash/grid/charts → gameplay denied."
+      "notes": "Negative regression: playback ok + syncEligible false + hash/grid/charts \u2192 gameplay denied."
     },
     {
       "req_id": "BL-LINK-006",
       "owner": "beatlink-party",
-      "expected_behavior": "Composition rights ≠ sound-recording rights; CC sync/adaptation require explicit attestation; no rip/DRM/lyric scrape.",
+      "expected_behavior": "Composition rights \u2260 sound-recording rights; CC sync/adaptation require explicit attestation; no rip/DRM/lyric scrape.",
       "verification_method": "unit_test",
-      "layers": [1, 2],
-      "tests": ["tests/musical_rights_mic_drafts.test.ts"],
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/musical_rights_mic_drafts.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/rightsLayers.ts",
         "docs/LINK_CAPABILITY_STATES.md"
@@ -168,7 +205,7 @@
       "art_status": "not_applicable",
       "limitations": [],
       "severity": "high",
-      "sha": "51dc56fe93b63bbfe951b007b19473756c773849",
+      "sha": "b5c7482a559677d53074a596d318608594cbb820",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "CC sync/adaptation caveats surface in rightsLayers findings."
@@ -178,7 +215,11 @@
       "owner": "beatlink-party",
       "expected_behavior": "Preserve five modes, rooms, six launch songs, karaoke mic consent, creator drafts with no auto-publish, and LAN party bind safety.",
       "verification_method": "regression_suite",
-      "layers": [2, 4, 7],
+      "layers": [
+        2,
+        4,
+        7
+      ],
       "tests": [
         "tests/five_modes_party_loop.test.ts",
         "tests/launch_song_library.test.ts",
@@ -190,13 +231,17 @@
       ],
       "native_physical": {
         "status": "partial",
-        "platforms": ["lan"],
+        "platforms": [
+          "lan"
+        ],
         "notes": "LAN review packet present; exact-head Wave007 after PR advances."
       },
       "art_status": "not_applicable",
-      "limitations": ["Exact-head CI/Wave007 pending after PR tip advances"],
+      "limitations": [
+        "Exact-head CI/Wave007 pending after PR tip advances"
+      ],
       "severity": "high",
-      "sha": "51dc56fe93b63bbfe951b007b19473756c773849",
+      "sha": "b5c7482a559677d53074a596d318608594cbb820",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "BETA/RC/LAUNCH/human commercial remain false."
@@ -206,8 +251,13 @@
       "owner": "beatlink-party",
       "expected_behavior": "BETA/RC/LAUNCH/human commercial honesty flags remain false; RTM bound to GUNNCHOS3K_PVS@1.0.0 with JSON Schema validation in CI.",
       "verification_method": "token_audit + schema_validation",
-      "layers": [1, 7],
-      "tests": ["scripts/validate_links_rtm.py"],
+      "layers": [
+        1,
+        7
+      ],
+      "tests": [
+        "scripts/validate_links_rtm.py"
+      ],
       "automated_evidence": [
         "docs/BETA_RC_TOKENS.json",
         "artifacts/rtm/BEATLINK_LINKS_RTM.json",
@@ -221,7 +271,7 @@
       "art_status": "not_applicable",
       "limitations": [],
       "severity": "blocker",
-      "sha": "51dc56fe93b63bbfe951b007b19473756c773849",
+      "sha": "b5c7482a559677d53074a596d318608594cbb820",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "independent_review_status=not_started on all rows."
