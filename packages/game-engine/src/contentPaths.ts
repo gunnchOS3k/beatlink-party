@@ -313,19 +313,26 @@ export function resolveSourceEligibilityRouter(input: {
 }): SourceEligibilityRoute {
   const decision = resolveContentPath(input);
   let letter = letterForPath(decision.path, decision.playbackStatus);
-  // METADATA_ONLY platform links without a catalog match are path E, not playable.
+  // Platform metadata / official embed without catalog match are path E — never gameplay.
+  // API credentials / legacy PLAYABLE_AUTHORIZED_PLATFORM do not make links playable.
   if (
     input.linkResolve &&
     !input.linkResolve.matchedCatalogId &&
     (input.linkResolve.playbackStatus === 'METADATA_ONLY' ||
-      input.linkResolve.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM')
+      input.linkResolve.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM' ||
+      input.linkResolve.capabilityState === 'METADATA_AVAILABLE' ||
+      input.linkResolve.capabilityState === 'OFFICIAL_EMBED_AVAILABLE')
   ) {
     letter = 'E';
   }
+  const syncAuthorized =
+    !input.linkResolve ||
+    !input.linkResolve.capabilityState ||
+    input.linkResolve.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED';
   const playable =
     decision.ok &&
-    (decision.playbackStatus === 'PLAYABLE_APPROVED' ||
-      decision.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM') &&
+    decision.playbackStatus === 'PLAYABLE_APPROVED' &&
+    syncAuthorized &&
     letter !== 'E' &&
     letter !== 'F';
   const alternatives: SourceEligibilityAlternative[] = [];

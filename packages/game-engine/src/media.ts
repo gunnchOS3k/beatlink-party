@@ -112,15 +112,24 @@ export class AuthorizedCatalogEmbedProvider implements MediaProvider {
     }
 
     if (link) {
-      const authorizedPlayback = link.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM';
+      // Official embed is listen/reference only — never gameplay from API keys.
+      const cap = link.capabilityState;
+      const embedCapable =
+        cap === 'OFFICIAL_EMBED_AVAILABLE' ||
+        // Legacy: PLAYABLE_AUTHORIZED_PLATFORM was wrongly assigned from API keys.
+        (!cap && link.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM');
       return {
-        kind: authorizedPlayback ? 'authorized_embed' : 'metadata_only',
+        kind: embedCapable ? 'authorized_embed' : 'metadata_only',
         songId: link.matchedCatalogId,
         title: link.title ?? entry?.title ?? 'Linked track',
         artist: link.artist ?? entry?.artist ?? null,
         bpm: entry?.bpm ?? input.fallbackBpm ?? null,
         durationMs: link.durationMs ?? entry?.durationMs ?? null,
-        playbackStatus: link.playbackStatus,
+        // Downgrade legacy PLAYABLE_AUTHORIZED_PLATFORM (API-key mistake) to METADATA_ONLY.
+        playbackStatus:
+          link.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM'
+            ? 'METADATA_ONLY'
+            : link.playbackStatus,
         embed: {
           platform: link.platform,
           sourceId: link.sourceId,

@@ -1,0 +1,117 @@
+{
+  "schema": "beatlink.requirements_traceability_matrix.v1",
+  "schema_note": "No shared PVS found under thursday-open-lab-hub; local RTM uses the same row schema (id, summary, claim, verification, evidence, blockers, next).",
+  "pvs_reference": null,
+  "product": "beatlink-party",
+  "surface": "links_capability_cursor_complete",
+  "updated_at_utc": "2026-10-29T18:48:00Z",
+  "branch": "cursor/pr34-musical-product",
+  "tokens": {
+    "BETA": false,
+    "RC": false,
+    "LAUNCH": false,
+    "HUMAN_COMMERCIAL": false
+  },
+  "capability_states": [
+    "METADATA_AVAILABLE",
+    "OFFICIAL_EMBED_AVAILABLE",
+    "DIRECT_AUDIO_RIGHTS_VERIFIED",
+    "GAMEPLAY_SYNC_AUTHORIZED",
+    "BLOCKED_OR_UNSUPPORTED"
+  ],
+  "rows": [
+    {
+      "id": "BL-LINK-001",
+      "summary": "Separate link capability states from API credentials",
+      "claim": "IMPLEMENTED",
+      "verification": "unit_test",
+      "evidence": [
+        "packages/game-engine/src/linkCapability.ts",
+        "tests/linkResolver.test.ts"
+      ],
+      "blockers": [],
+      "next": "Keep regression: YOUTUBE_API_KEY must not grant GAMEPLAY_SYNC_AUTHORIZED"
+    },
+    {
+      "id": "BL-LINK-002",
+      "summary": "YouTube official IFrame API visible player (events/state/controls/errors/reconnect)",
+      "claim": "IMPLEMENTED",
+      "verification": "code_review",
+      "evidence": [
+        "apps/web/src/components/YouTubeOfficialPlayer.tsx",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "blockers": ["Requires live browser smoke for reconnect UX"],
+      "next": "Host UI Playwright smoke for player state badge"
+    },
+    {
+      "id": "BL-LINK-003",
+      "summary": "Spotify/Apple Music metadata/embed/deep-link distinct from gameplay sync",
+      "claim": "IMPLEMENTED",
+      "verification": "unit_test",
+      "evidence": [
+        "apps/server/src/music/linkResolver.ts",
+        "packages/game-engine/src/linkProviders.ts"
+      ],
+      "blockers": [],
+      "next": "Optional MusicKit/Web Playback SDK remains EXTERNAL"
+    },
+    {
+      "id": "BL-LINK-004",
+      "summary": "SoundCloud/Bandcamp/Vimeo/Audius embed/listen-first scaffolds",
+      "claim": "SCAFFOLD",
+      "verification": "unit_test",
+      "evidence": [
+        "packages/game-engine/src/linkProviders.ts",
+        "tests/linkResolver.test.ts"
+      ],
+      "blockers": ["Official widget deep integration pending"],
+      "next": "Wire Bandcamp/Audius official embeds when source ids stable"
+    },
+    {
+      "id": "BL-LINK-005",
+      "summary": "Direct HTTPS WAV/MP3/OGG preferred gameplay route with rights+hash+grid+charts",
+      "claim": "IMPLEMENTED",
+      "verification": "unit_test",
+      "evidence": [
+        "packages/game-engine/src/directHttpsMedia.ts",
+        "packages/game-engine/src/rightsLayers.ts"
+      ],
+      "blockers": ["URL paste alone cannot attest rights — creator ingest required"],
+      "next": "Host UI for attaching attestation + hash to direct HTTPS URL"
+    },
+    {
+      "id": "BL-LINK-006",
+      "summary": "Composition vs sound-recording honesty; CC sync/adaptation caveats; no rip/DRM/lyric scrape",
+      "claim": "IMPLEMENTED",
+      "verification": "unit_test",
+      "evidence": [
+        "packages/game-engine/src/rightsLayers.ts",
+        "docs/LINK_CAPABILITY_STATES.md"
+      ],
+      "blockers": [],
+      "next": "Surface caveats in creator ingest UI copy"
+    },
+    {
+      "id": "BL-LINK-007",
+      "summary": "Preserve five modes, rooms, 6 launch songs, karaoke consent, LAN safety",
+      "claim": "PRESERVED",
+      "verification": "regression_suite",
+      "evidence": [
+        "tests/five_modes_party_loop.test.ts",
+        "content/songs/offline-launch-catalog.json"
+      ],
+      "blockers": [],
+      "next": "Wave007 browser integrity on tip"
+    },
+    {
+      "id": "BL-LINK-008",
+      "summary": "BETA/RC/LAUNCH/human commercial remain false",
+      "claim": "DOCUMENTED",
+      "verification": "token_audit",
+      "evidence": ["docs/BETA_RC_TOKENS.json", "artifacts/rtm/BEATLINK_LINKS_RTM.json"],
+      "blockers": [],
+      "next": "No commercial claim until human review"
+    }
+  ]
+}

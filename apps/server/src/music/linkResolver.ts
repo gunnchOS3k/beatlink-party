@@ -1,5 +1,22 @@
-import type { LinkResolveResult, MusicPlatform, PlaybackStatus, ProviderAuthStatus } from '@beatlink/shared';
-import { resolveSourceEligibilityRouter } from '@beatlink/game-engine';
+import type {
+  LinkCapabilityState,
+  LinkMediaClassification,
+  LinkResolveResult,
+  MusicPlatform,
+  PlaybackStatus,
+  ProviderAuthStatus,
+} from '@beatlink/shared';
+import {
+  detectProviderAdapter,
+  evaluateDirectHttpsMedia,
+  firstPartyOriginalRightsLayers,
+  isDirectAudioFormat,
+  mediaClassificationForCapability,
+  playbackStatusForCapability,
+  resolveLinkCapability,
+  resolveSourceEligibilityRouter,
+  capabilityHonestyMessage,
+} from '@beatlink/game-engine';
 import { loadCatalog } from '../beatmaps/store.js';
 
 const YOUTUBE_REGEX =
@@ -7,6 +24,10 @@ const YOUTUBE_REGEX =
 const SPOTIFY_REGEX = /open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/;
 const APPLE_MUSIC_REGEX =
   /music\.apple\.com\/([a-z]{2})\/(album|song|playlist)\/([^/?#]+)(?:\/(\d+))?/;
+const SOUNDCLOUD_REGEX = /(?:www\.)?soundcloud\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)/;
+const VIMEO_REGEX = /(?:www\.|player\.)?vimeo\.com\/(?:video\/)?(\d+)/;
+const AUDIUS_REGEX = /(?:www\.)?audius\.co\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)/;
+const BANDCAMP_REGEX = /([a-zA-Z0-9-]+)\.bandcamp\.com\/(track|album)\/([a-zA-Z0-9_-]+)/;
 
 const OEMBED_TIMEOUT_MS = 3500;
 
@@ -34,6 +55,13 @@ function detectPlatform(url: string): MusicPlatform {
   if (YOUTUBE_REGEX.test(url) || /music\.youtube\.com/.test(url)) return 'youtube';
   if (SPOTIFY_REGEX.test(url)) return 'spotify';
   if (/music\.apple\.com/.test(url)) return 'apple_music';
+  if (SOUNDCLOUD_REGEX.test(url) || /on\.soundcloud\.com/.test(url)) return 'soundcloud';
+  if (BANDCAMP_REGEX.test(url) || /\.bandcamp\.com/.test(url)) return 'bandcamp';
+  if (VIMEO_REGEX.test(url)) return 'vimeo';
+  if (AUDIUS_REGEX.test(url)) return 'audius';
+  if (isDirectAudioFormat(url)) return 'direct_https';
+  const adapter = detectProviderAdapter(url);
+  if (adapter) return adapter.platform;
   return 'unknown';
 }
 
@@ -61,6 +89,29 @@ function extractSourceId(url: string, platform: MusicPlatform): string | null {
       // fall through
     }
   }
+  if (platform === 'soundcloud') {
+    const m = url.match(SOUNDCLOUD_REGEX);
+    return m ? `${m[1]}/${m[2]}` : null;
+  }
+  if (platform === 'bandcamp') {
+    const m = url.match(BANDCAMP_REGEX);
+    return m ? `${m[1]}:${m[2]}:${m[3]}` : null;
+  }
+  if (platform === 'vimeo') {
+    const m = url.match(VIMEO_REGEX);
+    return m?.[1] ?? null;
+  }
+  if (platform === 'audius') {
+    const m = url.match(AUDIUS_REGEX);
+    return m ? `${m[1]}/${m[2]}` : null;
+  }
+  if (platform === 'direct_https') {
+    try {
+      return new URL(url).pathname;
+    } catch {
+      return null;
+    }
+  }
   return null;
 }
 
@@ -68,7 +119,6 @@ function parseTitleFromUrl(url: string): string | null {
   try {
     const u = new URL(url);
     const pathParts = u.pathname.split('/').filter(Boolean);
-    // Apple Music: /us/album/song-name/id — prefer slug before numeric id
     if (u.hostname.includes('apple.com') && pathParts.length >= 3) {
       const slug = pathParts[pathParts.length - 2];
       const last = pathParts[pathParts.length - 1];
@@ -99,7 +149,6 @@ function matchCatalog(title: string | null, artist: string | null): string | nul
     if (songTitle.includes(lower) || lower.includes(songTitle)) {
       return song.id;
     }
-    // Loose match: catalog title words appear in oEmbed title
     const words = songTitle.split(/\s+/).filter((w) => w.length > 3);
     if (words.length > 0 && words.every((w) => lower.includes(w))) {
       return song.id;
@@ -148,6 +197,19 @@ async function fetchSpotifyOEmbed(url: string): Promise<OEmbedPayload | null> {
   return data as OEmbedPayload;
 }
 
+function officialEmbedPossible(platform: MusicPlatform, sourceId: string | null): boolean {
+  if (!sourceId) return false;
+  return (
+    platform === 'youtube' ||
+    platform === 'spotify' ||
+    platform === 'apple_music' ||
+    platform === 'soundcloud' ||
+    platform === 'bandcamp' ||
+    platform === 'vimeo' ||
+    platform === 'audius'
+  );
+}
+
 function buildResult(partial: {
   platform: MusicPlatform;
   sourceId: string | null;
@@ -156,31 +218,32 @@ function buildResult(partial: {
   album: string | null;
   artworkUrl: string | null;
   durationMs: number | null;
-  playbackStatus: PlaybackStatus;
+  capabilityState: LinkCapabilityState;
   matchedCatalogId: string | null;
+  providerCredentialsPresent: boolean;
   message?: string;
+  analysisEligible?: boolean;
 }): LinkResolveResult {
   const fallbackOptions = [
     'Choose an approved demo song from the catalog',
-    'Upload music you own or have rights to use',
+    'Upload music you own or have rights to use (WAV/MP3/OGG + attestation)',
     'Use a royalty-free track from the approved catalog',
-    'Connect an official provider when credentials are configured (no audio ripping)',
+    'Provider API keys enrich metadata only — they are not music rights or gameplay sync',
   ];
 
-  const messages: Record<PlaybackStatus, string> = {
-    PLAYABLE_APPROVED: 'Matched to an approved catalog track. Ready to play with host metronome!',
-    PLAYABLE_AUTHORIZED_PLATFORM:
-      'Provider credentials detected. Official embed/auth path available — no audio was downloaded.',
-    METADATA_ONLY:
-      'Metadata only — choose an approved song or connect a provider. No audio was downloaded or ripped.',
-    NEEDS_USER_UPLOAD:
-      'This track is not in our catalog. Upload music you own to play this round.',
-    NEEDS_LICENSE: 'This track requires a commercial license before gameplay.',
-    UNSUPPORTED: 'Unsupported link format. Try YouTube, YouTube Music, Spotify, or Apple Music URLs.',
-    BLOCKED_BY_POLICY: 'This link is blocked by platform policy. Use approved catalog instead.',
-    TAKEN_DOWN: 'This track was taken down and cannot be used for playback.',
-    RIGHTS_EXPIRED: 'Rights attestation expired — renew attestation or pick an approved catalog track.',
-  };
+  const playbackStatus: PlaybackStatus = playbackStatusForCapability(partial.capabilityState, {
+    catalogMatched: Boolean(partial.matchedCatalogId),
+  });
+  const mediaClassification: LinkMediaClassification = mediaClassificationForCapability(
+    partial.capabilityState,
+    partial.platform,
+  );
+
+  const defaultMessage = `${capabilityHonestyMessage(partial.capabilityState)}${
+    partial.providerCredentialsPresent
+      ? ' Provider credentials are present for metadata/SDK wiring only.'
+      : ''
+  }`;
 
   const base: LinkResolveResult = {
     platform: partial.platform,
@@ -190,14 +253,18 @@ function buildResult(partial: {
     album: partial.album,
     artworkUrl: partial.artworkUrl,
     durationMs: partial.durationMs,
-    playbackStatus: partial.playbackStatus,
-    analysisEligible: partial.playbackStatus === 'PLAYABLE_APPROVED',
+    playbackStatus,
+    capabilityState: partial.capabilityState,
+    mediaClassification,
+    providerCredentialsPresent: partial.providerCredentialsPresent,
+    analysisEligible:
+      partial.analysisEligible ?? partial.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED',
     lyricsEligible: false,
     matchedCatalogId: partial.matchedCatalogId,
-    message: partial.message ?? messages[partial.playbackStatus],
+    message: partial.message ?? defaultMessage,
     fallbackOptions,
   };
-  // A–F eligibility: metadata/embed recognition alone is never full gameplay.
+
   const route = resolveSourceEligibilityRouter({
     linkResolve: base,
     catalogAlternatives: loadCatalog(),
@@ -205,7 +272,6 @@ function buildResult(partial: {
   const altLines = route.alternatives.map(
     (a) => `Catalog alternative [path ${route.letter}→A]: ${a.title} (${a.songId})`,
   );
-  // Preserve provider-specific wording (tests/Host UI); append eligibility when not playable.
   const message = route.playable
     ? base.message
     : `${base.message} Link recognition alone is not gameplay — choose a catalog alternative.`;
@@ -217,8 +283,9 @@ function buildResult(partial: {
 }
 
 /**
- * Resolve a pasted music link to metadata + playback eligibility.
- * Uses public oEmbed endpoints only (no audio download/streaming/rip).
+ * Resolve a pasted music link to metadata + capability eligibility.
+ * Uses public oEmbed / URL parsing only (no audio download/streaming/rip).
+ * API credentials ≠ music rights ≠ GAMEPLAY_SYNC_AUTHORIZED.
  */
 export async function resolveLink(url: string): Promise<LinkResolveResult> {
   const trimmed = url.trim();
@@ -231,8 +298,9 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
       album: null,
       artworkUrl: null,
       durationMs: null,
-      playbackStatus: 'UNSUPPORTED',
+      capabilityState: 'BLOCKED_OR_UNSUPPORTED',
       matchedCatalogId: null,
+      providerCredentialsPresent: false,
     });
   }
 
@@ -246,8 +314,10 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
       album: null,
       artworkUrl: null,
       durationMs: null,
-      playbackStatus: 'UNSUPPORTED',
+      capabilityState: 'BLOCKED_OR_UNSUPPORTED',
       matchedCatalogId: null,
+      providerCredentialsPresent: false,
+      message: 'Unsupported link format. Try YouTube, Spotify, Apple Music, SoundCloud, Bandcamp, Vimeo, Audius, or direct HTTPS WAV/MP3/OGG.',
     });
   }
 
@@ -258,6 +328,39 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
   const album: string | null = null;
   let durationMs: number | null = null;
   let appleMessage: string | undefined;
+  const credentialsPresent = hasProviderCredentials(platform);
+
+  // Direct HTTPS preferred gameplay route — rights must be attested separately.
+  if (platform === 'direct_https') {
+    const layers = firstPartyOriginalRightsLayers();
+    // Without attestation payload on the URL alone, we cannot verify rights — stay blocked/honest.
+    const decision = evaluateDirectHttpsMedia({
+      url: trimmed,
+      composition: { ...layers.composition, basis: 'none', syncAuthorized: false, adaptationAuthorized: false },
+      soundRecording: {
+        ...layers.soundRecording,
+        basis: 'none',
+        reproductionAuthorized: false,
+      },
+      beatGridReady: false,
+      chartsReady: false,
+      contentSha256: null,
+    });
+    return buildResult({
+      platform,
+      sourceId,
+      title: title ?? 'Direct HTTPS audio',
+      artist,
+      album,
+      artworkUrl,
+      durationMs,
+      capabilityState: decision.capabilityState,
+      matchedCatalogId: null,
+      providerCredentialsPresent: false,
+      message: `${decision.message} Paste alone is not attestation — use creator ingest with rights + hash + beat grid + charts.`,
+      analysisEligible: false,
+    });
+  }
 
   if (platform === 'youtube') {
     const oembed = await fetchYouTubeOEmbed(trimmed);
@@ -270,7 +373,6 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
     const oembed = await fetchSpotifyOEmbed(trimmed);
     if (oembed) {
       title = oembed.title ?? title;
-      // Spotify oEmbed often puts "Artist · Track" or author_name
       artist = oembed.author_name ?? artist;
       artworkUrl = oembed.thumbnail_url ?? null;
       if (title?.includes(' · ')) {
@@ -282,12 +384,18 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
       }
     }
   } else if (platform === 'apple_music') {
-    // Apple Music public oEmbed is limited; best-effort path title + honest messaging
     appleMessage =
-      'Apple Music metadata is best-effort from the URL path (public oEmbed is limited). No audio was downloaded.';
+      'Apple Music metadata is best-effort from the URL path (public oEmbed is limited). Deep-link only — developer token ≠ sync rights.';
+  } else if (
+    platform === 'soundcloud' ||
+    platform === 'bandcamp' ||
+    platform === 'vimeo' ||
+    platform === 'audius'
+  ) {
+    // Scaffold: parse path title only — embed/listen-first stubs, honest classification.
+    title = title ?? `${platform} track`;
   }
 
-  // Enrich catalog match with catalog duration when approved
   const matchedCatalogId = matchCatalog(title, artist);
   if (matchedCatalogId) {
     const song = loadCatalog().find((s) => s.id === matchedCatalogId);
@@ -296,6 +404,15 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
       artist = song.artist;
       durationMs = song.durationMs;
     }
+    const capabilityState = resolveLinkCapability({
+      platform,
+      hasMetadata: true,
+      officialEmbedPossible: officialEmbedPossible(platform, sourceId),
+      catalogMatched: true,
+      directAudioRightsVerified: false,
+      beatGridAndChartsReady: true,
+      providerCredentialsPresent: credentialsPresent,
+    });
     return buildResult({
       platform,
       sourceId,
@@ -304,27 +421,40 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
       album,
       artworkUrl,
       durationMs,
-      playbackStatus: 'PLAYABLE_APPROVED',
+      capabilityState,
       matchedCatalogId,
+      providerCredentialsPresent: credentialsPresent,
+      message:
+        'Matched to an approved catalog track. Gameplay uses catalog audio / song bed — never a platform rip. Ready with host metronome!',
+      analysisEligible: true,
     });
   }
 
-  if (hasProviderCredentials(platform)) {
-    return buildResult({
-      platform,
-      sourceId,
-      title,
-      artist,
-      album,
-      artworkUrl,
-      durationMs,
-      playbackStatus: 'PLAYABLE_AUTHORIZED_PLATFORM',
-      matchedCatalogId: null,
-      message:
-        platform === 'apple_music' && appleMessage
-          ? `${appleMessage} Provider token detected — connect Apple Music for official playback when available.`
-          : undefined,
-    });
+  // Critical fix: credentials must NOT yield PLAYABLE_AUTHORIZED_PLATFORM / GAMEPLAY_SYNC.
+  const hasMeta = Boolean(title || artist || artworkUrl || sourceId);
+  const embedOk = officialEmbedPossible(platform, sourceId);
+  const capabilityState = resolveLinkCapability({
+    platform,
+    hasMetadata: hasMeta,
+    officialEmbedPossible: embedOk,
+    catalogMatched: false,
+    directAudioRightsVerified: false,
+    beatGridAndChartsReady: false,
+    providerCredentialsPresent: credentialsPresent,
+  });
+
+  let message: string | undefined;
+  if (platform === 'apple_music' && appleMessage) {
+    message = `${appleMessage} Capability: ${capabilityState}.`;
+  } else if (credentialsPresent) {
+    message = `${capabilityHonestyMessage(capabilityState)} ${platform} credentials are configured for metadata/SDK wiring only — not music rights, not gameplay sync, not audio download.`;
+  } else if (
+    platform === 'soundcloud' ||
+    platform === 'bandcamp' ||
+    platform === 'vimeo' ||
+    platform === 'audius'
+  ) {
+    message = `${platform} scaffold: embed/listen-first (${capabilityState}). Not playable-audio gameplay until rights-verified direct HTTPS or catalog match.`;
   }
 
   return buildResult({
@@ -335,11 +465,10 @@ export async function resolveLink(url: string): Promise<LinkResolveResult> {
     album,
     artworkUrl,
     durationMs,
-    playbackStatus: 'METADATA_ONLY',
+    capabilityState,
     matchedCatalogId: null,
-    message:
-      platform === 'apple_music' && appleMessage
-        ? `${appleMessage} Connect Provider credentials are not configured — remaining METADATA_ONLY.`
-        : undefined,
+    providerCredentialsPresent: credentialsPresent,
+    message,
+    analysisEligible: false,
   });
 }

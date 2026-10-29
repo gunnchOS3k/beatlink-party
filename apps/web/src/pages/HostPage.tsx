@@ -31,6 +31,7 @@ import { NetworkStatus, SettingsDrawer } from '../components/NetworkStatus';
 import { BrandMark } from '../components/StageChrome';
 import { roleGlyph } from '../brand/glyphs';
 import { catalogEligibility, linkEligibility } from '../brand/complianceLabels';
+import { YouTubeOfficialPlayer } from '../components/YouTubeOfficialPlayer';
 import {
   getGameMode,
   isCallAndResponseWindow,
@@ -49,13 +50,23 @@ function LinkPreview({ result }: { result: LinkResolveResult }) {
       className={`compliance-banner link-preview eligibility-${eligibility.cls}`}
       data-testid="host-link-compliance"
       data-eligibility={eligibility.cls}
+      data-capability={result.capabilityState}
+      data-classification={result.mediaClassification}
     >
       <div className="row" style={{ marginBottom: '0.75rem' }}>
         <span className={`status-badge ${eligibility.badgeClass}`}>{eligibility.label}</span>
         <span className="status-badge status-pending" style={{ fontWeight: 600 }}>
+          {result.capabilityState}
+        </span>
+        <span className="status-badge status-pending" style={{ fontWeight: 500, fontSize: '0.75rem' }}>
           {result.playbackStatus}
         </span>
         <span style={{ fontSize: '0.85rem' }}>{result.platform}</span>
+        {result.providerCredentialsPresent ? (
+          <span className="status-badge status-pending" title="Informational only — not music rights">
+            API KEY ≠ RIGHTS
+          </span>
+        ) : null}
       </div>
       <div className="row" style={{ alignItems: 'flex-start', gap: '1rem' }}>
         {result.artworkUrl ? (
@@ -76,11 +87,15 @@ function LinkPreview({ result }: { result: LinkResolveResult }) {
             </p>
           ) : null}
           <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>{result.message}</p>
+          <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+            Classification: <code>{result.mediaClassification}</code> · composition ≠ sound recording ·
+            no rip / DRM / lyric scrape
+          </p>
         </div>
       </div>
       {result.sourceId &&
-      (result.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM' ||
-        result.playbackStatus === 'METADATA_ONLY') ? (
+      (result.capabilityState === 'OFFICIAL_EMBED_AVAILABLE' ||
+        result.capabilityState === 'METADATA_AVAILABLE') ? (
         <ProviderEmbed result={result} />
       ) : null}
     </div>
@@ -89,40 +104,14 @@ function LinkPreview({ result }: { result: LinkResolveResult }) {
 
 function ProviderEmbed({ result }: { result: LinkResolveResult }) {
   if (!result.sourceId) return null;
-  const isAuthorized = result.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM';
   if (result.platform === 'youtube') {
-    return (
-      <div style={{ marginTop: '0.75rem' }}>
-        <p className="label">
-          {isAuthorized
-            ? 'Official YouTube embed (authorized platform path)'
-            : 'Official YouTube embed preview (no API key required)'}
-        </p>
-        <iframe
-          title="YouTube preview"
-          width="100%"
-          height="200"
-          src={`https://www.youtube.com/embed/${result.sourceId}`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          style={{ border: 0, borderRadius: 12 }}
-        />
-        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
-          Host hearing uses the official embed. Multiplayer scoring still follows catalog metronome /
-          calibration unless a future SDK auth path unlocks platform-synced rounds.
-        </p>
-      </div>
-    );
+    return <YouTubeOfficialPlayer videoId={result.sourceId} title={result.title ?? 'YouTube'} />;
   }
   if (result.platform === 'spotify' && result.sourceId.startsWith('track:')) {
     const id = result.sourceId.slice('track:'.length);
     return (
       <div style={{ marginTop: '0.75rem' }}>
-        <p className="label">
-          {isAuthorized
-            ? 'Official Spotify embed (authorized platform path)'
-            : 'Official Spotify embed preview (no client secret required for iframe)'}
-        </p>
+        <p className="label">Official Spotify embed — metadata / listen (not gameplay sync)</p>
         <iframe
           title="Spotify preview"
           style={{ borderRadius: 12, border: 0 }}
@@ -133,8 +122,7 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
           loading="lazy"
         />
         <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
-          User-initiated Spotify iframe playback is shown here. Synchronized controller rounds still
-          require catalog match or Spotify Web Playback SDK + user OAuth.
+          Spotify is metadata/embed/deep-link distinct from gameplay sync. Client ID ≠ music rights.
         </p>
       </div>
     );
@@ -145,7 +133,7 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
       : null;
     return (
       <div style={{ marginTop: '0.75rem' }}>
-        <p className="label">Apple Music — legal deep-link / MusicKit boundary</p>
+        <p className="label">Apple Music — deep-link / MusicKit boundary (not gameplay sync)</p>
         {deepLink ? (
           <a
             href={deepLink}
@@ -160,8 +148,56 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
           <p style={{ fontSize: '0.9rem' }}>Paste a song URL with a recognizable Apple Music song id.</p>
         )}
         <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
-          MusicKit JS playback needs a signed developer token from a secure server endpoint. BeatLink
-          does not embed private keys or mint tokens in the client.
+          Developer token ≠ composition or sound-recording sync rights for BeatLink scoring.
+        </p>
+      </div>
+    );
+  }
+  if (result.platform === 'soundcloud') {
+    return (
+      <div style={{ marginTop: '0.75rem' }}>
+        <p className="label">SoundCloud scaffold — official widget embed / listen-first</p>
+        <iframe
+          title="SoundCloud embed"
+          width="100%"
+          height="166"
+          allow="autoplay"
+          src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(`https://soundcloud.com/${result.sourceId}`)}&auto_play=false`}
+          style={{ border: 0, borderRadius: 12 }}
+        />
+        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+          Embed-only classification. Not playable-audio gameplay until rights-verified direct HTTPS.
+        </p>
+      </div>
+    );
+  }
+  if (result.platform === 'vimeo') {
+    return (
+      <div style={{ marginTop: '0.75rem' }}>
+        <p className="label">Vimeo scaffold — official visible player (no AV separation)</p>
+        <iframe
+          title="Vimeo embed"
+          src={`https://player.vimeo.com/video/${result.sourceId}`}
+          width="100%"
+          height="200"
+          allow="autoplay; fullscreen; picture-in-picture"
+          style={{ border: 0, borderRadius: 12 }}
+        />
+        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+          Embed-only. No audio extraction.
+        </p>
+      </div>
+    );
+  }
+  if (result.platform === 'bandcamp' || result.platform === 'audius') {
+    return (
+      <div style={{ marginTop: '0.75rem' }}>
+        <p className="label">
+          {result.platform} scaffold — embed/listen-first ({result.mediaClassification})
+        </p>
+        <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
+          Honest stub: official embed path recognized. Not playable-audio gameplay. Prefer catalog or
+          rights-verified direct HTTPS WAV/MP3/OGG.
         </p>
       </div>
     );
@@ -176,7 +212,10 @@ function ConnectProviderCta({
   result: LinkResolveResult;
   providers: ProviderAuthStatus | null;
 }) {
-  if (result.playbackStatus !== 'METADATA_ONLY' && result.playbackStatus !== 'PLAYABLE_AUTHORIZED_PLATFORM') {
+  if (
+    result.capabilityState !== 'METADATA_AVAILABLE' &&
+    result.capabilityState !== 'OFFICIAL_EMBED_AVAILABLE'
+  ) {
     return null;
   }
   const configured =
@@ -190,29 +229,27 @@ function ConnectProviderCta({
 
   return (
     <div className="card stack" style={{ borderColor: 'var(--warning)' }}>
-      <h4>Connect Provider</h4>
+      <h4>Provider credentials ≠ music rights</h4>
       <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
-        Status:{' '}
+        Capability: <strong>{result.capabilityState}</strong> · Credentials:{' '}
         <strong>
           {configured
-            ? 'CREDENTIALS_PRESENT'
+            ? 'CREDENTIALS_PRESENT (metadata/SDK wiring only)'
             : (providers?.authState ?? 'EXTERNAL_PENDING')}
         </strong>
       </p>
       {!configured ? (
         <p style={{ fontSize: '0.9rem' }}>
-          Provider auth is <strong>EXTERNAL_PENDING</strong>. Use owned/open/local catalog songs.
-          Remaining <strong>METADATA_ONLY</strong> for platform links. Set provider env vars (
-          <code>SPOTIFY_CLIENT_ID</code>, <code>YOUTUBE_API_KEY</code>, or{' '}
-          <code>APPLE_MUSIC_DEVELOPER_TOKEN</code>) and restart the server. BeatLink never downloads
-          or rips platform audio.
+          Provider auth is <strong>EXTERNAL_PENDING</strong>. Use owned/open/local catalog songs or
+          rights-verified direct HTTPS. Env vars (<code>SPOTIFY_CLIENT_ID</code>,{' '}
+          <code>YOUTUBE_API_KEY</code>, <code>APPLE_MUSIC_DEVELOPER_TOKEN</code>) enrich metadata only
+          — they never authorize gameplay sync or ripping.
         </p>
       ) : (
         <p style={{ fontSize: '0.9rem' }}>
-          Provider auth path is available as <strong>PLAYABLE_AUTHORIZED_PLATFORM</strong>. Official
-          embed preview may appear above when a source id is present — embed ≠ rhythm-sync or
-          audio-extraction rights. Gameplay uses the approved catalog (path A/D) when a match
-          exists; otherwise pick a catalog alternative below.
+          Credentials are present but capability remains <strong>{result.capabilityState}</strong> —
+          not <code>GAMEPLAY_SYNC_AUTHORIZED</code>. Official embed ≠ rhythm-sync or audio-extraction
+          rights. Prefer approved catalog (path A/D) or direct HTTPS with rights + hash + beat grid.
         </p>
       )}
       <p style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>

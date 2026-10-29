@@ -58,12 +58,24 @@ Implemented by `resolveSourceEligibilityRouter` in `packages/game-engine/src/con
 
 YouTube may only be used under official player/embed rules when explicitly authorized; embed ≠ rhythm-sync or audio-extraction rights. Spotify is never a game-streaming content path under this policy.
 
-## Playback Status Values
+## Link capability states (primary)
 
-- `PLAYABLE_APPROVED` — matched to internal catalog; safe to play
-- `PLAYABLE_AUTHORIZED_PLATFORM` — future; official SDK playback
-- `METADATA_ONLY` — link recognized; no legal playback path
-- `NEEDS_USER_UPLOAD` — user must provide owned audio
+See [LINK_CAPABILITY_STATES.md](LINK_CAPABILITY_STATES.md).
+
+- `METADATA_AVAILABLE` — metadata only
+- `OFFICIAL_EMBED_AVAILABLE` — official embed / deep-link listen (not gameplay)
+- `DIRECT_AUDIO_RIGHTS_VERIFIED` — HTTPS WAV/MP3/OGG rights + hash (grid/charts still needed)
+- `GAMEPLAY_SYNC_AUTHORIZED` — catalog or rights-verified direct audio + beat grid + charts
+- `BLOCKED_OR_UNSUPPORTED` — blocked / unknown
+
+**API credentials ≠ music rights.** Never assign gameplay sync (or legacy `PLAYABLE_AUTHORIZED_PLATFORM`) merely because `YOUTUBE_API_KEY` / similar is set.
+
+## Playback Status Values (legacy companion)
+
+- `PLAYABLE_APPROVED` — matched to internal catalog or gameplay-sync-authorized direct audio
+- `PLAYABLE_AUTHORIZED_PLATFORM` — **deprecated**; reserved for future official sync SDK + rights; never from API keys
+- `METADATA_ONLY` — link recognized; no legal gameplay path (includes official embed listen)
+- `NEEDS_USER_UPLOAD` — user must provide owned audio / complete attestation
 - `NEEDS_LICENSE` — commercial license required
 - `UNSUPPORTED` — URL format not recognized
 - `BLOCKED_BY_POLICY` — blocked by platform or policy rules

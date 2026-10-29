@@ -67,6 +67,12 @@ const ALLOWED_PROVIDER_HOSTS = new Set([
   'youtu.be',
   'music.apple.com',
   'itunes.apple.com',
+  'soundcloud.com',
+  'on.soundcloud.com',
+  'bandcamp.com',
+  'vimeo.com',
+  'player.vimeo.com',
+  'audius.co',
 ]);
 
 export function detectRipIntent(signals: string[] = []): boolean {
@@ -144,8 +150,12 @@ export function resolveSongSource(input: SongSourceResolveInput): SongSource {
     canGameplayStream = true;
     canCacheMedia = false;
   } else if (media.kind === 'authorized_embed') {
-    // Only claim authorized platform playback when status proves it.
-    if (media.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM') {
+    // Official embed / legacy "authorized platform" from API keys is reference-only.
+    // Gameplay stream requires GAMEPLAY_SYNC_AUTHORIZED (catalog or rights-verified direct audio).
+    const syncOk =
+      input.linkResult?.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED' &&
+      media.playbackStatus === 'PLAYABLE_APPROVED';
+    if (syncOk) {
       kind = 'authorized_platform_playback';
       canGameplayStream = true;
       canCacheMedia = false;
