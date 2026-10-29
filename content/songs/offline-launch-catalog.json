@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0.0",
-  "purpose": "Offline legal launch catalog — public-domain / original / Creative Commons / creator-owned only. No ripping, no DRM bypass, no copyrighted commercial lyrics.",
+  "schema_version": "1.1.0",
+  "purpose": "Offline legal launch catalog — original / public-domain / Creative Commons / creator-owned full playable songs with rights records + hashes. No ripping, no DRM bypass, no copyrighted commercial lyrics.",
   "rip_forbidden": true,
   "drm_bypass_forbidden": true,
   "songs": [
@@ -8,176 +8,539 @@
       "id": "launch-pd-tap-grid",
       "title": "Public Domain Tap Grid",
       "artist": "BeatLink Public Domain Desk",
-      "durationMs": 36000,
+      "durationMs": 96000,
       "bpm": 120,
       "beatmapId": "launch-pd-tap-120",
       "license": "public_domain",
-      "description": "Public-domain beat grid for BeatTap offline launch.",
-      "modes": ["BeatTap"],
-      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "description": "Full-length original/authorized launch song (96s) — procedural WAV + note/phrase charts. No commercial rip.",
+      "modes": [
+        "BeatTap"
+      ],
+      "difficulties": [
+        "beginner",
+        "casual",
+        "pro",
+        "nightmare"
+      ],
       "analysisEligible": true,
       "launchEligible": true,
+      "audioAssetPath": "songs/audio/launch-pd-tap-grid.wav",
+      "assetSha256": "9a62665f863a45319bd88d84b8b5b0efd020e8457227726b1e7e1bc321a32d18",
+      "compositionSha256": "444b8b49242d27b2db39e772cde626414fc9c0383e37b2ebacb97f135c945980",
       "chart": {
         "beatmapId": "launch-pd-tap-120",
-        "difficulties": ["beginner", "casual", "pro", "nightmare"],
-        "noteRoles": ["beat_tapper"]
+        "difficulties": [
+          "beginner",
+          "casual",
+          "pro",
+          "nightmare"
+        ],
+        "noteRoles": [
+          "beat_tapper"
+        ]
       },
       "karaokeMeta": {
-        "prompts": ["Tap the pulse!", "Keep the grid!", "Stay on beat!"],
+        "prompts": [
+          "Tap the pulse!",
+          "Keep the grid!",
+          "Stay on beat!",
+          "Lock the downbeat!",
+          "Ride the eighths!",
+          "Close the loop!"
+        ],
         "noRecording": true,
-        "pitchHintHz": null,
-        "language": "en"
+        "pitchHintHz": 196,
+        "language": "en",
+        "phrases": [
+          {
+            "id": "ph-0",
+            "text": "Tap the pulse!",
+            "startMs": 17286,
+            "durationMs": 4800,
+            "targetPitchHz": 196
+          },
+          {
+            "id": "ph-1",
+            "text": "Keep the grid!",
+            "startMs": 29571,
+            "durationMs": 4800,
+            "targetPitchHz": 220
+          },
+          {
+            "id": "ph-2",
+            "text": "Stay on beat!",
+            "startMs": 41857,
+            "durationMs": 4800,
+            "targetPitchHz": 247
+          },
+          {
+            "id": "ph-3",
+            "text": "Lock the downbeat!",
+            "startMs": 54143,
+            "durationMs": 4800,
+            "targetPitchHz": 262
+          },
+          {
+            "id": "ph-4",
+            "text": "Ride the eighths!",
+            "startMs": 66429,
+            "durationMs": 4800,
+            "targetPitchHz": 294
+          },
+          {
+            "id": "ph-5",
+            "text": "Close the loop!",
+            "startMs": 78714,
+            "durationMs": 4800,
+            "targetPitchHz": 247
+          }
+        ]
       },
       "rights": {
         "license": "public_domain",
-        "attribution": "BeatLink original public-domain arrangement (no copyrighted melody).",
+        "attribution": "BeatLink Public Domain Desk — PD-original-arrangement",
         "ripForbidden": true,
         "drmBypassForbidden": true,
         "sourceKind": "public_domain",
-        "ccDeedUrl": null
+        "ccDeedUrl": null,
+        "licenseVersion": "PD-original-arrangement",
+        "author": "BeatLink Public Domain Desk",
+        "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=9a62665f863a45319bd88d84b8b5b0efd020e8457227726b1e7e1bc321a32d18",
+        "rightsRecordPath": "songs/rights/launch-pd-tap-grid.json"
       }
     },
     {
       "id": "launch-orig-call-mirror",
       "title": "Call Mirror",
       "artist": "BeatLink Original Studio",
-      "durationMs": 38000,
+      "durationMs": 102000,
       "bpm": 100,
       "beatmapId": "launch-orig-call-100",
       "license": "synthetic_original",
-      "description": "Original synthetic call/response bed for CallAndResponse.",
-      "modes": ["CallAndResponse"],
-      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "description": "Full-length original/authorized launch song (102s) — procedural WAV + note/phrase charts. No commercial rip.",
+      "modes": [
+        "CallAndResponse"
+      ],
+      "difficulties": [
+        "beginner",
+        "casual",
+        "pro",
+        "nightmare"
+      ],
       "analysisEligible": true,
       "launchEligible": true,
+      "audioAssetPath": "songs/audio/launch-orig-call-mirror.wav",
+      "assetSha256": "4a98fb43411bcc066b4febda7cb243473bb21395c04afafc1d4b73aa3ca8a888",
+      "compositionSha256": "f73fd9bfb8073d689454bbf6d0c6d553ab8640a324d1a3ec87e66038861dc67e",
       "chart": {
         "beatmapId": "launch-orig-call-100",
-        "difficulties": ["beginner", "casual", "pro", "nightmare"],
-        "noteRoles": ["beat_tapper", "vocalist"]
+        "difficulties": [
+          "beginner",
+          "casual",
+          "pro",
+          "nightmare"
+        ],
+        "noteRoles": [
+          "beat_tapper",
+          "vocalist"
+        ]
       },
       "karaokeMeta": {
-        "prompts": ["Echo the call!", "Answer the host!", "Mirror the phrase!"],
+        "prompts": [
+          "Echo the call!",
+          "Answer the host!",
+          "Mirror the phrase!",
+          "Hold the reply!",
+          "Trade the motif!",
+          "Land together!"
+        ],
         "noRecording": true,
         "pitchHintHz": 220,
-        "language": "en"
+        "language": "en",
+        "phrases": [
+          {
+            "id": "ph-0",
+            "text": "Echo the call!",
+            "startMs": 18143,
+            "durationMs": 4800,
+            "targetPitchHz": 220
+          },
+          {
+            "id": "ph-1",
+            "text": "Answer the host!",
+            "startMs": 31286,
+            "durationMs": 4800,
+            "targetPitchHz": 247
+          },
+          {
+            "id": "ph-2",
+            "text": "Mirror the phrase!",
+            "startMs": 44429,
+            "durationMs": 4800,
+            "targetPitchHz": 277
+          },
+          {
+            "id": "ph-3",
+            "text": "Hold the reply!",
+            "startMs": 57571,
+            "durationMs": 4800,
+            "targetPitchHz": 330
+          },
+          {
+            "id": "ph-4",
+            "text": "Trade the motif!",
+            "startMs": 70714,
+            "durationMs": 4800,
+            "targetPitchHz": 277
+          },
+          {
+            "id": "ph-5",
+            "text": "Land together!",
+            "startMs": 83857,
+            "durationMs": 4800,
+            "targetPitchHz": 247
+          }
+        ]
       },
       "rights": {
         "license": "synthetic_original",
-        "attribution": "BeatLink Original Studio — synthetic_original.",
+        "attribution": "BeatLink Original Studio — original-v1",
         "ripForbidden": true,
         "drmBypassForbidden": true,
         "sourceKind": "original",
-        "ccDeedUrl": null
+        "ccDeedUrl": null,
+        "licenseVersion": "original-v1",
+        "author": "BeatLink Original Studio",
+        "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=4a98fb43411bcc066b4febda7cb243473bb21395c04afafc1d4b73aa3ca8a888",
+        "rightsRecordPath": "songs/rights/launch-orig-call-mirror.json"
       }
     },
     {
       "id": "launch-cc-karaoke-warm",
       "title": "Warm CC Karaoke",
       "artist": "BeatLink CC Desk",
-      "durationMs": 42000,
+      "durationMs": 108000,
       "bpm": 96,
       "beatmapId": "launch-cc-karaoke-96",
       "license": "creative_commons",
-      "description": "CC0-style karaoke warm-up — placeholder prompts only, no commercial lyrics.",
-      "modes": ["KaraokePerformance"],
-      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "description": "Full-length original/authorized launch song (108s) — procedural WAV + note/phrase charts. No commercial rip.",
+      "modes": [
+        "KaraokePerformance"
+      ],
+      "difficulties": [
+        "beginner",
+        "casual",
+        "pro",
+        "nightmare"
+      ],
       "analysisEligible": true,
       "launchEligible": true,
+      "audioAssetPath": "songs/audio/launch-cc-karaoke-warm.wav",
+      "assetSha256": "f1a13251f90012966a2fab15ce1c3ebdef43f2e2182e94d3b96463c898ca18b2",
+      "compositionSha256": "083d4f8463a545dd495fda3f64b37bc5888e54a1f33ff3953983d058ee5c17ba",
       "chart": {
         "beatmapId": "launch-cc-karaoke-96",
-        "difficulties": ["beginner", "casual", "pro", "nightmare"],
-        "noteRoles": ["vocalist"]
+        "difficulties": [
+          "beginner",
+          "casual",
+          "pro",
+          "nightmare"
+        ],
+        "noteRoles": [
+          "vocalist"
+        ]
       },
       "karaokeMeta": {
-        "prompts": ["Sing the warm-up!", "Hold the vowel!", "Soft chorus cue!"],
+        "prompts": [
+          "Sing the warm-up!",
+          "Hold the vowel!",
+          "Soft chorus cue!",
+          "Lift the phrase!",
+          "Breathe and return!",
+          "Gentle landing!"
+        ],
         "noRecording": true,
         "pitchHintHz": 196,
-        "language": "en"
+        "language": "en",
+        "phrases": [
+          {
+            "id": "ph-0",
+            "text": "Sing the warm-up!",
+            "startMs": 19000,
+            "durationMs": 4800,
+            "targetPitchHz": 196
+          },
+          {
+            "id": "ph-1",
+            "text": "Hold the vowel!",
+            "startMs": 33000,
+            "durationMs": 4800,
+            "targetPitchHz": 220
+          },
+          {
+            "id": "ph-2",
+            "text": "Soft chorus cue!",
+            "startMs": 47000,
+            "durationMs": 4800,
+            "targetPitchHz": 233
+          },
+          {
+            "id": "ph-3",
+            "text": "Lift the phrase!",
+            "startMs": 61000,
+            "durationMs": 4800,
+            "targetPitchHz": 262
+          },
+          {
+            "id": "ph-4",
+            "text": "Breathe and return!",
+            "startMs": 75000,
+            "durationMs": 4800,
+            "targetPitchHz": 294
+          },
+          {
+            "id": "ph-5",
+            "text": "Gentle landing!",
+            "startMs": 89000,
+            "durationMs": 4800,
+            "targetPitchHz": 220
+          }
+        ]
       },
       "rights": {
         "license": "creative_commons",
-        "attribution": "BeatLink CC Desk — CC0 dedication for offline digital launch.",
+        "attribution": "BeatLink CC Desk — CC0-1.0",
         "ripForbidden": true,
         "drmBypassForbidden": true,
         "sourceKind": "creative_commons",
-        "ccDeedUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        "ccDeedUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "licenseVersion": "CC0-1.0",
+        "author": "BeatLink CC Desk",
+        "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=f1a13251f90012966a2fab15ce1c3ebdef43f2e2182e94d3b96463c898ca18b2",
+        "rightsRecordPath": "songs/rights/launch-cc-karaoke-warm.json"
       }
     },
     {
       "id": "launch-creator-band-stomp",
       "title": "Creator Band Stomp",
       "artist": "BeatLink Creator Attestation Desk",
-      "durationMs": 40000,
+      "durationMs": 99000,
       "bpm": 126,
       "beatmapId": "launch-creator-band-126",
       "license": "creator_owned",
-      "description": "Creator-owned four-on-the-floor bed for BandRoles.",
-      "modes": ["BandRoles"],
-      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "description": "Full-length original/authorized launch song (99s) — procedural WAV + note/phrase charts. No commercial rip.",
+      "modes": [
+        "BandRoles"
+      ],
+      "difficulties": [
+        "beginner",
+        "casual",
+        "pro",
+        "nightmare"
+      ],
       "analysisEligible": true,
       "launchEligible": true,
+      "audioAssetPath": "songs/audio/launch-creator-band-stomp.wav",
+      "assetSha256": "28184d0e0bc0ff223e57c436ee910a23a740c32a88aa5bede80f7c71907225a3",
+      "compositionSha256": "a794e0afbd1bcace1a26070f9ead8a472faca07c811965206414018e15fdf02f",
       "chart": {
         "beatmapId": "launch-creator-band-126",
-        "difficulties": ["beginner", "casual", "pro", "nightmare"],
-        "noteRoles": ["beat_tapper", "vocalist", "hype_captain"]
+        "difficulties": [
+          "beginner",
+          "casual",
+          "pro",
+          "nightmare"
+        ],
+        "noteRoles": [
+          "beat_tapper",
+          "vocalist",
+          "hype_captain"
+        ]
       },
       "karaokeMeta": {
-        "prompts": ["Band hit!", "Hype the drop!", "Hold the stomp!"],
+        "prompts": [
+          "Band hit!",
+          "Hype the drop!",
+          "Hold the stomp!",
+          "Kick with the floor!",
+          "Stack the chord!",
+          "Ride the outro!"
+        ],
         "noRecording": true,
         "pitchHintHz": 180,
-        "language": "en"
+        "language": "en",
+        "phrases": [
+          {
+            "id": "ph-0",
+            "text": "Band hit!",
+            "startMs": 17714,
+            "durationMs": 4800,
+            "targetPitchHz": 180
+          },
+          {
+            "id": "ph-1",
+            "text": "Hype the drop!",
+            "startMs": 30429,
+            "durationMs": 4800,
+            "targetPitchHz": 220
+          },
+          {
+            "id": "ph-2",
+            "text": "Hold the stomp!",
+            "startMs": 43143,
+            "durationMs": 4800,
+            "targetPitchHz": 240
+          },
+          {
+            "id": "ph-3",
+            "text": "Kick with the floor!",
+            "startMs": 55857,
+            "durationMs": 4800,
+            "targetPitchHz": 270
+          },
+          {
+            "id": "ph-4",
+            "text": "Stack the chord!",
+            "startMs": 68571,
+            "durationMs": 4800,
+            "targetPitchHz": 240
+          },
+          {
+            "id": "ph-5",
+            "text": "Ride the outro!",
+            "startMs": 81286,
+            "durationMs": 4800,
+            "targetPitchHz": 220
+          }
+        ]
       },
       "rights": {
         "license": "creator_owned",
-        "attribution": "Creator-attested original — BeatLink Creator Attestation Desk.",
+        "attribution": "BeatLink Creator Attestation Desk — creator-attested-v1",
         "ripForbidden": true,
         "drmBypassForbidden": true,
         "sourceKind": "creator_owned",
-        "ccDeedUrl": null
+        "ccDeedUrl": null,
+        "licenseVersion": "creator-attested-v1",
+        "author": "BeatLink Creator Attestation Desk",
+        "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=28184d0e0bc0ff223e57c436ee910a23a740c32a88aa5bede80f7c71907225a3",
+        "rightsRecordPath": "songs/rights/launch-creator-band-stomp.json"
       }
     },
     {
       "id": "launch-pd-predict-pulse",
       "title": "Prediction Pulse PD",
       "artist": "BeatLink Public Domain Desk",
-      "durationMs": 35000,
+      "durationMs": 90000,
       "bpm": 130,
       "beatmapId": "launch-pd-predict-130",
       "license": "public_domain",
-      "description": "Public-domain section-change pulse for PredictionTrivia.",
-      "modes": ["PredictionTrivia"],
-      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "description": "Full-length original/authorized launch song (90s) — procedural WAV + note/phrase charts. No commercial rip.",
+      "modes": [
+        "PredictionTrivia"
+      ],
+      "difficulties": [
+        "beginner",
+        "casual",
+        "pro",
+        "nightmare"
+      ],
       "analysisEligible": true,
       "launchEligible": true,
+      "audioAssetPath": "songs/audio/launch-pd-predict-pulse.wav",
+      "assetSha256": "9aa3ab603aeec1d6388e57a1f5c230a7f05725c5fe4a6c3cedc413779566e37e",
+      "compositionSha256": "6048b97352ffb8f168a307752d9e247dcb68b50e89944b59b578b3a398291c21",
       "chart": {
         "beatmapId": "launch-pd-predict-130",
-        "difficulties": ["beginner", "casual", "pro", "nightmare"],
-        "noteRoles": ["hype_captain"]
+        "difficulties": [
+          "beginner",
+          "casual",
+          "pro",
+          "nightmare"
+        ],
+        "noteRoles": [
+          "hype_captain"
+        ]
       },
       "karaokeMeta": {
-        "prompts": ["Predict the drop!", "Call the section!", "Vote the fill!"],
+        "prompts": [
+          "Predict the drop!",
+          "Call the section!",
+          "Vote the fill!",
+          "Lock your pick!",
+          "Watch the rise!",
+          "Confirm the hit!"
+        ],
         "noRecording": true,
-        "pitchHintHz": null,
-        "language": "en"
+        "pitchHintHz": 165,
+        "language": "en",
+        "phrases": [
+          {
+            "id": "ph-0",
+            "text": "Predict the drop!",
+            "startMs": 16429,
+            "durationMs": 4800,
+            "targetPitchHz": 165
+          },
+          {
+            "id": "ph-1",
+            "text": "Call the section!",
+            "startMs": 27857,
+            "durationMs": 4800,
+            "targetPitchHz": 196
+          },
+          {
+            "id": "ph-2",
+            "text": "Vote the fill!",
+            "startMs": 39286,
+            "durationMs": 4800,
+            "targetPitchHz": 220
+          },
+          {
+            "id": "ph-3",
+            "text": "Lock your pick!",
+            "startMs": 50714,
+            "durationMs": 4800,
+            "targetPitchHz": 247
+          },
+          {
+            "id": "ph-4",
+            "text": "Watch the rise!",
+            "startMs": 62143,
+            "durationMs": 4800,
+            "targetPitchHz": 294
+          },
+          {
+            "id": "ph-5",
+            "text": "Confirm the hit!",
+            "startMs": 73571,
+            "durationMs": 4800,
+            "targetPitchHz": 220
+          }
+        ]
       },
       "rights": {
         "license": "public_domain",
-        "attribution": "BeatLink PD desk — original arrangement, no copyrighted melody.",
+        "attribution": "BeatLink Public Domain Desk — PD-original-arrangement",
         "ripForbidden": true,
         "drmBypassForbidden": true,
         "sourceKind": "public_domain",
-        "ccDeedUrl": null
+        "ccDeedUrl": null,
+        "licenseVersion": "PD-original-arrangement",
+        "author": "BeatLink Public Domain Desk",
+        "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=9aa3ab603aeec1d6388e57a1f5c230a7f05725c5fe4a6c3cedc413779566e37e",
+        "rightsRecordPath": "songs/rights/launch-pd-predict-pulse.json"
       }
     },
     {
       "id": "launch-cc-multi-party",
       "title": "CC Multi-Mode Party",
       "artist": "BeatLink CC Desk",
-      "durationMs": 44000,
+      "durationMs": 114000,
       "bpm": 118,
       "beatmapId": "launch-cc-multi-118",
       "license": "creative_commons",
-      "description": "CC-BY sparkle loop covering all five modes for rematch coverage.",
+      "description": "Full-length original/authorized launch song (114s) — procedural WAV + note/phrase charts. No commercial rip.",
       "modes": [
         "BeatTap",
         "CallAndResponse",
@@ -185,27 +548,99 @@
         "BandRoles",
         "PredictionTrivia"
       ],
-      "difficulties": ["beginner", "casual", "pro", "nightmare"],
+      "difficulties": [
+        "beginner",
+        "casual",
+        "pro",
+        "nightmare"
+      ],
       "analysisEligible": true,
       "launchEligible": true,
+      "audioAssetPath": "songs/audio/launch-cc-multi-party.wav",
+      "assetSha256": "ffd1544be4e910b34b22d295b41545b046b1c34173c2535f617689fd1c00c38f",
+      "compositionSha256": "49f4dcf1b027495d4775aece93592409479d4629b21bf623dc81b5cd73b50d15",
       "chart": {
         "beatmapId": "launch-cc-multi-118",
-        "difficulties": ["beginner", "casual", "pro", "nightmare"],
-        "noteRoles": ["beat_tapper", "vocalist", "hype_captain"]
+        "difficulties": [
+          "beginner",
+          "casual",
+          "pro",
+          "nightmare"
+        ],
+        "noteRoles": [
+          "beat_tapper",
+          "vocalist",
+          "hype_captain"
+        ]
       },
       "karaokeMeta": {
-        "prompts": ["Party sparkle!", "All-mode cue!", "Crowd cheer!"],
+        "prompts": [
+          "Party sparkle!",
+          "All-mode cue!",
+          "Crowd cheer!",
+          "Swap the role!",
+          "Lift the room!",
+          "Finale glow!"
+        ],
         "noRecording": true,
         "pitchHintHz": 208,
-        "language": "en"
+        "language": "en",
+        "phrases": [
+          {
+            "id": "ph-0",
+            "text": "Party sparkle!",
+            "startMs": 19857,
+            "durationMs": 4800,
+            "targetPitchHz": 208
+          },
+          {
+            "id": "ph-1",
+            "text": "All-mode cue!",
+            "startMs": 34714,
+            "durationMs": 4800,
+            "targetPitchHz": 233
+          },
+          {
+            "id": "ph-2",
+            "text": "Crowd cheer!",
+            "startMs": 49571,
+            "durationMs": 4800,
+            "targetPitchHz": 262
+          },
+          {
+            "id": "ph-3",
+            "text": "Swap the role!",
+            "startMs": 64429,
+            "durationMs": 4800,
+            "targetPitchHz": 311
+          },
+          {
+            "id": "ph-4",
+            "text": "Lift the room!",
+            "startMs": 79286,
+            "durationMs": 4800,
+            "targetPitchHz": 349
+          },
+          {
+            "id": "ph-5",
+            "text": "Finale glow!",
+            "startMs": 94143,
+            "durationMs": 4800,
+            "targetPitchHz": 262
+          }
+        ]
       },
       "rights": {
         "license": "creative_commons",
-        "attribution": "BeatLink CC Desk — CC-BY 4.0 offline digital launch stub.",
+        "attribution": "BeatLink CC Desk — CC-BY-4.0",
         "ripForbidden": true,
         "drmBypassForbidden": true,
         "sourceKind": "creative_commons",
-        "ccDeedUrl": "https://creativecommons.org/licenses/by/4.0/"
+        "ccDeedUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "licenseVersion": "CC-BY-4.0",
+        "author": "BeatLink CC Desk",
+        "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=ffd1544be4e910b34b22d295b41545b046b1c34173c2535f617689fd1c00c38f",
+        "rightsRecordPath": "songs/rights/launch-cc-multi-party.json"
       }
     }
   ]

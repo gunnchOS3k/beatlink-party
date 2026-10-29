@@ -21,6 +21,7 @@ import {
   nextPredictionSection,
   LiveGetUserMediaAdapter,
   microphonePitchAnalysisClaim,
+  scorePhrasePitchCoverage,
   startLiveMicContinuousAnalysis,
   type LiveMicContinuousHandle,
 } from '@beatlink/game-engine';
@@ -78,6 +79,9 @@ export default function PlayerPage() {
   const micAdapterRef = useRef<LiveGetUserMediaAdapter | null>(null);
   const liveAnalysisRef = useRef<LiveMicContinuousHandle | null>(null);
   const lastPitchMatchRef = useRef<number | null>(null);
+  const phraseFramesRef = useRef<Array<{ pitched: boolean; pitchMatch: number }>>([]);
+  const activePhraseIdRef = useRef<string | null>(null);
+  const targetPitchHzRef = useRef(220);
   const inputSeqRef = useRef(0);
   const playerIdRef = useRef<string | undefined>(undefined);
   playerIdRef.current = player?.id;
@@ -166,6 +170,34 @@ export default function PlayerPage() {
       );
     setCurrentPrompt(prompt ?? null);
   }, [beatmap, gameTimeMs, player, karaokeState]);
+
+  // Keep live DSP target on the active song phrase — never a fixed 220/196 probe.
+  useEffect(() => {
+    const nextId = currentPrompt?.id ?? null;
+    const hz =
+      currentPrompt?.targetPitchHz && currentPrompt.targetPitchHz > 0
+        ? currentPrompt.targetPitchHz
+        : 220;
+    targetPitchHzRef.current = hz;
+    if (nextId !== activePhraseIdRef.current) {
+      activePhraseIdRef.current = nextId;
+      phraseFramesRef.current = [];
+      lastPitchMatchRef.current = null;
+    }
+    liveAnalysisRef.current?.setTargetPitchHz(hz);
+  }, [currentPrompt]);
+
+  // Drop pitch claim when leaving play (results / rematch / lobby).
+  useEffect(() => {
+    if (room?.phase === 'playing') return;
+    liveAnalysisRef.current?.stop();
+    liveAnalysisRef.current = null;
+    lastPitchMatchRef.current = null;
+    phraseFramesRef.current = [];
+    activePhraseIdRef.current = null;
+    setPitchAnalysisActive(false);
+    setLastPitchHz(null);
+  }, [room?.phase]);
 
   function claimHost() {
     if (!player) return;
@@ -288,10 +320,17 @@ export default function PlayerPage() {
     sendInput('swipe', { noteId: note?.id });
   }
 
+  function resolvePhraseTargetHz(prompt: VocalPrompt | null | undefined): number {
+    if (prompt?.targetPitchHz && prompt.targetPitchHz > 0) return prompt.targetPitchHz;
+    return 220;
+  }
+
   function stopLiveKaraokeAnalysis() {
     liveAnalysisRef.current?.stop();
     liveAnalysisRef.current = null;
     lastPitchMatchRef.current = null;
+    phraseFramesRef.current = [];
+    activePhraseIdRef.current = null;
     setPitchAnalysisActive(false);
     setLastPitchHz(null);
   }
@@ -309,18 +348,43 @@ export default function PlayerPage() {
       // Genuine continuous path only: live mic PCM → DSP → phrase scoring.
       // Never authorize pitchAnalysisActive from a synthetic tone probe.
       const stream = adapter.getStream();
-      const targetHz = currentPrompt ? 220 : 196;
+      targetPitchHzRef.current = resolvePhraseTargetHz(currentPrompt);
       const handle =
         stream != null
           ? startLiveMicContinuousAnalysis(stream, {
-              targetPitchHz: targetHz,
-              intervalMs: 100,
+              targetPitchHz: () => targetPitchHzRef.current,
+              intervalMs: 80,
+              frameDurationMs: 80,
               onFrame: (frame) => {
-                lastPitchMatchRef.current = frame.score.pitchMatch;
-                setLastPitchHz(frame.features.pitchHz || null);
+                const pitched = frame.features.voiced && frame.features.pitchHz > 0;
+                // Silence is not a fabricated match — only retain voiced coverage frames.
+                if (activePhraseIdRef.current) {
+                  phraseFramesRef.current.push({
+                    pitched,
+                    pitchMatch: pitched ? frame.score.pitchMatch : 0,
+                  });
+                  // Bound memory — keep ~8s of 80ms ticks.
+                  if (phraseFramesRef.current.length > 100) {
+                    phraseFramesRef.current.splice(0, phraseFramesRef.current.length - 100);
+                  }
+                }
+                const coverage = scorePhrasePitchCoverage(phraseFramesRef.current);
+                lastPitchMatchRef.current = coverage.phrasePitchMatch;
+                setLastPitchHz(pitched ? frame.features.pitchHz : null);
+                // Drop claim if continuous handle stopped being live mid-session.
+                if (!liveAnalysisRef.current?.live) {
+                  setPitchAnalysisActive(false);
+                }
+              },
+              onLifecycleEnd: () => {
+                setPitchAnalysisActive(false);
+                setLastPitchHz(null);
+                lastPitchMatchRef.current = null;
               },
             })
           : null;
+      // Await a tick so live reflects AudioContext running state when available.
+      await new Promise((r) => setTimeout(r, 30));
       const claim = microphonePitchAnalysisClaim({
         micConsent: 'granted',
         continuousLive: handle?.live === true,
@@ -328,9 +392,15 @@ export default function PlayerPage() {
       if (handle && claim) {
         liveAnalysisRef.current = handle;
         setPitchAnalysisActive(true);
-      } else {
+      } else if (handle) {
         // Permission alone is not a pitch claim — keep timing-only honesty.
-        handle?.stop();
+        // If context is still resuming, accept handle but claim only while live===true.
+        liveAnalysisRef.current = handle;
+        setPitchAnalysisActive(handle.live === true);
+        if (!handle.live) {
+          setLastPitchHz(null);
+        }
+      } else {
         setPitchAnalysisActive(false);
         setLastPitchHz(null);
       }
@@ -351,14 +421,26 @@ export default function PlayerPage() {
   }
 
   function handleVocal() {
+    const liveNow =
+      pitchAnalysisActive &&
+      liveAnalysisRef.current?.live === true &&
+      micConsent === 'granted';
+    const coverage = scorePhrasePitchCoverage(phraseFramesRef.current);
+    const pitchMatch = liveNow ? coverage.phrasePitchMatch : undefined;
     sendInput('vocal_phrase', {
       promptId: currentPrompt?.id,
       // Client honesty flag — true only while continuous consented mic DSP is live.
-      pitchAnalysisActive,
-      ...(pitchAnalysisActive && lastPitchMatchRef.current != null
-        ? { pitchMatch: lastPitchMatchRef.current }
+      // Server bounds this scalar; it is not independent physical-mic attestation.
+      pitchAnalysisActive: liveNow,
+      ...(pitchMatch != null && liveNow ? { pitchMatch } : {}),
+      ...(liveNow
+        ? {
+            voicedCoverage: coverage.voicedCoverage,
+            phraseFrames: coverage.frames,
+          }
         : {}),
     });
+    phraseFramesRef.current = [];
   }
 
   function handleVocalFallbackTap() {

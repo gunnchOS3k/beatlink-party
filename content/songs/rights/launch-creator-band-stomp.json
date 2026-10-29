@@ -1,0 +1,23 @@
+{
+  "schema": "beatlink.asset_rights.v1",
+  "trackId": "launch-creator-band-stomp",
+  "title": "Creator Band Stomp",
+  "artist": "BeatLink Creator Attestation Desk",
+  "author": "BeatLink Creator Attestation Desk",
+  "license": "creator_owned",
+  "licenseVersion": "creator-attested-v1",
+  "sourceKind": "creator_owned",
+  "attribution": "BeatLink Creator Attestation Desk — creator-attested-v1",
+  "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=28184d0e0bc0ff223e57c436ee910a23a740c32a88aa5bede80f7c71907225a3",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": null,
+  "audioAssetPath": "songs/audio/launch-creator-band-stomp.wav",
+  "assetSha256": "28184d0e0bc0ff223e57c436ee910a23a740c32a88aa5bede80f7c71907225a3",
+  "compositionSha256": "a794e0afbd1bcace1a26070f9ead8a472faca07c811965206414018e15fdf02f",
+  "sampleRate": 22050,
+  "channels": 1,
+  "durationMs": 99000,
+  "bpm": 126,
+  "generatedBy": "scripts/generate_launch_songs.mjs"
+}

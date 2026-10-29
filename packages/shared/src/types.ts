@@ -245,6 +245,16 @@ export type CatalogLicense =
   /** Creator-owned original — offline launch path with attestation metadata. */
   | 'creator_owned';
 
+/** Timed phrase target for karaoke pitch path — original placeholders only. */
+export interface CatalogKaraokePhrase {
+  id: string;
+  text: string;
+  startMs: number;
+  durationMs: number;
+  /** Melody target in Hz for consented live DSP (never implies commercial lyrics). */
+  targetPitchHz: number;
+}
+
 /** Offline karaoke metadata — placeholder prompts only; never copyrighted lyrics. */
 export interface CatalogKaraokeMeta {
   prompts: string[];
@@ -252,6 +262,8 @@ export interface CatalogKaraokeMeta {
   noRecording: true;
   pitchHintHz?: number | null;
   language?: string;
+  /** Timed phrase/note targets for pitch path — preferred over pitchHintHz alone. */
+  phrases?: CatalogKaraokePhrase[];
 }
 
 export interface CatalogChartMeta {
@@ -276,6 +288,14 @@ export interface CatalogRightsMeta {
     | 'demo';
   /** Optional CC deed URL (never a download/rip endpoint). */
   ccDeedUrl?: string | null;
+  /** Exact license version string when applicable (e.g. CC-BY-4.0). */
+  licenseVersion?: string | null;
+  /** Author / studio of record for this asset. */
+  author?: string | null;
+  /** Ownership / permission evidence note (never a stream rip claim). */
+  ownershipEvidence?: string | null;
+  /** Relative path to the per-asset rights record JSON. */
+  rightsRecordPath?: string | null;
 }
 
 export interface SongCatalogEntry {
@@ -297,6 +317,12 @@ export interface SongCatalogEntry {
   analysisEligible?: boolean;
   /** Marks track as part of the offline legal launch set. */
   launchEligible?: boolean;
+  /** Relative path under content/ for the original/authorized audio asset. */
+  audioAssetPath?: string | null;
+  /** SHA-256 hex of the audio asset bytes (or recipe payload when procedural-only). */
+  assetSha256?: string | null;
+  /** Composition / arrangement hash for procedural beds without a WAV. */
+  compositionSha256?: string | null;
 }
 
 export interface RightsAttestation {
@@ -340,6 +366,8 @@ export interface VocalPrompt {
   timeMs: number;
   text: string;
   durationMs: number;
+  /** Optional melody target for consented live pitch DSP. */
+  targetPitchHz?: number | null;
 }
 
 export interface HypeEvent {
@@ -388,6 +416,10 @@ export interface PlayerInputEvent {
   pitchAnalysisActive?: boolean;
   /** Karaoke pitch match 0..1 from ephemeral live DSP (discarded after score). */
   pitchMatch?: number;
+  /** Fraction of phrase frames that were voiced (client report; server-bounded). */
+  voicedCoverage?: number;
+  /** Number of DSP frames contributing to the phrase pitch aggregate. */
+  phraseFrames?: number;
   /** Client event identity for server idempotency (Wave007). */
   event_id?: string;
   idempotency_key?: string;

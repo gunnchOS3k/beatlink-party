@@ -1,0 +1,23 @@
+{
+  "schema": "beatlink.asset_rights.v1",
+  "trackId": "launch-orig-call-mirror",
+  "title": "Call Mirror",
+  "artist": "BeatLink Original Studio",
+  "author": "BeatLink Original Studio",
+  "license": "synthetic_original",
+  "licenseVersion": "original-v1",
+  "sourceKind": "original",
+  "attribution": "BeatLink Original Studio — original-v1",
+  "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=4a98fb43411bcc066b4febda7cb243473bb21395c04afafc1d4b73aa3ca8a888",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": null,
+  "audioAssetPath": "songs/audio/launch-orig-call-mirror.wav",
+  "assetSha256": "4a98fb43411bcc066b4febda7cb243473bb21395c04afafc1d4b73aa3ca8a888",
+  "compositionSha256": "f73fd9bfb8073d689454bbf6d0c6d553ab8640a324d1a3ec87e66038861dc67e",
+  "sampleRate": 22050,
+  "channels": 1,
+  "durationMs": 102000,
+  "bpm": 100,
+  "generatedBy": "scripts/generate_launch_songs.mjs"
+}

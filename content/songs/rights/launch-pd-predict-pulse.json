@@ -1,0 +1,23 @@
+{
+  "schema": "beatlink.asset_rights.v1",
+  "trackId": "launch-pd-predict-pulse",
+  "title": "Prediction Pulse PD",
+  "artist": "BeatLink Public Domain Desk",
+  "author": "BeatLink Public Domain Desk",
+  "license": "public_domain",
+  "licenseVersion": "PD-original-arrangement",
+  "sourceKind": "public_domain",
+  "attribution": "BeatLink Public Domain Desk — PD-original-arrangement",
+  "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=9aa3ab603aeec1d6388e57a1f5c230a7f05725c5fe4a6c3cedc413779566e37e",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": null,
+  "audioAssetPath": "songs/audio/launch-pd-predict-pulse.wav",
+  "assetSha256": "9aa3ab603aeec1d6388e57a1f5c230a7f05725c5fe4a6c3cedc413779566e37e",
+  "compositionSha256": "6048b97352ffb8f168a307752d9e247dcb68b50e89944b59b578b3a398291c21",
+  "sampleRate": 22050,
+  "channels": 1,
+  "durationMs": 90000,
+  "bpm": 130,
+  "generatedBy": "scripts/generate_launch_songs.mjs"
+}

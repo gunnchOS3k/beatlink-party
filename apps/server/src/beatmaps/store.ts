@@ -10,7 +10,7 @@ const contentRoot = join(__dirname, '../../../../content');
 
 let catalog: SongCatalogEntry[] = [];
 /** Versioned beatmap cache — charts are loaded once per beatmap id, not regenerated each play. */
-const BEATMAP_CACHE_VERSION = 1;
+const BEATMAP_CACHE_VERSION = 2;
 const beatmapCache = new Map<string, Beatmap>();
 
 function cacheKey(beatmapId: string): string {
@@ -65,7 +65,14 @@ export function getBeatmap(beatmapId: string): Beatmap | null {
     // fall through to generated once, then cache
   }
 
-  const generated = createDemoBeatmap(beatmapId, song.id, song.bpm, song.durationMs);
+  const generated = createDemoBeatmap(
+    beatmapId,
+    song.id,
+    song.bpm,
+    song.durationMs,
+    'casual',
+    song,
+  );
   beatmapCache.set(key, generated as Beatmap);
   return structuredClone(generated as Beatmap);
 }

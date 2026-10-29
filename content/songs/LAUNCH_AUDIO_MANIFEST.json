@@ -1,0 +1,47 @@
+{
+  "generated_at_utc": "2026-10-29T04:57:25.872Z",
+  "songs": [
+    {
+      "id": "launch-pd-tap-grid",
+      "audioAssetPath": "songs/audio/launch-pd-tap-grid.wav",
+      "assetSha256": "9a62665f863a45319bd88d84b8b5b0efd020e8457227726b1e7e1bc321a32d18",
+      "durationMs": 96000,
+      "bpm": 120
+    },
+    {
+      "id": "launch-orig-call-mirror",
+      "audioAssetPath": "songs/audio/launch-orig-call-mirror.wav",
+      "assetSha256": "4a98fb43411bcc066b4febda7cb243473bb21395c04afafc1d4b73aa3ca8a888",
+      "durationMs": 102000,
+      "bpm": 100
+    },
+    {
+      "id": "launch-cc-karaoke-warm",
+      "audioAssetPath": "songs/audio/launch-cc-karaoke-warm.wav",
+      "assetSha256": "f1a13251f90012966a2fab15ce1c3ebdef43f2e2182e94d3b96463c898ca18b2",
+      "durationMs": 108000,
+      "bpm": 96
+    },
+    {
+      "id": "launch-creator-band-stomp",
+      "audioAssetPath": "songs/audio/launch-creator-band-stomp.wav",
+      "assetSha256": "28184d0e0bc0ff223e57c436ee910a23a740c32a88aa5bede80f7c71907225a3",
+      "durationMs": 99000,
+      "bpm": 126
+    },
+    {
+      "id": "launch-pd-predict-pulse",
+      "audioAssetPath": "songs/audio/launch-pd-predict-pulse.wav",
+      "assetSha256": "9aa3ab603aeec1d6388e57a1f5c230a7f05725c5fe4a6c3cedc413779566e37e",
+      "durationMs": 90000,
+      "bpm": 130
+    },
+    {
+      "id": "launch-cc-multi-party",
+      "audioAssetPath": "songs/audio/launch-cc-multi-party.wav",
+      "assetSha256": "ffd1544be4e910b34b22d295b41545b046b1c34173c2535f617689fd1c00c38f",
+      "durationMs": 114000,
+      "bpm": 118
+    }
+  ]
+}

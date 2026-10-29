@@ -1,0 +1,23 @@
+{
+  "schema": "beatlink.asset_rights.v1",
+  "trackId": "launch-pd-tap-grid",
+  "title": "Public Domain Tap Grid",
+  "artist": "BeatLink Public Domain Desk",
+  "author": "BeatLink Public Domain Desk",
+  "license": "public_domain",
+  "licenseVersion": "PD-original-arrangement",
+  "sourceKind": "public_domain",
+  "attribution": "BeatLink Public Domain Desk — PD-original-arrangement",
+  "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=9a62665f863a45319bd88d84b8b5b0efd020e8457227726b1e7e1bc321a32d18",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": null,
+  "audioAssetPath": "songs/audio/launch-pd-tap-grid.wav",
+  "assetSha256": "9a62665f863a45319bd88d84b8b5b0efd020e8457227726b1e7e1bc321a32d18",
+  "compositionSha256": "444b8b49242d27b2db39e772cde626414fc9c0383e37b2ebacb97f135c945980",
+  "sampleRate": 22050,
+  "channels": 1,
+  "durationMs": 96000,
+  "bpm": 120,
+  "generatedBy": "scripts/generate_launch_songs.mjs"
+}

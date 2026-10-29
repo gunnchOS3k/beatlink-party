@@ -974,6 +974,7 @@ export class RoomManager {
               timeMs: 700,
               text: 'Prompt timing — tap the phrase window',
               durationMs: 2000,
+              targetPitchHz: 220,
             },
             ...beatmap.vocalPrompts.filter((v) => v.timeMs < durationMs - 500).slice(0, 2),
           ]
@@ -1485,13 +1486,23 @@ export class RoomManager {
           player.streak,
         );
         // Pitch bonus only when client reports continuous live DSP (never synthetic probe).
+        // Server bounds the scalar — this is NOT independent physical-mic attestation.
         const pitchAnalysisActive =
           input.type === 'vocal_phrase' && input.pitchAnalysisActive === true;
         const pitchMatchRaw = input.pitchMatch;
+        const voicedCoverageRaw = input.voicedCoverage;
+        const voicedCoverage =
+          typeof voicedCoverageRaw === 'number' && Number.isFinite(voicedCoverageRaw)
+            ? Math.min(1, Math.max(0, voicedCoverageRaw))
+            : undefined;
+        // Reject stale/malformed pitch: require finite [0,1] and non-trivial voiced coverage when claimed.
         const pitchMatch =
           pitchAnalysisActive &&
           typeof pitchMatchRaw === 'number' &&
-          Number.isFinite(pitchMatchRaw)
+          Number.isFinite(pitchMatchRaw) &&
+          pitchMatchRaw >= 0 &&
+          pitchMatchRaw <= 1 &&
+          (voicedCoverage == null || voicedCoverage >= 0.15)
             ? Math.min(1, Math.max(0, pitchMatchRaw))
             : undefined;
         const modeScore = scoreForMode({

@@ -1,0 +1,23 @@
+{
+  "schema": "beatlink.asset_rights.v1",
+  "trackId": "launch-cc-karaoke-warm",
+  "title": "Warm CC Karaoke",
+  "artist": "BeatLink CC Desk",
+  "author": "BeatLink CC Desk",
+  "license": "creative_commons",
+  "licenseVersion": "CC0-1.0",
+  "sourceKind": "creative_commons",
+  "attribution": "BeatLink CC Desk — CC0-1.0",
+  "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=f1a13251f90012966a2fab15ce1c3ebdef43f2e2182e94d3b96463c898ca18b2",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "audioAssetPath": "songs/audio/launch-cc-karaoke-warm.wav",
+  "assetSha256": "f1a13251f90012966a2fab15ce1c3ebdef43f2e2182e94d3b96463c898ca18b2",
+  "compositionSha256": "083d4f8463a545dd495fda3f64b37bc5888e54a1f33ff3953983d058ee5c17ba",
+  "sampleRate": 22050,
+  "channels": 1,
+  "durationMs": 108000,
+  "bpm": 96,
+  "generatedBy": "scripts/generate_launch_songs.mjs"
+}

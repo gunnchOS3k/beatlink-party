@@ -1,10 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'node:http';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { DifficultyId, GameModeId } from '@beatlink/shared';
 import { registerTelemetrySink } from '@beatlink/shared';
 import {
   createDefaultProviderBundle,
+  ingestCreatorOwnedBinary,
   ingestCreatorOwnedStub,
   listGameModes,
 } from '@beatlink/game-engine';
@@ -44,10 +47,14 @@ if (process.env.BEATLINK_TELEMETRY === '1') {
 
 const PORT = Number(process.env.PORT ?? 3001);
 const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '*';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const contentRoot = join(__dirname, '../../../content');
 
 const app = express();
 app.use(cors({ origin: CORS_ORIGIN }));
-app.use(express.json());
+app.use(express.json({ limit: '14mb' }));
+/** Rights-cleared launch WAV / rights JSON only — never a stream rip cache. */
+app.use('/content', express.static(contentRoot, { fallthrough: true, index: false }));
 
 const providers = createDefaultProviderBundle();
 let roomStoreBackend: 'memory' | 'redis' = 'memory';
@@ -110,6 +117,106 @@ app.post('/content/creator-ingest', (req, res) => {
       | undefined,
   });
   return res.status(result.ok ? 200 : 422).json(result);
+});
+
+/**
+ * Creator-owned local WAV binary ingest — validate/hash/BPM/chart draft.
+ * Never auto-publishes. Rejects platform URLs. Does not scrape lyrics or bypass DRM.
+ */
+app.post('/content/creator-ingest-binary', (req, res) => {
+  const body = (req.body ?? {}) as {
+    trackId?: string;
+    title?: string;
+    artist?: string;
+    attestorId?: string;
+    ownsOrLicensed?: boolean;
+    durationMs?: number;
+    bpm?: number;
+    pitchHintHz?: number | null;
+    claimedSourceUrl?: string | null;
+    ripIntentSignals?: string[];
+    declaredLicense?: string;
+    mimeType?: string;
+    acknowledgeNoAutoPublish?: boolean;
+    /** Base64 WAV bytes (local owned media only). */
+    audioBase64?: string;
+  };
+  if (!body.trackId || !body.title || !body.artist || !body.attestorId) {
+    return res.status(400).json({
+      error: 'trackId, title, artist, and attestorId are required',
+      honesty: {
+        ripPerformed: false,
+        lyricsScraped: false,
+        drmCircumvented: false,
+        commercialLicenseClaimed: false,
+        audioBinaryStored: false,
+        autoPublished: false,
+      },
+    });
+  }
+  if (!body.audioBase64) {
+    return res.status(400).json({
+      error: 'audioBase64 (PCM WAV) is required for binary ingest',
+      honesty: {
+        ripPerformed: false,
+        lyricsScraped: false,
+        drmCircumvented: false,
+        commercialLicenseClaimed: false,
+        audioBinaryStored: false,
+        autoPublished: false,
+      },
+    });
+  }
+  let audioBytes: Uint8Array;
+  try {
+    audioBytes = Uint8Array.from(Buffer.from(String(body.audioBase64), 'base64'));
+  } catch {
+    return res.status(400).json({
+      error: 'audioBase64 must be valid base64',
+      honesty: {
+        ripPerformed: false,
+        lyricsScraped: false,
+        drmCircumvented: false,
+        commercialLicenseClaimed: false,
+        audioBinaryStored: false,
+        autoPublished: false,
+      },
+    });
+  }
+  const result = ingestCreatorOwnedBinary({
+    trackId: String(body.trackId),
+    title: String(body.title),
+    artist: String(body.artist),
+    attestorId: String(body.attestorId),
+    ownsOrLicensed: Boolean(body.ownsOrLicensed),
+    durationMs: body.durationMs,
+    bpm: body.bpm,
+    pitchHintHz: body.pitchHintHz ?? null,
+    claimedSourceUrl: body.claimedSourceUrl ?? null,
+    ripIntentSignals: body.ripIntentSignals,
+    declaredLicense: body.declaredLicense as
+      | 'creator_owned'
+      | 'creative_commons'
+      | 'public_domain'
+      | 'licensed_pack'
+      | undefined,
+    mimeType: body.mimeType ?? 'audio/wav',
+    acknowledgeNoAutoPublish: Boolean(body.acknowledgeNoAutoPublish),
+    audioBytes,
+  });
+  // Never return chart note dumps larger than needed — strip to summary for HTTP.
+  const { chartEditor, ...rest } = result;
+  return res.status(result.ok ? 200 : 422).json({
+    ...rest,
+    chartEditorSummary: chartEditor
+      ? {
+          noteCount: chartEditor.chart.notes.length,
+          confidenceGate: chartEditor.confidenceGate,
+          bpm: chartEditor.chart.bpm,
+          revision: chartEditor.revision,
+        }
+      : null,
+  });
 });
 
 app.post('/rooms', (req, res) => {

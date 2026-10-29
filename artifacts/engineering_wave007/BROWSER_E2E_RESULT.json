@@ -8,7 +8,7 @@
   "performer_context_id": "performer-mobile-390",
   "audience_context_id": "audience-mobile-412",
   "canonical_room_code_same": true,
-  "room_code": "2XE3X",
+  "room_code": "TZ6UP",
   "scenario_steps_passed": 32,
   "scenario_steps_total": 32,
   "steps": [
@@ -26,7 +26,7 @@
       "step": 3,
       "name": "lobby_room_code_visible",
       "ok": true,
-      "detail": "2XE3X"
+      "detail": "TZ6UP"
     },
     {
       "step": 4,
@@ -120,13 +120,13 @@
       "step": 19,
       "name": "round_ends",
       "ok": true,
-      "detail": "3074e261e2305486"
+      "detail": "c62ba298b6b60617"
     },
     {
       "step": 20,
       "name": "outcome_hash_consistent",
       "ok": true,
-      "detail": "3074e261e2305486 vs 3074e261e2305486"
+      "detail": "c62ba298b6b60617 vs c62ba298b6b60617"
     },
     {
       "step": 21,
@@ -171,7 +171,7 @@
       "step": 28,
       "name": "prior_result_immutable",
       "ok": true,
-      "detail": "3074e261e2305486"
+      "detail": "c62ba298b6b60617"
     },
     {
       "step": 29,

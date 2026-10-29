@@ -29,6 +29,7 @@ export * from './eventScaleSim.js';
 export * from './eventLifecycle.js';
 export * from './contentPaths.js';
 export * from './creatorIngest.js';
+export * from './creatorBinaryIngest.js';
 export * from './modePlayableSession.js';
 export * from './digitalRc.js';
 export * from './providers.js';

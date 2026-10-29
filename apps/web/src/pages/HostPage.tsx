@@ -16,7 +16,7 @@ import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreat
 import {
   startCalibrationClicks,
   startHostMetronome,
-  startHostSongBed,
+  startHostCatalogAudio,
   resumeAudioContext,
 } from '../lib/hostAudio';
 import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
@@ -476,25 +476,39 @@ export default function HostPage() {
       beatmap?.vocalPrompts.map((p) => ({
         startMs: p.timeMs,
         durationMs: p.durationMs,
+        targetPitchHz: p.targetPitchHz ?? undefined,
       })) ?? [];
-    void resumeAudioContext();
-    metronomeRef.current =
-      noteTimesMs.length > 0 || phraseWindowsMs.length > 0
-        ? startHostSongBed({
-            bpm,
-            offsetMs: room.calibrationOffsetMs ?? 0,
-            durationMs: room.gameDurationMs,
-            startedAtMs: startedAt,
-            noteTimesMs,
-            phraseWindowsMs,
-          })
-        : startHostMetronome({
-            bpm,
-            offsetMs: room.calibrationOffsetMs ?? 0,
-            durationMs: room.gameDurationMs,
-            startedAtMs: startedAt,
-          });
+    const audioUrl = song?.audioAssetPath
+      ? `/content/${song.audioAssetPath.replace(/^\/+/, '')}`
+      : null;
+    let cancelled = false;
+    void resumeAudioContext().then(async () => {
+      if (cancelled) return;
+      const handle =
+        noteTimesMs.length > 0 || phraseWindowsMs.length > 0 || audioUrl
+          ? await startHostCatalogAudio({
+              bpm,
+              offsetMs: room.calibrationOffsetMs ?? 0,
+              durationMs: room.gameDurationMs,
+              startedAtMs: startedAt,
+              noteTimesMs,
+              phraseWindowsMs,
+              audioUrl,
+            })
+          : startHostMetronome({
+              bpm,
+              offsetMs: room.calibrationOffsetMs ?? 0,
+              durationMs: room.gameDurationMs,
+              startedAtMs: startedAt,
+            });
+      if (cancelled) {
+        handle.stop();
+        return;
+      }
+      metronomeRef.current = handle;
+    });
     return () => {
+      cancelled = true;
       metronomeRef.current?.stop();
       metronomeRef.current = null;
     };

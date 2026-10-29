@@ -1,0 +1,23 @@
+{
+  "schema": "beatlink.asset_rights.v1",
+  "trackId": "launch-cc-multi-party",
+  "title": "CC Multi-Mode Party",
+  "artist": "BeatLink CC Desk",
+  "author": "BeatLink CC Desk",
+  "license": "creative_commons",
+  "licenseVersion": "CC-BY-4.0",
+  "sourceKind": "creative_commons",
+  "attribution": "BeatLink CC Desk — CC-BY-4.0",
+  "ownershipEvidence": "Original procedural composition authored for BeatLink launch; sha256=ffd1544be4e910b34b22d295b41545b046b1c34173c2535f617689fd1c00c38f",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "audioAssetPath": "songs/audio/launch-cc-multi-party.wav",
+  "assetSha256": "ffd1544be4e910b34b22d295b41545b046b1c34173c2535f617689fd1c00c38f",
+  "compositionSha256": "49f4dcf1b027495d4775aece93592409479d4629b21bf623dc81b5cd73b50d15",
+  "sampleRate": 22050,
+  "channels": 1,
+  "durationMs": 114000,
+  "bpm": 118,
+  "generatedBy": "scripts/generate_launch_songs.mjs"
+}
