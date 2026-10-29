@@ -182,7 +182,7 @@
         "2026-10-29 isolated slice: destination SSRF host policy + lobby attach/deny for syncEligible=false + hash-matched launch catalog select; browser E2E journey and durable scored-result persistence still open; HUMAN/RC2/V1 remain false."
       ],
       "severity": "blocker",
-      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
+      "sha": "665f108974358cab06c71d7753697761ca44853c",
       "independent_review_status": "not_started",
       "cursor_complete_status": "in_progress",
       "notes": "Negative regression: playback ok + syncEligible false denies scored lobby attach. Positive: syncEligible + launch asset hash selects catalog beatmap. Browser production UI journey + five-mode residual still required before complete."
