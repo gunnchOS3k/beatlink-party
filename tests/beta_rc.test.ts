@@ -296,10 +296,13 @@ describe('Beta — rights/legal content paths', () => {
     };
 
     const rf = catalog.songs.find((s) => s.license === 'royalty_free')!;
-    const pd = catalog.songs.find((s) => s.license === 'public_domain')!;
+    // Former "PD" stubs were reclassified — metadata alone never grants public_domain.
+    const firstParty = catalog.songs.find(
+      (s) => s.license === 'synthetic_original' && s.id.startsWith('pd-'),
+    )!;
     const licensed = catalog.songs.find((s) => s.license === 'licensed_pack')!;
     expect(rf).toBeTruthy();
-    expect(pd).toBeTruthy();
+    expect(firstParty).toBeTruthy();
     expect(licensed).toBeTruthy();
 
     const rfPath = resolveContentPath({ catalogEntry: rf });

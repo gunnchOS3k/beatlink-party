@@ -37,7 +37,8 @@ The link resolver does **not**:
 | Creator-owned uploads | Stub | `POST /content/creator-ingest` — attestation metadata only |
 | Licensed music packs | Future | Requires label deals |
 | Official platform playback | Future | Per-platform SDK + license |
-| Public-domain / royalty-free | Yes | Offline launch catalog + song beds |
+| First-party original / CC-released / royalty-free | Yes | Offline launch catalog + song beds (ownership ≠ license; no fake PD via metadata) |
+| Verified third-party public domain | Conditional | Only with ownershipClass=verified_public_domain + source evidence |
 
 LAN phone/TV bind (local-dev only): see [LAN_PARTY_PHONE_TV.md](LAN_PARTY_PHONE_TV.md).
 

@@ -272,6 +272,23 @@ export interface CatalogChartMeta {
   noteRoles: PlayerRole[];
 }
 
+/** Who owns the composition — separate from the outbound license label. */
+export type OwnershipClass =
+  | 'first_party_original'
+  | 'creator_attested'
+  | 'third_party_licensed'
+  | 'verified_public_domain'
+  | 'unverified';
+
+export interface ThirdPartyLicenseRecord {
+  kind: 'creative_commons' | 'royalty_free' | 'licensed_pack' | 'public_domain' | 'other';
+  version?: string | null;
+  deedUrl?: string | null;
+  owner?: string | null;
+  /** Evidence note — never a stream rip claim. */
+  evidence?: string | null;
+}
+
 export interface CatalogRightsMeta {
   license: CatalogLicense;
   attribution: string;
@@ -296,6 +313,19 @@ export interface CatalogRightsMeta {
   ownershipEvidence?: string | null;
   /** Relative path to the per-asset rights record JSON. */
   rightsRecordPath?: string | null;
+  /** Ownership class — must not be inferred solely from a license string. */
+  ownershipClass?: OwnershipClass | null;
+  /** Human-readable license label that must match ownership + deed evidence. */
+  licenseLabel?: string | null;
+  /**
+   * Commercial use gate. Metadata alone never sets this true — requires verified
+   * attribution / commercial review. Default false for launch catalog.
+   */
+  commercialEligible?: boolean;
+  /** Whether attribution text has been human-verified (not generator-asserted only). */
+  attributionVerified?: boolean;
+  /** Third-party license deed when ownershipClass is third_party_licensed or CC release. */
+  thirdPartyLicense?: ThirdPartyLicenseRecord | null;
 }
 
 export interface SongCatalogEntry {

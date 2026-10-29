@@ -1064,6 +1064,7 @@ export default function HostPage() {
 
       {room?.phase === 'playing' && (
         <div className="stage" data-testid="host-gameplay" data-phase="playing">
+          <div className="se-follow-spot" aria-hidden="true" />
           <h2 style={{ textAlign: 'center', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>
             LIVE ON STAGE
           </h2>

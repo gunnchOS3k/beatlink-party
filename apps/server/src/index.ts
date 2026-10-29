@@ -7,6 +7,7 @@ import type { DifficultyId, GameModeId } from '@beatlink/shared';
 import { registerTelemetrySink } from '@beatlink/shared';
 import {
   createDefaultProviderBundle,
+  defaultCreatorDraftStore,
   ingestCreatorOwnedBinary,
   ingestCreatorOwnedStub,
   listGameModes,
@@ -206,8 +207,14 @@ app.post('/content/creator-ingest-binary', (req, res) => {
   });
   // Never return chart note dumps larger than needed — strip to summary for HTTP.
   const { chartEditor, ...rest } = result;
+  const draft =
+    result.ok && result.catalogDraft
+      ? defaultCreatorDraftStore.saveFromIngest(result, String(body.attestorId))
+      : null;
   return res.status(result.ok ? 200 : 422).json({
     ...rest,
+    draftId: draft?.draftId ?? null,
+    draftStatus: draft?.status ?? null,
     chartEditorSummary: chartEditor
       ? {
           noteCount: chartEditor.chart.notes.length,
@@ -216,6 +223,55 @@ app.post('/content/creator-ingest-binary', (req, res) => {
           revision: chartEditor.revision,
         }
       : null,
+  });
+});
+
+/** List durable creator drafts (never launch-published). */
+app.get('/content/creator-drafts', (req, res) => {
+  const attestorId = typeof req.query.attestorId === 'string' ? req.query.attestorId : undefined;
+  const drafts = defaultCreatorDraftStore.list(attestorId).map((d) => ({
+    draftId: d.draftId,
+    trackId: d.trackId,
+    attestorId: d.attestorId,
+    status: d.status,
+    sha256: d.sha256,
+    title: d.catalogDraft.title,
+    launchEligible: false,
+    commercialEligible: false,
+    autoPublish: false,
+    message: d.message,
+  }));
+  res.json({ drafts, autoPublish: false, commercialEligible: false });
+});
+
+/** Withdraw a creator draft — clears binary references and takes down attestation. */
+app.post('/content/creator-drafts/:draftId/withdraw', (req, res) => {
+  const attestorId = String((req.body ?? {}).attestorId ?? '');
+  if (!attestorId) {
+    return res.status(400).json({ error: 'attestorId required', withdrawn: false });
+  }
+  const withdrawn = defaultCreatorDraftStore.withdraw(req.params.draftId, attestorId);
+  if (!withdrawn) {
+    return res.status(404).json({ error: 'draft_not_found_or_forbidden', withdrawn: false });
+  }
+  res.json({
+    withdrawn: true,
+    draftId: withdrawn.draftId,
+    status: withdrawn.status,
+    autoPublish: false,
+    message: withdrawn.message,
+  });
+});
+
+/** Explicit publish attempt — always blocked (no auto-publish path). */
+app.post('/content/creator-drafts/:draftId/publish', (req, res) => {
+  const attempt = defaultCreatorDraftStore.attemptPublish(req.params.draftId);
+  res.status(409).json({
+    ok: false,
+    reason: attempt.reason,
+    autoPublish: false,
+    commercialEligible: false,
+    message: attempt.draft?.message ?? 'Publish blocked',
   });
 });
 

@@ -48,7 +48,7 @@
       "bpm": 140,
       "beatmapId": "synth-click-140",
       "license": "synthetic_original",
-      "description": "Faster synthetic click train — original BeatLink signal."
+      "description": "Faster synthetic click train \u2014 original BeatLink signal."
     },
     {
       "id": "synth-lofi-metro",
@@ -82,23 +82,53 @@
     },
     {
       "id": "pd-scale-drills",
-      "title": "Public Domain Scale Drills",
-      "artist": "BeatLink Public Domain Desk",
+      "title": "Scale Drills Original",
+      "artist": "BeatLink Original Studio",
       "durationMs": 32000,
       "bpm": 100,
       "beatmapId": "pd-scale-100",
-      "license": "public_domain",
-      "description": "Public-domain scale drill pattern (original arrangement, no copyrighted melody)."
+      "license": "synthetic_original",
+      "description": "First-party synthetic arrangement using traditional scale/march rhythmic pedagogy. Not a verified third-party public-domain master recording. commercialEligible=false.",
+      "rights": {
+        "license": "synthetic_original",
+        "attribution": "BeatLink Original Studio \u2014 original-v1",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "original",
+        "licenseVersion": "original-v1",
+        "author": "BeatLink Original Studio",
+        "ownershipEvidence": "First-party procedural/demo arrangement; not a PD scrape.",
+        "ownershipClass": "first_party_original",
+        "licenseLabel": "BeatLink original (synthetic_original)",
+        "commercialEligible": false,
+        "attributionVerified": true,
+        "thirdPartyLicense": null
+      }
     },
     {
       "id": "pd-march-grid",
-      "title": "March Grid",
-      "artist": "BeatLink Public Domain Desk",
+      "title": "March Grid Original",
+      "artist": "BeatLink Original Studio",
       "durationMs": 34000,
       "bpm": 112,
       "beatmapId": "pd-march-112",
-      "license": "public_domain",
-      "description": "Public-domain march-style beat grid for prediction trivia sections."
+      "license": "synthetic_original",
+      "description": "First-party synthetic arrangement using traditional scale/march rhythmic pedagogy. Not a verified third-party public-domain master recording. commercialEligible=false.",
+      "rights": {
+        "license": "synthetic_original",
+        "attribution": "BeatLink Original Studio \u2014 original-v1",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "original",
+        "licenseVersion": "original-v1",
+        "author": "BeatLink Original Studio",
+        "ownershipEvidence": "First-party procedural/demo arrangement; not a PD scrape.",
+        "ownershipClass": "first_party_original",
+        "licenseLabel": "BeatLink original (synthetic_original)",
+        "commercialEligible": false,
+        "attributionVerified": true,
+        "thirdPartyLicense": null
+      }
     },
     {
       "id": "rf-sparkle-loop",
@@ -108,7 +138,22 @@
       "bpm": 118,
       "beatmapId": "rf-sparkle-118",
       "license": "royalty_free",
-      "description": "Internal royalty-free sparkle loop — original BeatLink composition stub."
+      "description": "Internal royalty-free sparkle loop \u2014 original BeatLink composition stub.",
+      "rights": {
+        "license": "royalty_free",
+        "attribution": "BeatLink Royalty-Free Desk \u2014 internal RF desk",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "royalty_free",
+        "licenseVersion": "internal-rf-v1",
+        "author": "BeatLink Royalty-Free Desk",
+        "ownershipEvidence": "First-party royalty-free desk composition stub.",
+        "ownershipClass": "first_party_original",
+        "licenseLabel": "royalty_free (first-party desk)",
+        "commercialEligible": false,
+        "attributionVerified": true,
+        "thirdPartyLicense": null
+      }
     },
     {
       "id": "rf-basement-warm",
@@ -118,7 +163,22 @@
       "bpm": 96,
       "beatmapId": "rf-basement-96",
       "license": "royalty_free",
-      "description": "Warm royalty-free warm-up loop for karaoke no-recording path."
+      "description": "Warm royalty-free warm-up loop for karaoke no-recording path.",
+      "rights": {
+        "license": "royalty_free",
+        "attribution": "BeatLink Royalty-Free Desk \u2014 internal RF desk",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "royalty_free",
+        "licenseVersion": "internal-rf-v1",
+        "author": "BeatLink Royalty-Free Desk",
+        "ownershipEvidence": "First-party royalty-free desk composition stub.",
+        "ownershipClass": "first_party_original",
+        "licenseLabel": "royalty_free (first-party desk)",
+        "commercialEligible": false,
+        "attributionVerified": true,
+        "thirdPartyLicense": null
+      }
     },
     {
       "id": "synth-prediction-pulse",
@@ -138,7 +198,22 @@
       "bpm": 122,
       "beatmapId": "licensed-aurora-122",
       "license": "licensed_pack",
-      "description": "Stub licensed-pack demo entry for Beta rights path tests (not a commercial label deal)."
+      "description": "Stub licensed-pack demo entry for Beta rights path tests (not a commercial label deal).",
+      "rights": {
+        "license": "licensed_pack",
+        "attribution": "BeatLink Licensed Desk \u2014 stub pack (not a commercial label deal)",
+        "ripForbidden": true,
+        "drmBypassForbidden": true,
+        "sourceKind": "licensed_pack",
+        "licenseVersion": "stub-pack-v0",
+        "author": "BeatLink Licensed Desk",
+        "ownershipEvidence": "Internal stub for rights-path tests only \u2014 no commercial deal.",
+        "ownershipClass": "first_party_original",
+        "licenseLabel": "licensed_pack stub (non-commercial test fixture)",
+        "commercialEligible": false,
+        "attributionVerified": false,
+        "thirdPartyLicense": null
+      }
     }
   ]
 }
