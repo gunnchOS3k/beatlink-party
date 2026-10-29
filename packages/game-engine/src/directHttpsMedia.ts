@@ -68,15 +68,6 @@ export interface DirectHttpsUrlPolicyResult {
   normalizedUrl: string | null;
 }
 
-function isHttpsUrl(raw: string): boolean {
-  try {
-    const u = new URL(raw.trim());
-    return u.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
 function extensionOf(url: string): string {
   try {
     const path = new URL(url).pathname.toLowerCase();
