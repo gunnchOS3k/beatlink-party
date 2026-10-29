@@ -51,7 +51,7 @@
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "Keep regression: credentials \u2260 gameplay sync."
+      "notes": "Keep regression: credentials ≠ gameplay sync."
     },
     {
       "req_id": "BL-LINK-002",
@@ -114,12 +114,12 @@
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "metadata/embed \u2260 gameplay"
+      "notes": "metadata/embed ≠ gameplay"
     },
     {
       "req_id": "BL-LINK-004",
       "owner": "beatlink-party",
-      "expected_behavior": "SoundCloud/Bandcamp/Vimeo/Audius are embed/listen-first scaffolds \u2014 not complete gameplay support.",
+      "expected_behavior": "SoundCloud/Bandcamp/Vimeo/Audius are embed/listen-first scaffolds — not complete gameplay support.",
       "verification_method": "unit_test",
       "layers": [
         1,
@@ -139,7 +139,7 @@
       },
       "art_status": "not_applicable",
       "limitations": [
-        "Official widget deep integration pending \u2014 scaffolds \u2260 complete support"
+        "Official widget deep integration pending — scaffolds ≠ complete support"
       ],
       "severity": "low",
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
@@ -161,13 +161,18 @@
         "tests/linkResolver.test.ts",
         "tests/direct_https_sync_eligible.test.ts",
         "tests/direct_https_lobby_attach.test.ts",
-        "packages/game-engine/src/startPreconditions.test.ts"
+        "tests/direct_https_private_draft_gameplay.test.ts",
+        "tests/direct_https_attach_socket.test.ts",
+        "packages/game-engine/src/startPreconditions.test.ts",
+        "tests/e2e/direct_https_attach.playwright.spec.ts"
       ],
       "automated_evidence": [
         "packages/game-engine/src/directHttpsMedia.ts",
         "packages/game-engine/src/rightsLayers.ts",
         "packages/game-engine/src/creatorBinaryIngest.ts",
         "packages/game-engine/src/directHttpsLobbyAttach.ts",
+        "packages/game-engine/src/privateDraftBeatmap.ts",
+        "packages/game-engine/src/creatorDraftStore.ts",
         "apps/server/src/rooms/RoomManager.ts",
         "apps/web/src/components/DirectHttpsWorkflowPanel.tsx"
       ],
@@ -179,18 +184,18 @@
       "art_status": "not_applicable",
       "limitations": [
         "Creator must attach attestation + hash; auto-publish remains false",
-        "2026-10-29 isolated slice: destination SSRF host policy + lobby attach/deny for syncEligible=false + hash-matched launch catalog select; browser E2E journey and durable scored-result persistence still open; HUMAN/RC2/V1 remain false."
+        "2026-10-29 closeout: server-authoritative hash/draft selection; forged catalog reject; DNS/IPv6/redirect destination pins; private-draft new-media scored path evidenced in vitest; Playwright UI journey blocked pending playwright install for chromium_headless_shell-1148; HUMAN/RC2/V1 remain false."
       ],
       "severity": "blocker",
-      "sha": "665f108974358cab06c71d7753697761ca44853c",
+      "sha": "77fef8992793e283f6609434100b15f87c7d3e87",
       "independent_review_status": "not_started",
       "cursor_complete_status": "in_progress",
-      "notes": "Negative regression: playback ok + syncEligible false denies scored lobby attach. Positive: syncEligible + launch asset hash selects catalog beatmap. Browser production UI journey + five-mode residual still required before complete."
+      "notes": "BL-LINK-005 remains in_progress. Server no longer trusts client matchedCatalogId. Private unpublished draft bytes can score when hash+chart+syncEligible. Browser production UI journey still required before complete."
     },
     {
       "req_id": "BL-LINK-006",
       "owner": "beatlink-party",
-      "expected_behavior": "Composition rights \u2260 sound-recording rights; CC sync/adaptation require explicit attestation; no rip/DRM/lyric scrape.",
+      "expected_behavior": "Composition rights ≠ sound-recording rights; CC sync/adaptation require explicit attestation; no rip/DRM/lyric scrape.",
       "verification_method": "unit_test",
       "layers": [
         1,
