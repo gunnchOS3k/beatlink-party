@@ -16,10 +16,24 @@ export interface DirectHttpsLobbyAttachInput extends DirectHttpsMediaInput {
   title?: string | null;
   artist?: string | null;
   /**
-   * Catalog song whose assetSha256 matches contentSha256, or an explicit
-   * authorized project-owned catalog id supplied by the host after hash match.
+   * Client-declared catalog id — advisory only. Never authorizes scored play.
+   * Server must supply `serverVerifiedCatalogId` from hash/draft lookup.
    */
   matchedCatalogId?: string | null;
+  /**
+   * Server-verified catalog or private-draft track id derived from contentSha256.
+   * Required for scored play. Client-supplied matchedCatalogId cannot substitute.
+   */
+  serverVerifiedCatalogId?: string | null;
+  /**
+   * When true, the verified id is a private creator draft (not launch catalog).
+   * Scored play still requires GAMEPLAY_SYNC_AUTHORIZED + syncEligible.
+   */
+  privateDraft?: boolean;
+  /** Durable private draft id when privateDraft is true. */
+  privateDraftId?: string | null;
+  /** Chart/source revision identity for evidence. */
+  chartRevision?: number | null;
 }
 
 export interface DirectHttpsLobbyAttachResult {
@@ -29,6 +43,11 @@ export interface DirectHttpsLobbyAttachResult {
   scoredPlayAllowed: boolean;
   /** Catalog song to selectSong() when scoredPlayAllowed. */
   selectSongId: string | null;
+  /** Forge / mismatch — client declared an id the server did not verify. */
+  forgedCatalogAttempt: boolean;
+  privateDraft: boolean;
+  privateDraftId: string | null;
+  chartRevision: number | null;
   message: string;
 }
 
@@ -45,17 +64,36 @@ function playbackStatusFor(decision: DirectHttpsMediaDecision): LinkResolveResul
 /**
  * Build the lobby attach decision from a direct-HTTPS evaluation.
  * Never elevates syncEligible=false to scored play, even with hash/grid/charts/catalog id.
+ * Client matchedCatalogId never authorizes selection — only serverVerifiedCatalogId does.
  */
 export function buildDirectHttpsLobbyAttach(
   input: DirectHttpsLobbyAttachInput,
 ): DirectHttpsLobbyAttachResult {
   const decision = evaluateDirectHttpsMedia(input);
-  const catalogId =
+  const clientDeclared =
     typeof input.matchedCatalogId === 'string' && input.matchedCatalogId.trim()
       ? input.matchedCatalogId.trim()
       : null;
+  const verifiedId =
+    typeof input.serverVerifiedCatalogId === 'string' && input.serverVerifiedCatalogId.trim()
+      ? input.serverVerifiedCatalogId.trim()
+      : null;
+
+  const forgedCatalogAttempt = Boolean(
+    clientDeclared && (!verifiedId || clientDeclared !== verifiedId),
+  );
+
+  const catalogId = forgedCatalogAttempt ? null : verifiedId;
+  const privateDraft = Boolean(input.privateDraft && catalogId);
+  const privateDraftId =
+    privateDraft && typeof input.privateDraftId === 'string' ? input.privateDraftId : null;
+  const chartRevision =
+    typeof input.chartRevision === 'number' && Number.isFinite(input.chartRevision)
+      ? input.chartRevision
+      : null;
 
   const scoredPlayAllowed =
+    !forgedCatalogAttempt &&
     decision.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED' &&
     decision.syncEligible &&
     Boolean(catalogId);
@@ -63,12 +101,17 @@ export function buildDirectHttpsLobbyAttach(
   const selectSongId = scoredPlayAllowed ? catalogId : null;
 
   let message = decision.message;
-  if (decision.rightsOk && !decision.syncEligible) {
+  if (forgedCatalogAttempt) {
+    message =
+      'Forged or mismatched catalog id rejected — scored selection requires server-verified asset hash identity.';
+  } else if (decision.rightsOk && !decision.syncEligible) {
     message =
       'Playback/preview rights cleared but syncEligible=false — scored gameplay denied. Compose sync/adaptation attestation required.';
   } else if (decision.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED' && !catalogId) {
     message =
-      'Direct HTTPS gameplay sync authorized, but no matching approved catalog/launch asset hash was provided — cannot attach scored beatmap.';
+      'Direct HTTPS gameplay sync authorized, but no matching approved catalog/launch or private-draft asset hash was verified — cannot attach scored beatmap.';
+  } else if (scoredPlayAllowed && privateDraft) {
+    message = `Authorized direct HTTPS attached for scored private-draft play via ${catalogId} (unpublished).`;
   } else if (scoredPlayAllowed) {
     message = `Authorized direct HTTPS attached for scored play via catalog ${catalogId}.`;
   }
@@ -82,16 +125,23 @@ export function buildDirectHttpsLobbyAttach(
     artworkUrl: null,
     durationMs: null,
     playbackStatus: scoredPlayAllowed ? 'PLAYABLE_APPROVED' : playbackStatusFor(decision),
-    capabilityState: decision.capabilityState,
-    mediaClassification: decision.mediaClassification,
+    capabilityState: forgedCatalogAttempt
+      ? 'BLOCKED_OR_UNSUPPORTED'
+      : decision.capabilityState,
+    mediaClassification: forgedCatalogAttempt
+      ? 'blocked'
+      : decision.mediaClassification,
     providerCredentialsPresent: false,
-    analysisEligible: decision.analysisEligible && decision.syncEligible,
+    analysisEligible: decision.analysisEligible && decision.syncEligible && !forgedCatalogAttempt,
     lyricsEligible: false,
     matchedCatalogId: selectSongId,
     message,
     fallbackOptions: scoredPlayAllowed
       ? []
-      : ['Choose an approved launch/catalog song', 'Attest syncEligible + supply matching asset hash'],
+      : [
+          'Choose an approved launch/catalog song or ingest a private draft',
+          'Attest syncEligible + supply matching asset hash',
+        ],
   };
 
   return {
@@ -99,6 +149,10 @@ export function buildDirectHttpsLobbyAttach(
     linkResolve,
     scoredPlayAllowed,
     selectSongId,
+    forgedCatalogAttempt,
+    privateDraft,
+    privateDraftId,
+    chartRevision,
     message,
   };
 }

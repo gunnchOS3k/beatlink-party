@@ -135,11 +135,36 @@ export function DirectHttpsWorkflowPanel(props: {
     setAttachMessage(null);
     try {
       // Re-evaluate so attach uses current attestation; server re-checks syncEligible.
+      // evaluateDirectHttps returns HTTP 422 bodies without throwing — gate here.
       const decision = await evaluateDirectHttps({
         ...buildAttachPayload(),
         probe: Boolean(url),
       });
       setResult(decision);
+      const evalOk = decision.ok === true;
+      const probeOk = decision.probe == null || (decision.probe as { ok?: boolean }).ok !== false;
+      const gameplayOk = decision.gameplaySyncAuthorized === true;
+      if (!evalOk || !probeOk) {
+        setAttachMessage(
+          String(
+            decision.message ??
+              decision.error ??
+              'Evaluation rejected — lobby attach refused (server must also enforce).',
+          ),
+        );
+        return;
+      }
+      // Preview-only path may still attach when rights cleared but sync denied;
+      // scored selection is independently enforced on the socket/server.
+      if (!gameplayOk && decision.capabilityState !== 'DIRECT_AUDIO_RIGHTS_VERIFIED') {
+        setAttachMessage(
+          String(
+            decision.message ??
+              'Evaluation not playback-cleared — lobby attach refused.',
+          ),
+        );
+        return;
+      }
       const attached = await props.onAttachToLobby(buildAttachPayload());
       if (!attached) {
         setAttachMessage('Could not attach to lobby (host/room required).');

@@ -41,12 +41,13 @@ describe('direct HTTPS lobby attach', () => {
       },
       beatGridReady: true,
       chartsReady: true,
-      matchedCatalogId: 'launch-pd-tap-grid',
+      serverVerifiedCatalogId: 'launch-pd-tap-grid',
       title: 'Launch PD Tap Grid',
     });
 
     expect(attach.decision.rightsOk).toBe(true);
     expect(attach.decision.syncEligible).toBe(false);
+    expect(attach.forgedCatalogAttempt).toBe(false);
     expect(attach.scoredPlayAllowed).toBe(false);
     expect(attach.selectSongId).toBeNull();
     expect(attach.linkResolve.matchedCatalogId).toBeNull();
@@ -54,7 +55,26 @@ describe('direct HTTPS lobby attach', () => {
     expect(attach.message.toLowerCase()).toMatch(/scored gameplay denied|synceligible=false/);
   });
 
-  it('authorizes scored attach when syncEligible + matching launch hash', () => {
+  it('authorizes scored attach when syncEligible + server-verified launch hash', () => {
+    const layers = firstPartyOriginalRightsLayers();
+    const attach = buildDirectHttpsLobbyAttach({
+      url,
+      contentSha256: hash,
+      composition: layers.composition,
+      soundRecording: layers.soundRecording,
+      beatGridReady: true,
+      chartsReady: true,
+      serverVerifiedCatalogId: 'launch-pd-tap-grid',
+      title: 'Launch PD Tap Grid',
+    });
+    expect(attach.scoredPlayAllowed).toBe(true);
+    expect(attach.selectSongId).toBe('launch-pd-tap-grid');
+    expect(attach.forgedCatalogAttempt).toBe(false);
+    expect(attach.linkResolve.capabilityState).toBe('GAMEPLAY_SYNC_AUTHORIZED');
+    expect(attach.linkResolve.playbackStatus).toBe('PLAYABLE_APPROVED');
+  });
+
+  it('NEGATIVE: client matchedCatalogId alone never authorizes scored play', () => {
     const layers = firstPartyOriginalRightsLayers();
     const attach = buildDirectHttpsLobbyAttach({
       url,
@@ -64,12 +84,29 @@ describe('direct HTTPS lobby attach', () => {
       beatGridReady: true,
       chartsReady: true,
       matchedCatalogId: 'launch-pd-tap-grid',
-      title: 'Launch PD Tap Grid',
+      // missing serverVerifiedCatalogId
     });
-    expect(attach.scoredPlayAllowed).toBe(true);
-    expect(attach.selectSongId).toBe('launch-pd-tap-grid');
-    expect(attach.linkResolve.capabilityState).toBe('GAMEPLAY_SYNC_AUTHORIZED');
-    expect(attach.linkResolve.playbackStatus).toBe('PLAYABLE_APPROVED');
+    expect(attach.scoredPlayAllowed).toBe(false);
+    expect(attach.selectSongId).toBeNull();
+    expect(attach.forgedCatalogAttempt).toBe(true);
+  });
+
+  it('NEGATIVE: forged catalog id mismatched from server hash identity is rejected', () => {
+    const layers = firstPartyOriginalRightsLayers();
+    const attach = buildDirectHttpsLobbyAttach({
+      url,
+      contentSha256: hash,
+      composition: layers.composition,
+      soundRecording: layers.soundRecording,
+      beatGridReady: true,
+      chartsReady: true,
+      matchedCatalogId: 'demo-neon-groove',
+      serverVerifiedCatalogId: 'launch-pd-tap-grid',
+    });
+    expect(attach.forgedCatalogAttempt).toBe(true);
+    expect(attach.scoredPlayAllowed).toBe(false);
+    expect(attach.selectSongId).toBeNull();
+    expect(attach.linkResolve.matchedCatalogId).toBeNull();
   });
 
   it('RoomManager attach selects catalog only when scoredPlayAllowed', () => {
@@ -105,6 +142,19 @@ describe('direct HTTPS lobby attach', () => {
       true,
     );
 
+    const forged = manager.attachDirectHttps(room.code, {
+      url,
+      contentSha256: hash,
+      composition: layers.composition,
+      soundRecording: layers.soundRecording,
+      beatGridReady: true,
+      chartsReady: true,
+      matchedCatalogId: 'demo-neon-groove',
+    });
+    expect(forged!.attach.forgedCatalogAttempt).toBe(true);
+    expect(forged!.attach.scoredPlayAllowed).toBe(false);
+    expect(forged!.room.selectedSongId).toBeNull();
+
     const allowed = manager.attachDirectHttps(room.code, {
       url,
       contentSha256: hash,
@@ -117,6 +167,7 @@ describe('direct HTTPS lobby attach', () => {
     expect(allowed!.attach.scoredPlayAllowed).toBe(true);
     expect(allowed!.room.selectedSongId).toBe('launch-pd-tap-grid');
     expect(allowed!.room.phase).toBe('song_select');
-    expect(allowed!.room.beatmap).not.toBeNull();
+    expect(manager.getRoom(room.code)?.beatmap).not.toBeNull();
+    expect(allowed!.room.privateMedia).toBeNull();
   });
 });

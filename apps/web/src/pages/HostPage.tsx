@@ -11,7 +11,7 @@ import type {
   SongCatalogEntry,
 } from '@beatlink/shared';
 import { GAME_MODE_IDS, MAX_PERFORMERS, ROLES } from '@beatlink/shared';
-import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
+import { API_URL, fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
 import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
 import {
   startCalibrationClicks,
@@ -516,9 +516,13 @@ export default function HostPage() {
         durationMs: p.durationMs,
         targetPitchHz: p.targetPitchHz ?? undefined,
       })) ?? [];
-    const audioUrl = song?.audioAssetPath
-      ? `/content/${song.audioAssetPath.replace(/^\/+/, '')}`
+    // Private draft playback uses retained draft bytes — never a launch catalog substitute.
+    const privateAudio = room.privateMedia?.audioPath
+      ? `${API_URL}${room.privateMedia.audioPath}`
       : null;
+    const audioUrl =
+      privateAudio ??
+      (song?.audioAssetPath ? `/content/${song.audioAssetPath.replace(/^\/+/, '')}` : null);
     let cancelled = false;
     void resumeAudioContext().then(async () => {
       if (cancelled) return;
@@ -557,6 +561,7 @@ export default function HostPage() {
     room?.gameDurationMs,
     room?.calibrationOffsetMs,
     room?.linkResolveResult,
+    room?.privateMedia?.audioPath,
     songs,
     beatmapBpm,
     beatmap,

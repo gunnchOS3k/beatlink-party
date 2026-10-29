@@ -29,12 +29,48 @@ export const DIRECT_AUDIO_MIME = [
 export const DIRECT_HTTPS_MAX_REDIRECTS = 0;
 
 /**
+ * Normalize hostname / IP literals for destination policy.
+ * Strips surrounding brackets so `[fc00::1]` is checked the same as `fc00::1`.
+ */
+export function normalizeDirectHttpsHostname(hostname: string): string {
+  let host = hostname.trim().toLowerCase().replace(/\.$/, '');
+  if (host.startsWith('[') && host.endsWith(']')) {
+    host = host.slice(1, -1);
+  }
+  // Collapse IPv4-mapped IPv6 (:ffff:a.b.c.d) to the embedded IPv4 for RFC1918 checks.
+  const v4Mapped = host.match(/^:?:ffff:(\d{1,3}(?:\.\d{1,3}){3})$/i);
+  if (v4Mapped?.[1]) return v4Mapped[1];
+  return host;
+}
+
+/** True when an IPv6 literal is loopback, link-local, or unique-local (ULA). */
+export function isBlockedIpv6Literal(host: string): boolean {
+  const h = normalizeDirectHttpsHostname(host);
+  if (!h.includes(':')) return false;
+  if (h === '::' || h === '::1' || h === '0:0:0:0:0:0:0:0' || h === '0:0:0:0:0:0:0:1') {
+    return true;
+  }
+  // Expand leading compression enough to inspect the first hextet.
+  const first = (h.startsWith('::') ? h.slice(2) : h).split(':')[0] ?? '';
+  if (!/^[0-9a-f]{1,4}$/i.test(first) && first !== '') {
+    // Still treat well-known private prefixes even when compression is odd.
+    if (/^(fc|fd)/i.test(h) || /^fe80:/i.test(h)) return true;
+    return /^(fc|fd)/i.test(first) || /^fe80$/i.test(first);
+  }
+  const hextet = Number.parseInt(first || '0', 16);
+  // fe80::/10 link-local; fc00::/7 unique-local (fc/fd).
+  if ((hextet & 0xffc0) === 0xfe80) return true;
+  if ((hextet & 0xfe00) === 0xfc00) return true;
+  return false;
+}
+
+/**
  * Block loopback / link-local / RFC1918 / metadata hostnames and IP literals.
  * Literal IP checks cover common SSRF shapes; hostname labels cover localhost/.local.
- * Callers that resolve DNS must re-check the resolved address before fetch.
+ * Callers that resolve DNS must re-check every resolved address before fetch.
  */
 export function isBlockedDirectHttpsDestination(hostname: string): boolean {
-  const host = hostname.trim().toLowerCase().replace(/\.$/, '');
+  const host = normalizeDirectHttpsHostname(hostname);
   if (!host) return true;
   if (
     host === 'localhost' ||
@@ -46,8 +82,7 @@ export function isBlockedDirectHttpsDestination(hostname: string): boolean {
     host === '0.0.0.0' ||
     host === '::' ||
     host === '::1' ||
-    host === '0:0:0:0:0:0:0:1' ||
-    host === '[::1]'
+    host === '0:0:0:0:0:0:0:1'
   ) {
     return true;
   }
@@ -68,16 +103,92 @@ export function isBlockedDirectHttpsDestination(hostname: string): boolean {
     return false;
   }
 
-  // IPv6 literals commonly appear without brackets in URL.hostname
   if (host.includes(':')) {
-    if (host === '::1' || host.startsWith('fe80:') || host.startsWith('fc') || host.startsWith('fd')) {
-      return true;
-    }
-    // Unique-local / link-local prefixes
-    if (/^(fc|fd)[0-9a-f]{0,2}:/i.test(host) || /^fe80:/i.test(host)) return true;
+    return isBlockedIpv6Literal(host);
   }
 
   return false;
+}
+
+export type DirectHttpsDnsLookup = (hostname: string) => Promise<string[]>;
+
+export interface DirectHttpsDestinationPinResult {
+  ok: boolean;
+  hostname: string;
+  addresses: string[];
+  blockers: string[];
+}
+
+/**
+ * Resolve hostname and refuse when any returned address is private/blocked.
+ * Protects against DNS rebinding between static URL policy and the actual connect.
+ */
+export async function pinDirectHttpsDestinations(
+  hostname: string,
+  lookup?: DirectHttpsDnsLookup,
+): Promise<DirectHttpsDestinationPinResult> {
+  const host = normalizeDirectHttpsHostname(hostname);
+  const blockers: string[] = [];
+  if (!host) {
+    return { ok: false, hostname: host, addresses: [], blockers: ['Empty destination host.'] };
+  }
+  if (isBlockedDirectHttpsDestination(host)) {
+    return {
+      ok: false,
+      hostname: host,
+      addresses: [],
+      blockers: [
+        'Destination host is blocked (loopback, link-local, private, or metadata). Direct HTTPS must not target internal networks.',
+      ],
+    };
+  }
+
+  // Literal IPs: no DNS; the address is the destination.
+  if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host) || host.includes(':')) {
+    return { ok: true, hostname: host, addresses: [host], blockers: [] };
+  }
+
+  if (!lookup) {
+    // Without an injectable resolver, keep static hostname policy only.
+    return { ok: true, hostname: host, addresses: [], blockers: [] };
+  }
+
+  let addresses: string[] = [];
+  try {
+    addresses = await lookup(host);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return {
+      ok: false,
+      hostname: host,
+      addresses: [],
+      blockers: [`DNS lookup failed: ${msg}`],
+    };
+  }
+
+  if (!addresses.length) {
+    return {
+      ok: false,
+      hostname: host,
+      addresses: [],
+      blockers: ['DNS returned no addresses for destination host.'],
+    };
+  }
+
+  for (const addr of addresses) {
+    if (isBlockedDirectHttpsDestination(addr)) {
+      blockers.push(
+        `Resolved address ${addr} is blocked (private/loopback/link-local/metadata). Refusing connect.`,
+      );
+    }
+  }
+
+  return {
+    ok: blockers.length === 0,
+    hostname: host,
+    addresses,
+    blockers,
+  };
 }
 
 export interface DirectHttpsMediaInput {
@@ -189,7 +300,8 @@ export interface DirectHttpsProbeResult {
 
 /**
  * HEAD/GET probe with redirect refusal (default maxRedirects=0).
- * Never follows open redirects to a different host or non-audio path.
+ * Pins DNS destinations before fetch; never follows open redirects to a
+ * different host or private address. Use injectable lookup/fetch doubles in tests.
  */
 export async function probeDirectHttpsMedia(
   rawUrl: string,
@@ -197,6 +309,8 @@ export async function probeDirectHttpsMedia(
     maxRedirects?: number;
     fetchImpl?: typeof fetch;
     method?: 'HEAD' | 'GET';
+    /** Injectable DNS resolver — when provided, every returned address is re-checked. */
+    dnsLookup?: DirectHttpsDnsLookup;
   },
 ): Promise<DirectHttpsProbeResult> {
   const maxRedirects = opts?.maxRedirects ?? DIRECT_HTTPS_MAX_REDIRECTS;
@@ -211,6 +325,32 @@ export async function probeDirectHttpsMedia(
       mimeType: null,
       redirected: false,
       blockers: policy.blockers,
+    };
+  }
+
+  let hostname: string;
+  try {
+    hostname = new URL(policy.normalizedUrl).hostname;
+  } catch {
+    return {
+      ok: false,
+      finalUrl: null,
+      status: null,
+      mimeType: null,
+      redirected: false,
+      blockers: ['Invalid normalized HTTPS URL.'],
+    };
+  }
+
+  const pin = await pinDirectHttpsDestinations(hostname, opts?.dnsLookup);
+  if (!pin.ok) {
+    return {
+      ok: false,
+      finalUrl: null,
+      status: null,
+      mimeType: null,
+      redirected: false,
+      blockers: pin.blockers,
     };
   }
 
@@ -232,9 +372,41 @@ export async function probeDirectHttpsMedia(
       headers: { Accept: 'audio/*,application/ogg' },
     });
 
+    const blockers: string[] = [];
+    // Manual redirect mode: inspect Location and refuse private / host-swap hops.
+    if (res.status >= 300 && res.status < 400) {
+      const location = res.headers.get('location');
+      blockers.push(
+        `Redirect refused (maxRedirects=${maxRedirects}). Direct HTTPS media must not hop hosts.`,
+      );
+      if (location) {
+        try {
+          const next = new URL(location, policy.normalizedUrl);
+          if (isBlockedDirectHttpsDestination(next.hostname)) {
+            blockers.push(
+              `Redirect target host ${normalizeDirectHttpsHostname(next.hostname)} is blocked.`,
+            );
+          }
+          const nextPin = await pinDirectHttpsDestinations(next.hostname, opts?.dnsLookup);
+          for (const b of nextPin.blockers) {
+            if (!blockers.includes(b)) blockers.push(b);
+          }
+        } catch {
+          blockers.push('Redirect Location could not be parsed.');
+        }
+      }
+      return {
+        ok: false,
+        finalUrl: null,
+        status: res.status,
+        mimeType: null,
+        redirected: true,
+        blockers,
+      };
+    }
+
     const mimeType = res.headers.get('content-type')?.split(';')[0]?.trim() ?? null;
     const formatOk = isDirectAudioFormat(policy.normalizedUrl, mimeType);
-    const blockers: string[] = [];
     if (!res.ok) blockers.push(`Probe HTTP ${res.status}.`);
     if (!formatOk) blockers.push('Probed MIME/path is not WAV/MP3/OGG.');
 

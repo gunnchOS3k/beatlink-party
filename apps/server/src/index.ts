@@ -213,12 +213,18 @@ app.post('/content/creator-ingest-binary', (req, res) => {
   const { chartEditor, ...rest } = result;
   const draft =
     result.ok && result.catalogDraft
-      ? defaultCreatorDraftStore.saveFromIngest(result, String(body.attestorId))
+      ? defaultCreatorDraftStore.saveFromIngest(
+          result,
+          String(body.attestorId),
+          Date.now(),
+          audioBytes,
+        )
       : null;
   return res.status(result.ok ? 200 : 422).json({
     ...rest,
     draftId: draft?.draftId ?? null,
     draftStatus: draft?.status ?? null,
+    audioBinaryRetained: Boolean(draft?.audioBytes?.byteLength),
     chartEditorSummary: chartEditor
       ? {
           noteCount: chartEditor.chart.notes.length,
@@ -228,6 +234,19 @@ app.post('/content/creator-ingest-binary', (req, res) => {
         }
       : null,
   });
+});
+
+/** Serve retained private-draft WAV bytes (unpublished; not launch catalog). */
+app.get('/content/creator-drafts/:draftId/audio', (req, res) => {
+  const draft = defaultCreatorDraftStore.get(req.params.draftId);
+  if (!draft || draft.status === 'withdrawn' || !draft.audioBytes?.byteLength) {
+    return res.status(404).json({ error: 'Private draft audio not found' });
+  }
+  res.setHeader('Content-Type', 'audio/wav');
+  res.setHeader('X-BeatLink-Private-Draft', '1');
+  res.setHeader('X-BeatLink-Content-SHA256', draft.sha256);
+  res.setHeader('Cache-Control', 'no-store');
+  return res.send(Buffer.from(draft.audioBytes));
 });
 
 /** List durable creator drafts (never launch-published). */

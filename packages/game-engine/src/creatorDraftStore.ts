@@ -39,8 +39,15 @@ export interface CreatorDraftRecord {
 }
 
 export interface CreatorDraftStore {
-  saveFromIngest(result: CreatorBinaryIngestResult, attestorId: string, nowMs?: number): CreatorDraftRecord | null;
+  saveFromIngest(
+    result: CreatorBinaryIngestResult,
+    attestorId: string,
+    nowMs?: number,
+    audioBytes?: Uint8Array | null,
+  ): CreatorDraftRecord | null;
   get(draftId: string): CreatorDraftRecord | null;
+  /** Server-authoritative lookup by immutable content hash (private, unpublished). */
+  findBySha256(sha256: string | null | undefined): CreatorDraftRecord | null;
   list(attestorId?: string): CreatorDraftRecord[];
   requestReview(draftId: string, forceReviewAck: boolean, nowMs?: number): CreatorDraftRecord | null;
   withdraw(draftId: string, attestorId: string, nowMs?: number): CreatorDraftRecord | null;
@@ -57,10 +64,14 @@ export function createCreatorDraftStore(): CreatorDraftStore {
   const byId = new Map<string, CreatorDraftRecord>();
 
   return {
-    saveFromIngest(result, attestorId, nowMs = Date.now()) {
+    saveFromIngest(result, attestorId, nowMs = Date.now(), audioBytes = null) {
       if (!result.ok || !result.catalogDraft || !result.sha256) return null;
       if (result.honesty.autoPublished) return null;
       const draftId = newId('draft');
+      const retained =
+        audioBytes && audioBytes.byteLength > 0
+          ? new Uint8Array(audioBytes)
+          : null;
       const record: CreatorDraftRecord = {
         draftId,
         trackId: result.catalogDraft.id,
@@ -79,7 +90,8 @@ export function createCreatorDraftStore(): CreatorDraftStore {
         },
         chartEditor: result.chartEditor,
         sha256: result.sha256,
-        audioBytes: null, // caller may attach via separate durable blob API; keep ephemeral by default
+        // Retain owned WAV for private room playback only — never launch-published.
+        audioBytes: retained,
         rightsGate: {
           ownsOrLicensed: Boolean(result.attestation?.ownsOrLicensed),
           commercialEligible: false,
@@ -95,6 +107,16 @@ export function createCreatorDraftStore(): CreatorDraftStore {
 
     get(draftId) {
       return byId.get(draftId) ?? null;
+    },
+
+    findBySha256(sha256) {
+      if (!sha256 || !/^[a-f0-9]{64}$/i.test(sha256)) return null;
+      const needle = sha256.toLowerCase();
+      for (const draft of byId.values()) {
+        if (draft.status === 'withdrawn') continue;
+        if (draft.sha256.toLowerCase() === needle) return draft;
+      }
+      return null;
     },
 
     list(attestorId) {

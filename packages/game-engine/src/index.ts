@@ -48,4 +48,5 @@ export * from './linkCapability.js';
 export * from './linkProviders.js';
 export * from './directHttpsMedia.js';
 export * from './directHttpsLobbyAttach.js';
+export * from './privateDraftBeatmap.js';
 export * from './rightsLayers.js';

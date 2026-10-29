@@ -70,7 +70,9 @@ import {
   applyDeviceTimingProfile,
   buildDeviceTimingProfile,
   createDefaultDeviceTimingProfile,
+  beatmapFromPrivateDraft,
   buildDirectHttpsLobbyAttach,
+  defaultCreatorDraftStore,
   evaluateCountdownPreconditions,
   evaluateStartPreconditions,
   type DeviceTimingProfile,
@@ -214,6 +216,7 @@ export class RoomManager {
       selectedSongId: null,
       pastedLinkUrl: null,
       linkResolveResult: null,
+      privateMedia: null,
       gameMode: options.gameMode ?? DEFAULT_GAME_MODE,
       difficulty: options.difficulty ?? DEFAULT_DIFFICULTY,
       calibrationOffsetMs: 0,
@@ -1010,7 +1013,8 @@ export class RoomManager {
 
   /**
    * Attach a direct-HTTPS evaluation to the lobby.
-   * Scored song selection requires GAMEPLAY_SYNC_AUTHORIZED + matching launch/catalog hash.
+   * Scored song selection requires GAMEPLAY_SYNC_AUTHORIZED + server-verified asset hash
+   * (launch catalog OR private creator draft). Client matchedCatalogId never authorizes.
    * syncEligible=false never selects a beatmap (playback/preview message only).
    */
   attachDirectHttps(
@@ -1020,17 +1024,60 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;
 
+    // Server authority: derive identity from content hash only — never client catalog id.
     const hashMatchedId = findSongIdByAssetSha256(input.contentSha256 ?? null);
-    const matchedCatalogId = input.matchedCatalogId ?? hashMatchedId;
+    const privateDraft = hashMatchedId
+      ? null
+      : defaultCreatorDraftStore.findBySha256(input.contentSha256 ?? null);
+    const serverVerifiedCatalogId = hashMatchedId ?? privateDraft?.trackId ?? null;
+
     const attach = buildDirectHttpsLobbyAttach({
       ...input,
-      matchedCatalogId,
+      // Preserve client declaration only so forge detection can compare.
+      matchedCatalogId: input.matchedCatalogId ?? null,
+      serverVerifiedCatalogId,
+      privateDraft: Boolean(privateDraft),
+      privateDraftId: privateDraft?.draftId ?? null,
+      chartRevision: privateDraft?.chartEditor?.revision ?? null,
     });
 
     room.pastedLinkUrl = input.url;
     room.linkResolveResult = attach.linkResolve;
 
+    if (attach.scoredPlayAllowed && attach.selectSongId && privateDraft) {
+      const draftBeatmap = beatmapFromPrivateDraft(privateDraft);
+      if (!draftBeatmap || !privateDraft.audioBytes?.byteLength) {
+        room.privateMedia = null;
+        return {
+          room: this.publish(room)!,
+          attach: {
+            ...attach,
+            scoredPlayAllowed: false,
+            selectSongId: null,
+            message:
+              'Private draft hash matched but durable audio bytes or chart are missing — scored attach denied.',
+          },
+        };
+      }
+      room.selectedSongId = privateDraft.trackId;
+      room.beatmap = {
+        ...draftBeatmap,
+        offsetMs: room.calibrationOffsetMs,
+      };
+      room.gameDurationMs = draftBeatmap.durationMs;
+      room.phase = 'song_select';
+      room.privateMedia = {
+        draftId: privateDraft.draftId,
+        trackId: privateDraft.trackId,
+        contentSha256: privateDraft.sha256,
+        chartRevision: privateDraft.chartEditor?.revision ?? 0,
+        audioPath: `/content/creator-drafts/${privateDraft.draftId}/audio`,
+      };
+      return { room: this.publish(room)!, attach };
+    }
+
     if (attach.scoredPlayAllowed && attach.selectSongId) {
+      room.privateMedia = null;
       const selected = this.selectSong(code, attach.selectSongId);
       if (!selected) {
         // Keep the honest link snapshot even if beatmap lookup failed.
@@ -1043,6 +1090,11 @@ export class RoomManager {
     }
 
     // Deny scored attach: peers see the snapshot; independently chosen catalog songs stay.
+    if (attach.forgedCatalogAttempt) {
+      room.privateMedia = null;
+      room.selectedSongId = null;
+      room.beatmap = null;
+    }
     return { room: this.publish(room)!, attach };
   }
 
@@ -1795,6 +1847,7 @@ export class RoomManager {
     room.gameStartTime = null;
     room.pastedLinkUrl = null;
     room.linkResolveResult = null;
+    room.privateMedia = null;
     room.calibrationOffsetMs = 0;
     room.calibrationSamples = [];
     room.selectedSongId = null;

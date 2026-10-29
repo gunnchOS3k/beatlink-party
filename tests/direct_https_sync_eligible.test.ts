@@ -82,6 +82,41 @@ describe('evaluateDirectHttpsMedia syncEligible gate', () => {
     expect(publicOk.urlOk).toBe(true);
   });
 
+  it('NEGATIVE: bracketed IPv6 unique-local / link-local hosts are blocked', () => {
+    for (const raw of [
+      'https://[fc00::1]/owned.wav',
+      'https://[fd12:3456:789a::1]/owned.wav',
+      'https://[fe80::1]/owned.wav',
+      'https://[::1]/owned.wav',
+    ]) {
+      const policy = validateDirectHttpsUrlPolicy(raw);
+      expect(policy.ok).toBe(false);
+      expect(policy.blockers.join(' ').toLowerCase()).toMatch(/blocked|private|loopback|link-local|internal/);
+    }
+  });
+
+  it('NEGATIVE: DNS that resolves to private addresses is refused before fetch', async () => {
+    const { pinDirectHttpsDestinations } = await import(
+      '../packages/game-engine/src/directHttpsMedia.js'
+    );
+    const pin = await pinDirectHttpsDestinations('cdn.example.com', async () => ['10.0.0.8']);
+    expect(pin.ok).toBe(false);
+    expect(pin.blockers.join(' ')).toMatch(/10\.0\.0\.8/);
+
+    let fetched = false;
+    const probe = await probeDirectHttpsMedia(url, {
+      maxRedirects: 0,
+      dnsLookup: async () => ['192.168.0.50'],
+      fetchImpl: (async () => {
+        fetched = true;
+        return new Response(null, { status: 200, headers: { 'content-type': 'audio/wav' } });
+      }) as unknown as typeof fetch,
+    });
+    expect(fetched).toBe(false);
+    expect(probe.ok).toBe(false);
+    expect(probe.blockers.join(' ')).toMatch(/192\.168\.0\.50|blocked|private/i);
+  });
+
   it('probe refuses redirects when maxRedirects=0', async () => {
     const fetchImpl = async () => {
       throw new TypeError('Failed to fetch: redirect');
@@ -93,5 +128,19 @@ describe('evaluateDirectHttpsMedia syncEligible gate', () => {
     expect(probe.ok).toBe(false);
     expect(probe.redirected || probe.blockers.join(' ')).toBeTruthy();
     expect(probe.blockers.join(' ').toLowerCase()).toMatch(/redirect|failed/);
+  });
+
+  it('NEGATIVE: manual redirect Location to private host is refused', async () => {
+    const probe = await probeDirectHttpsMedia(url, {
+      maxRedirects: 1,
+      fetchImpl: (async () =>
+        new Response(null, {
+          status: 302,
+          headers: { location: 'https://127.0.0.1/steal.wav' },
+        })) as unknown as typeof fetch,
+    });
+    expect(probe.ok).toBe(false);
+    expect(probe.redirected).toBe(true);
+    expect(probe.blockers.join(' ').toLowerCase()).toMatch(/redirect|blocked|127/);
   });
 });

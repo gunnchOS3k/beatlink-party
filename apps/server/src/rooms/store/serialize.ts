@@ -22,6 +22,7 @@ export function serializeRoom(room: InternalRoomLive): RoomSnapshot {
     selectedSongId: room.selectedSongId,
     pastedLinkUrl: room.pastedLinkUrl,
     linkResolveResult: room.linkResolveResult,
+    privateMedia: room.privateMedia ?? null,
     gameMode: room.gameMode,
     difficulty: room.difficulty,
     calibrationOffsetMs: room.calibrationOffsetMs,

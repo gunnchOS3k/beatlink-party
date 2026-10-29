@@ -182,6 +182,18 @@ export interface RoomState {
   pastedLinkUrl: string | null;
   /** Last successful link resolve snapshot, broadcast to peers. */
   linkResolveResult: LinkResolveResult | null;
+  /**
+   * Private creator-draft media bound to this room (unpublished).
+   * Playback uses draft audio bytes + draft chart — not launch catalog assets.
+   */
+  privateMedia?: {
+    draftId: string;
+    trackId: string;
+    contentSha256: string;
+    chartRevision: number;
+    /** Loopback-relative path serving the retained draft WAV. */
+    audioPath: string;
+  } | null;
   /** First-class selectable mode for this room round. */
   gameMode: GameModeId;
   /** Difficulty applied to mode scoring / chart density. */

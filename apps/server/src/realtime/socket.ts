@@ -452,9 +452,32 @@ socket.on(
           cb?.({ ok: false, error: 'url, composition, and soundRecording are required' });
           return;
         }
-        const attached = roomManager.attachDirectHttps(code, data.attach);
+        // Host auth ≠ trust client catalog declarations. Strip serverVerified* —
+        // RoomManager re-derives identity from contentSha256 only.
+        const attachIn = { ...data.attach } as DirectHttpsLobbyAttachInput & Record<string, unknown>;
+        delete attachIn.serverVerifiedCatalogId;
+        delete attachIn.privateDraft;
+        delete attachIn.privateDraftId;
+        delete attachIn.chartRevision;
+        const attached = roomManager.attachDirectHttps(code, {
+          ...attachIn,
+          matchedCatalogId: attachIn.matchedCatalogId ?? null,
+        });
         if (!attached) {
           cb?.({ ok: false, error: 'Unable to attach direct HTTPS on room' });
+          return;
+        }
+        // Independent enforcement: rejected / forged evaluations never report scored ok.
+        if (attached.attach.forgedCatalogAttempt || !attached.attach.decision.ok) {
+          io.to(code).emit('room.state', attached.room);
+          cb?.({
+            ok: false,
+            error: attached.attach.message,
+            scoredPlayAllowed: false,
+            selectSongId: null,
+            message: attached.attach.message,
+            room: attached.room,
+          });
           return;
         }
         io.to(code).emit('room.state', attached.room);
