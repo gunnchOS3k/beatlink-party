@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S12 karaoke rematch honesty atop soaked 5f16fc8. HUMAN/RC2/V1 false."
+      "notes": "S12 tip 5a7a895; soaked 5f16fc8 all SUCCESS. Karaoke rematch honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -966,7 +966,7 @@
         "independent_humans=false"
       ],
       "severity": "medium",
-      "sha": "PLACEHOLDER_S12",
+      "sha": "5a7a895b793d2edaca342b757aae4d1cd655e0ee",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S12 party karaoke rematch honesty."
