@@ -28,6 +28,10 @@ export const DIRECT_AUDIO_MIME = [
 /** Default: refuse automatic redirects (open-redirect / host-swap abuse). */
 export const DIRECT_HTTPS_MAX_REDIRECTS = 0;
 
+/** Hard ceiling for direct-HTTPS media bytes (probe Content-Length + local validate). */
+export const DIRECT_HTTPS_MAX_BYTES = 12 * 1024 * 1024; // 12 MiB
+export const DIRECT_HTTPS_MIN_BYTES = 256;
+
 /**
  * Normalize hostname / IP literals for destination policy.
  * Strips surrounding brackets so `[fc00::1]` is checked the same as `fc00::1`.
@@ -205,6 +209,20 @@ export interface DirectHttpsMediaInput {
   chartsReady: boolean;
   /** Signals that look like rip / DRM / lyric scrape intents. */
   ripIntentSignals?: string[];
+  /**
+   * Optional absolute expiry for the rights/media attestation (epoch ms).
+   * When set and `nowMs` is past it, gameplay/playback attach is refused.
+   */
+  rightsExpiresAtMs?: number | null;
+  /** Evaluation clock — defaults to Date.now() when expiry is checked. */
+  nowMs?: number;
+  /**
+   * Optional raw bytes for magic/size validation before hash trust.
+   * When provided, MIME spoof + oversized + invalid container are blockers.
+   */
+  contentBytes?: Uint8Array | null;
+  /** Declared Content-Length (or probe) — oversized refused even without bytes. */
+  contentLength?: number | null;
 }
 
 export interface DirectHttpsMediaDecision {
@@ -294,8 +312,143 @@ export interface DirectHttpsProbeResult {
   finalUrl: string | null;
   status: number | null;
   mimeType: string | null;
+  contentLength: number | null;
   redirected: boolean;
   blockers: string[];
+}
+
+export type DirectAudioMagicKind = 'wav' | 'mp3' | 'ogg' | 'unknown';
+
+export interface DirectHttpsBytesValidation {
+  ok: boolean;
+  magic: DirectAudioMagicKind;
+  byteLength: number;
+  sniffedMime: string | null;
+  mimeSpoof: boolean;
+  oversized: boolean;
+  undersized: boolean;
+  blockers: string[];
+}
+
+/** Sniff container magic — RIFF/WAVE, ID3/MPEG frame, OggS. */
+export function sniffDirectAudioMagic(bytes: Uint8Array): DirectAudioMagicKind {
+  if (bytes.byteLength < 4) return 'unknown';
+  const b0 = bytes[0]!;
+  const b1 = bytes[1]!;
+  const b2 = bytes[2]!;
+  const b3 = bytes[3]!;
+  // RIFF....WAVE
+  if (
+    b0 === 0x52 &&
+    b1 === 0x49 &&
+    b2 === 0x46 &&
+    b3 === 0x46 &&
+    bytes.byteLength >= 12 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x41 &&
+    bytes[10] === 0x56 &&
+    bytes[11] === 0x45
+  ) {
+    return 'wav';
+  }
+  // OggS
+  if (b0 === 0x4f && b1 === 0x67 && b2 === 0x67 && b3 === 0x53) return 'ogg';
+  // ID3 tag or MPEG frame sync (11 set bits)
+  if (b0 === 0x49 && b1 === 0x44 && b2 === 0x33) return 'mp3';
+  if (b0 === 0xff && (b1 & 0xe0) === 0xe0) return 'mp3';
+  return 'unknown';
+}
+
+export function mimeForDirectAudioMagic(magic: DirectAudioMagicKind): string | null {
+  switch (magic) {
+    case 'wav':
+      return 'audio/wav';
+    case 'mp3':
+      return 'audio/mpeg';
+    case 'ogg':
+      return 'audio/ogg';
+    default:
+      return null;
+  }
+}
+
+/**
+ * Validate media bytes: size ceiling + magic container + declared-MIME spoof detect.
+ * Declared text/html (or other non-audio) with audio magic — or audio MIME with unknown
+ * magic — is treated as spoof / invalid container.
+ */
+export function validateDirectHttpsMediaBytes(
+  bytes: Uint8Array,
+  declaredMime?: string | null,
+  opts?: { maxBytes?: number; minBytes?: number },
+): DirectHttpsBytesValidation {
+  const maxBytes = opts?.maxBytes ?? DIRECT_HTTPS_MAX_BYTES;
+  const minBytes = opts?.minBytes ?? DIRECT_HTTPS_MIN_BYTES;
+  const blockers: string[] = [];
+  const byteLength = bytes.byteLength;
+  const oversized = byteLength > maxBytes;
+  const undersized = byteLength < minBytes;
+  if (oversized) {
+    blockers.push(
+      `Media exceeds DIRECT_HTTPS_MAX_BYTES (${maxBytes}). Oversized payloads are refused.`,
+    );
+  }
+  if (undersized) {
+    blockers.push(`Media below DIRECT_HTTPS_MIN_BYTES (${minBytes}).`);
+  }
+
+  const magic = sniffDirectAudioMagic(bytes);
+  const sniffedMime = mimeForDirectAudioMagic(magic);
+  const declared = (declaredMime ?? '').split(';')[0]?.trim().toLowerCase() || null;
+  let mimeSpoof = false;
+
+  if (magic === 'unknown') {
+    blockers.push('Media magic is not WAV/MP3/OGG — invalid or spoofed container.');
+  }
+
+  if (declared) {
+    const declaredAudio = (DIRECT_AUDIO_MIME as readonly string[]).includes(declared);
+    if (!declaredAudio) {
+      mimeSpoof = true;
+      blockers.push(
+        `Declared MIME ${declared} is not an allowed audio type (MIME spoof / non-audio).`,
+      );
+    } else if (sniffedMime) {
+      const family = (m: string) =>
+        m.includes('wav') || m.includes('wave')
+          ? 'wav'
+          : m.includes('mpeg') || m.includes('mp3')
+            ? 'mp3'
+            : m.includes('ogg')
+              ? 'ogg'
+              : 'other';
+      if (family(declared) !== family(sniffedMime) && family(declared) !== 'other') {
+        mimeSpoof = true;
+        blockers.push(
+          `MIME spoof: declared ${declared} but bytes sniff as ${sniffedMime}.`,
+        );
+      }
+    }
+  }
+
+  return {
+    ok: blockers.length === 0,
+    magic,
+    byteLength,
+    sniffedMime,
+    mimeSpoof,
+    oversized,
+    undersized,
+    blockers,
+  };
+}
+
+/** Refuse when a declared Content-Length exceeds the direct-HTTPS ceiling. */
+export function isOversizedDirectHttpsLength(
+  contentLength: number | null | undefined,
+  maxBytes = DIRECT_HTTPS_MAX_BYTES,
+): boolean {
+  return typeof contentLength === 'number' && Number.isFinite(contentLength) && contentLength > maxBytes;
 }
 
 /**
@@ -323,6 +476,7 @@ export async function probeDirectHttpsMedia(
       finalUrl: null,
       status: null,
       mimeType: null,
+      contentLength: null,
       redirected: false,
       blockers: policy.blockers,
     };
@@ -337,6 +491,7 @@ export async function probeDirectHttpsMedia(
       finalUrl: null,
       status: null,
       mimeType: null,
+      contentLength: null,
       redirected: false,
       blockers: ['Invalid normalized HTTPS URL.'],
     };
@@ -349,6 +504,7 @@ export async function probeDirectHttpsMedia(
       finalUrl: null,
       status: null,
       mimeType: null,
+      contentLength: null,
       redirected: false,
       blockers: pin.blockers,
     };
@@ -360,6 +516,7 @@ export async function probeDirectHttpsMedia(
       finalUrl: null,
       status: null,
       mimeType: null,
+      contentLength: null,
       redirected: false,
       blockers: ['fetch unavailable for direct HTTPS probe.'],
     };
@@ -400,21 +557,43 @@ export async function probeDirectHttpsMedia(
         finalUrl: null,
         status: res.status,
         mimeType: null,
+        contentLength: null,
         redirected: true,
         blockers,
       };
     }
 
     const mimeType = res.headers.get('content-type')?.split(';')[0]?.trim() ?? null;
+    const lengthHeader = res.headers.get('content-length');
+    const contentLength =
+      lengthHeader != null && /^\d+$/.test(lengthHeader.trim())
+        ? Number.parseInt(lengthHeader.trim(), 10)
+        : null;
     const formatOk = isDirectAudioFormat(policy.normalizedUrl, mimeType);
     if (!res.ok) blockers.push(`Probe HTTP ${res.status}.`);
     if (!formatOk) blockers.push('Probed MIME/path is not WAV/MP3/OGG.');
+    if (isOversizedDirectHttpsLength(contentLength)) {
+      blockers.push(
+        `Content-Length ${contentLength} exceeds DIRECT_HTTPS_MAX_BYTES (${DIRECT_HTTPS_MAX_BYTES}). Oversized media refused.`,
+      );
+    }
+    // Declared non-audio Content-Type on an audio-looking path is MIME spoof.
+    if (
+      mimeType &&
+      !(DIRECT_AUDIO_MIME as readonly string[]).includes(mimeType.toLowerCase()) &&
+      isDirectAudioFormat(policy.normalizedUrl, null)
+    ) {
+      blockers.push(
+        `MIME spoof: path claims audio but Content-Type is ${mimeType}.`,
+      );
+    }
 
     return {
       ok: blockers.length === 0,
       finalUrl: policy.normalizedUrl,
       status: res.status,
       mimeType,
+      contentLength,
       redirected: false,
       blockers,
     };
@@ -426,6 +605,7 @@ export async function probeDirectHttpsMedia(
       finalUrl: null,
       status: null,
       mimeType: null,
+      contentLength: null,
       redirected,
       blockers: [
         redirected
@@ -458,6 +638,28 @@ export function evaluateDirectHttpsMedia(input: DirectHttpsMediaInput): DirectHt
   const hashPresent = Boolean(input.contentSha256 && /^[a-f0-9]{64}$/i.test(input.contentSha256));
   if (!hashPresent) blockers.push('SHA-256 content hash required for integrity.');
 
+  if (isOversizedDirectHttpsLength(input.contentLength ?? null)) {
+    blockers.push(
+      `Content-Length ${input.contentLength} exceeds DIRECT_HTTPS_MAX_BYTES (${DIRECT_HTTPS_MAX_BYTES}). Oversized media refused.`,
+    );
+  }
+
+  if (input.contentBytes && input.contentBytes.byteLength > 0) {
+    const bytesGate = validateDirectHttpsMediaBytes(input.contentBytes, input.mimeType);
+    for (const b of bytesGate.blockers) {
+      if (!blockers.includes(b)) blockers.push(b);
+    }
+  }
+
+  const nowMs = input.nowMs ?? Date.now();
+  if (
+    typeof input.rightsExpiresAtMs === 'number' &&
+    Number.isFinite(input.rightsExpiresAtMs) &&
+    nowMs > input.rightsExpiresAtMs
+  ) {
+    blockers.push('Rights/media attestation expired — direct HTTPS attach refused.');
+  }
+
   const rights = assessRightsLayers({
     composition: input.composition,
     soundRecording: input.soundRecording,
@@ -471,14 +673,18 @@ export function evaluateDirectHttpsMedia(input: DirectHttpsMediaInput): DirectHt
     );
   }
 
-  const playbackCleared = rights.ok && hashPresent && urlOk && formatOk;
+  const bytesOrSizeBlocked = blockers.some((b) =>
+    /oversized|mime spoof|magic|DIRECT_HTTPS_MIN_BYTES|DIRECT_HTTPS_MAX_BYTES|expired/i.test(b),
+  );
+  const playbackCleared = rights.ok && hashPresent && urlOk && formatOk && !bytesOrSizeBlocked;
   // Incomplete attestation / rip / bad URL — not a silent metadata elevation.
   const hardBlocked =
-    blockers.some((b) => /rip|drm|extract/i.test(b)) ||
+    blockers.some((b) => /rip|drm|extract|expired|mime spoof|oversized|magic/i.test(b)) ||
     !urlOk ||
     !formatOk ||
     !rights.ok ||
-    !hashPresent;
+    !hashPresent ||
+    bytesOrSizeBlocked;
 
   // PRIORITY: GAMEPLAY_SYNC_AUTHORIZED requires syncEligible, not rights.ok alone.
   const gridAndCharts = input.beatGridReady && input.chartsReady;

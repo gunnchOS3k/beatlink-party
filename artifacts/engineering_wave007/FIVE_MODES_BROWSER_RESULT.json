@@ -2,7 +2,7 @@
   "playwright_ran": true,
   "playwright_skipped": false,
   "browser": "chromium",
-  "room_code": "P7ZTF",
+  "room_code": "3YBBY",
   "song_id": "demo-neon-groove",
   "chart_license": "demo_generated_royalty_free",
   "host_session_absent_from_guest": true,
@@ -12,24 +12,24 @@
     {
       "mode": "BeatTap",
       "completed": true,
-      "maxScore": 500,
-      "ledger": "0689f046faa62250",
+      "maxScore": 1200,
+      "ledger": "ca4de28d6e9f1e5b",
       "banner": "MODE · BEAT TAP — HIT THE JUDGMENT LINE",
-      "detail": "scores=[500,0,0]"
+      "detail": "scores=[1200,0,0]"
     },
     {
       "mode": "CallAndResponse",
       "completed": true,
-      "maxScore": 1200,
-      "ledger": "b8b2c3db952f4138",
+      "maxScore": 1500,
+      "ledger": "7d3fe4a5ce3c99cf",
       "banner": "MODE · CALL & RESPONSE — WAIT FOR THE ECHO WINDOW",
-      "detail": "scores=[1200,0,0]"
+      "detail": "scores=[1500,0,0]"
     },
     {
       "mode": "KaraokePerformance",
       "completed": true,
       "maxScore": 105,
-      "ledger": "e3751e0aaf7e2c0c",
+      "ledger": "1f77691d1de9f012",
       "banner": "MODE · KARAOKE — PHRASE TIMING (PITCH OFF UNTIL MIC CONSENT)",
       "detail": "scores=[105,0,0]"
     },
@@ -37,7 +37,7 @@
       "mode": "BandRoles",
       "completed": true,
       "maxScore": 1400,
-      "ledger": "3f45f7d564375f3f",
+      "ledger": "8b116830bf15835c",
       "banner": "MODE · BAND ROLES — STAY IN YOUR LANE; COVER ALL THREE SEATS FOR BAND LOCKED",
       "detail": "scores=[1400,115,380]"
     },
@@ -45,7 +45,7 @@
       "mode": "PredictionTrivia",
       "completed": true,
       "maxScore": 275,
-      "ledger": "678e807df9ced500",
+      "ledger": "ec557edc484af494",
       "banner": "MODE · PREDICTION TRIVIA — LOCK THE NEXT SECTION BEFORE IT STARTS",
       "detail": "scores=[275,0,0]"
     }
