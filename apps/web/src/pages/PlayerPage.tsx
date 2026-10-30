@@ -31,6 +31,7 @@ import {
   assessKaraokePhraseContinuity,
   assessKaraokeRevokeContinuity,
   assessPartyKaraokeHonesty,
+  assessKaraokeVocalistHandoff,
   planMobileHostPresentation,
   type LiveMicContinuousHandle,
   type MicMatrixState,
@@ -973,6 +974,18 @@ export default function PlayerPage() {
                   maxPerformers: 8,
                   scriptedAudience: true,
                   karaokeModeActive: true,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-vocalist-handoff-banner"
+            >
+              {
+                assessKaraokeVocalistHandoff({
+                  fromSeatId: 'prior-vocalist',
+                  toSeatId: deviceRole === 'vocalist' ? 'self' : deviceRole,
+                  priorPitchActive: pitchAnalysisActive,
                 }).honestyBanner
               }
             </p>
