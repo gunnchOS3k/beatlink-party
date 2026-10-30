@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T17:04:34Z",
+  "generated_at": "2026-10-30T18:51:01Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S7: party timing budgets + player background resync; karaoke real-mic path (mocked/stub \u2014 not physical phone); section-aware chart quality; host/player LAN dual-socket workflow. Exact-head CI on 55825f4 green (CI/Wave007/Gate1/Windows). Local tip ahead unpublished. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false."
+      "notes": "S7b after FF of S7 tip 5f29b93 into draft PR #34: host digital workflow; karaoke server pitch claim bound (flag alone insufficient); mode-aware charts. Exact-head CI on 5f29b93: CI/Wave007/Gate1 SUCCESS; Windows settling. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; physical phone false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -240,14 +240,18 @@
         "tests/musical_chart_quality.test.ts",
         "tests/party_timing_budget.test.ts",
         "tests/karaoke_real_mic_path.test.ts",
-        "tests/host_player_lan_workflow.test.ts"
+        "tests/host_player_lan_workflow.test.ts",
+        "tests/host_digital_workflow.test.ts",
+        "tests/karaoke_pitch_claim_bound.test.ts"
       ],
       "automated_evidence": [
         "content/songs/offline-launch-catalog.json",
         "artifacts/engineering_wave007/FIVE_MODES_BROWSER_RESULT.json",
         "packages/game-engine/src/partyTimingBudget.ts",
         "apps/server/src/beatmaps/generator.ts",
-        "apps/web/src/pages/PlayerPage.tsx"
+        "apps/web/src/pages/PlayerPage.tsx",
+        "packages/game-engine/src/hostDigitalWorkflow.ts",
+        "packages/game-engine/src/karaokePitchClaimBound.ts"
       ],
       "native_physical": {
         "status": "partial",
@@ -259,15 +263,15 @@
       },
       "art_status": "not_applicable",
       "limitations": [
-        "Wave007 + five-mode browser E2E held from S6 tip; S7 adds timing/mic/chart unit+socket evidence tip-local",
-        "HUMAN/RC2/V1 remain false; dual-socket \u2260 physical phone; proposed timing budgets claimedPassed=false",
-        "Exact-head remote CI observed green on 55825f4; S7 tip unpublished pending owner FF"
+        "S7 tip 5f29b93 FF into draft PR #34; S7b tip local then FF if CI green",
+        "HUMAN/RC2/V1 false; dual-socket/browser \u2260 physical phone; timing claimedPassed=false",
+        "API key \u2260 gameplay sync preserved"
       ],
       "severity": "high",
-      "sha": "17ee0aa2cf9b197e583edd6c5e267599e575e0c1",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "S7 extended five-mode/LAN/karaoke/timing engineering. BETA/RC/LAUNCH/human commercial remain false. Whole-game Cursor Complete not claimed."
+      "notes": "S7b host digital + karaoke bound + mode charts. Whole-game Cursor Complete not claimed."
     },
     {
       "req_id": "BL-LINK-008",
@@ -311,11 +315,14 @@
       ],
       "tests": [
         "tests/party_timing_budget.test.ts",
-        "tests/host_player_lan_workflow.test.ts"
+        "tests/host_player_lan_workflow.test.ts",
+        "tests/host_digital_workflow.test.ts"
       ],
       "automated_evidence": [
         "packages/game-engine/src/partyTimingBudget.ts",
-        "apps/web/src/pages/PlayerPage.tsx"
+        "apps/web/src/pages/PlayerPage.tsx",
+        "packages/game-engine/src/hostDigitalWorkflow.ts",
+        "apps/web/src/pages/HostPage.tsx"
       ],
       "native_physical": {
         "status": "partial",
@@ -331,10 +338,10 @@
         "No physical phone / Metal claim"
       ],
       "severity": "high",
-      "sha": "17ee0aa2cf9b197e583edd6c5e267599e575e0c1",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "S7 proposed budgets + resync path. independent_review not_started."
+      "notes": "S7b host digital workflow + pause/resume clock assess. physical phone false. claimedPassed=false."
     },
     {
       "req_id": "BL-KARAOKE-MIC-001",
@@ -348,12 +355,15 @@
       "tests": [
         "tests/karaoke_real_mic_path.test.ts",
         "tests/musical_rights_mic_drafts.test.ts",
-        "tests/e2e/karaoke_real_mic_path.playwright.spec.ts"
+        "tests/e2e/karaoke_real_mic_path.playwright.spec.ts",
+        "tests/karaoke_pitch_claim_bound.test.ts"
       ],
       "automated_evidence": [
         "packages/game-engine/src/karaokeMicMatrix.ts",
         "packages/game-engine/src/liveMicPipeline.ts",
-        "apps/web/src/pages/PlayerPage.tsx"
+        "apps/web/src/pages/PlayerPage.tsx",
+        "packages/game-engine/src/karaokePitchClaimBound.ts",
+        "apps/server/src/rooms/RoomManager.ts"
       ],
       "native_physical": {
         "status": "partial",
@@ -368,10 +378,10 @@
         "Secure-origin LAN mic still requires devices + PHYSICAL_LAN_REVIEW_PACKET"
       ],
       "severity": "high",
-      "sha": "17ee0aa2cf9b197e583edd6c5e267599e575e0c1",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "S7 real-mic path honesty. Physical phone false."
+      "notes": "S7b server boundKaraokePitchClaim \u2014 client flag alone never grants pitch. Physical phone false."
     },
     {
       "req_id": "BL-CHART-QUALITY-001",
@@ -400,10 +410,45 @@
         "HUMAN/RC2/V1 false"
       ],
       "severity": "medium",
-      "sha": "17ee0aa2cf9b197e583edd6c5e267599e575e0c1",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "S7 section-aware generator v1.2.0 + cache bump."
+      "notes": "S7b mode-aware chart density (CallAndResponse/Karaoke/Prediction). Not human taste sign-off."
+    },
+    {
+      "req_id": "BL-HOST-DIGITAL-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Digital host workflow checklist covers create\u2192calibrate\u2192play\u2192pause/resume\u2192results with honesty banner; browser/loopback only; never claims physical phone.",
+      "verification_method": "unit_test + host UI banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/host_digital_workflow.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/hostDigitalWorkflow.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital host path only \u2014 PHYSICAL_LAN_REVIEW_PACKET still PREPARED."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_phone=false",
+        "HUMAN/RC2/V1 false"
+      ],
+      "severity": "medium",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7b digital host workflow."
     }
   ]
 }
