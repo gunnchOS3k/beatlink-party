@@ -81,25 +81,32 @@ describe('linkResolver', () => {
     expect(result.message.toLowerCase()).toContain('apple');
   });
 
-  it('scaffolds SoundCloud / Bandcamp / Vimeo / Audius as embed-only', async () => {
+  it('scaffolds SoundCloud / Bandcamp / Vimeo / Audius as embed-only (not playable gameplay)', async () => {
     stubOEmbed(null);
     const sc = await resolveLink('https://soundcloud.com/artist/track-name');
     expect(sc.platform).toBe('soundcloud');
     expect(sc.capabilityState).toBe('OFFICIAL_EMBED_AVAILABLE');
     expect(sc.mediaClassification).toBe('embed_only');
     expect(sc.playbackStatus).not.toBe('PLAYABLE_AUTHORIZED_PLATFORM');
+    expect(sc.capabilityState).not.toBe('GAMEPLAY_SYNC_AUTHORIZED');
 
     const bc = await resolveLink('https://artist.bandcamp.com/track/song-title');
     expect(bc.platform).toBe('bandcamp');
     expect(bc.capabilityState).toBe('OFFICIAL_EMBED_AVAILABLE');
+    expect(bc.mediaClassification).toBe('embed_only');
+    expect(bc.capabilityState).not.toBe('GAMEPLAY_SYNC_AUTHORIZED');
 
     const vim = await resolveLink('https://vimeo.com/123456789');
     expect(vim.platform).toBe('vimeo');
     expect(vim.capabilityState).toBe('OFFICIAL_EMBED_AVAILABLE');
+    expect(vim.mediaClassification).toBe('embed_only');
+    expect(vim.capabilityState).not.toBe('GAMEPLAY_SYNC_AUTHORIZED');
 
     const au = await resolveLink('https://audius.co/artist/track-slug');
     expect(au.platform).toBe('audius');
     expect(au.capabilityState).toBe('OFFICIAL_EMBED_AVAILABLE');
+    expect(au.mediaClassification).toBe('embed_only');
+    expect(au.capabilityState).not.toBe('GAMEPLAY_SYNC_AUTHORIZED');
   });
 
   it('returns UNSUPPORTED / BLOCKED for unknown URLs', async () => {

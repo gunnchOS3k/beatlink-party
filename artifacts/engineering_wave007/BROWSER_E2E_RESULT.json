@@ -8,7 +8,7 @@
   "performer_context_id": "performer-mobile-390",
   "audience_context_id": "audience-mobile-412",
   "canonical_room_code_same": true,
-  "room_code": "EBM9Z",
+  "room_code": "CP6KA",
   "scenario_steps_passed": 32,
   "scenario_steps_total": 32,
   "steps": [
@@ -26,7 +26,7 @@
       "step": 3,
       "name": "lobby_room_code_visible",
       "ok": true,
-      "detail": "EBM9Z"
+      "detail": "CP6KA"
     },
     {
       "step": 4,
@@ -120,13 +120,13 @@
       "step": 19,
       "name": "round_ends",
       "ok": true,
-      "detail": "c87cd2c646f93187"
+      "detail": "9adb9add123521ec"
     },
     {
       "step": 20,
       "name": "outcome_hash_consistent",
       "ok": true,
-      "detail": "c87cd2c646f93187 vs c87cd2c646f93187"
+      "detail": "9adb9add123521ec vs 9adb9add123521ec"
     },
     {
       "step": 21,
@@ -171,7 +171,7 @@
       "step": 28,
       "name": "prior_result_immutable",
       "ok": true,
-      "detail": "c87cd2c646f93187"
+      "detail": "9adb9add123521ec"
     },
     {
       "step": 29,

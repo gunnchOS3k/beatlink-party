@@ -9,6 +9,7 @@ import { describe, expect, it, beforeEach } from 'vitest';
 import {
   assessRightsLayers,
   defaultCreatorDraftStore,
+  describeRightsAssertionHonesty,
   evaluateDirectHttpsMedia,
   firstPartyOriginalRightsLayers,
   ingestCreatorOwnedBinary,
@@ -50,6 +51,13 @@ describe('direct HTTPS full scored path', () => {
     });
     expect(rights.ok).toBe(true);
     expect(rights.syncEligible).toBe(true);
+    // Rights assertion (gameplay gate) ≠ verified legal clearance / commercial license.
+    const honesty = describeRightsAssertionHonesty(rights);
+    expect(honesty.gameplayGateOk).toBe(true);
+    expect(honesty.syncEligible).toBe(true);
+    expect(honesty.verifiedLegalClearance).toBe(false);
+    expect(honesty.commercialEligible).toBe(false);
+    expect(honesty.note.toLowerCase()).toMatch(/not verified legal clearance/);
 
     // Composition without sync stays distinct from recording playback.
     const playbackOnly = assessRightsLayers({

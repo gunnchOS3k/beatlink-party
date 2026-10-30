@@ -225,3 +225,32 @@ export function firstPartyOriginalRightsLayers(): {
     },
   };
 }
+
+/**
+ * Honesty boundary: assessRightsLayers / syncEligible are gameplay-gate assertions
+ * from attested inputs — never verified legal clearance or commercial license review.
+ */
+export const RIGHTS_ASSERTION_NOT_LEGAL_CLEARANCE =
+  'Fixture/attested rights.ok or syncEligible is a gameplay gate assertion — not verified legal clearance, commercial license review, or HUMAN/RC authority.';
+
+export interface RightsAssertionHonesty {
+  gameplayGateOk: boolean;
+  syncEligible: boolean;
+  /** Always false — machine attestation is not counsel-reviewed clearance. */
+  verifiedLegalClearance: false;
+  /** Always false until separate human commercial review. */
+  commercialEligible: false;
+  note: string;
+}
+
+export function describeRightsAssertionHonesty(
+  assessment: RightsLayersAssessment,
+): RightsAssertionHonesty {
+  return {
+    gameplayGateOk: assessment.ok,
+    syncEligible: assessment.syncEligible,
+    verifiedLegalClearance: false,
+    commercialEligible: false,
+    note: RIGHTS_ASSERTION_NOT_LEGAL_CLEARANCE,
+  };
+}
