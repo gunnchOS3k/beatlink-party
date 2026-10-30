@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S12 5c22345 after 5f16fc8 CI SUCCESS. Karaoke rematch honesty. HUMAN/RC2/V1 false."
+      "notes": "S12 tip b0025f3; prior 5f16fc8 CI SUCCESS. Karaoke rematch honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -1000,7 +1000,7 @@
         "audience_pitch=false"
       ],
       "severity": "medium",
-      "sha": "5c223453633769271513b35c7b927ef10208a99b",
+      "sha": "b0025f3cf5cd77238b71ba20067ac2ab64a006f3",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S12 party karaoke rematch honesty."
