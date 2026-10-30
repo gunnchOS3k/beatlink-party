@@ -984,7 +984,7 @@ export default function PlayerPage() {
               {
                 assessKaraokeVocalistHandoff({
                   fromSeatId: 'prior-vocalist',
-                  toSeatId: deviceRole === 'vocalist' ? 'self' : deviceRole,
+                  toSeatId: player.role === 'vocalist' ? 'self' : String(player.role),
                   priorPitchActive: pitchAnalysisActive,
                 }).honestyBanner
               }
