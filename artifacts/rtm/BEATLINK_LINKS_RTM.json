@@ -2,10 +2,10 @@
   "schema_version": "1.0.0",
   "contract_id": "GUNNCHOS3K_PVS",
   "contract_version": "1.0.0",
-  "contract_source_sha": "45b456617002569c33a5a27fe30d5cf8be5a7032",
+  "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-29T20:00:00Z",
+  "generated_at": "2026-10-30T13:42:15Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "Links capability + syncEligible gate + RTM schema bind in progress on eng/pr34-sync-eligible-rtm"
+      "notes": "S5 local: BL-LINK-005 + security/full-path/Wave007 on tip; whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; B002 no push."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -51,7 +51,7 @@
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "Keep regression: credentials ≠ gameplay sync."
+      "notes": "Keep regression: credentials \u2260 gameplay sync."
     },
     {
       "req_id": "BL-LINK-002",
@@ -83,7 +83,7 @@
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "in_progress",
-      "notes": "Cached rejected promise cleared on failure + reconnect."
+      "notes": "Cached rejected promise cleared on failure + reconnect. S5 reconfirmed: YOUTUBE_API_KEY\u2260gameplay sync; IFrame embed-only path preserved (youtube_iframe_api_retry + linkResolver). Live youtube.com smoke still open."
     },
     {
       "req_id": "BL-LINK-003",
@@ -114,12 +114,12 @@
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "metadata/embed ≠ gameplay"
+      "notes": "metadata/embed \u2260 gameplay"
     },
     {
       "req_id": "BL-LINK-004",
       "owner": "beatlink-party",
-      "expected_behavior": "SoundCloud/Bandcamp/Vimeo/Audius are embed/listen-first scaffolds — not complete gameplay support.",
+      "expected_behavior": "SoundCloud/Bandcamp/Vimeo/Audius are embed/listen-first scaffolds \u2014 not complete gameplay support.",
       "verification_method": "unit_test",
       "layers": [
         1,
@@ -139,7 +139,7 @@
       },
       "art_status": "not_applicable",
       "limitations": [
-        "Official widget deep integration pending — scaffolds ≠ complete support"
+        "Official widget deep integration pending \u2014 scaffolds \u2260 complete support"
       ],
       "severity": "low",
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
@@ -184,18 +184,18 @@
       "art_status": "not_applicable",
       "limitations": [
         "Creator must attach attestation + hash; auto-publish remains false",
-        "2026-10-29 closeout: server-authoritative hash/draft selection; forged catalog reject; DNS/IPv6/redirect destination pins; private-draft new-media scored path evidenced in vitest; Playwright UI journey blocked pending playwright install for chromium_headless_shell-1148; HUMAN/RC2/V1 remain false."
+        "2026-10-30 S5: full-path vitest (paste\u2192classify\u2192rights\u2260recording\u2192bytes\u2192hash/grid\u2192score\u2192results\u2192rematch/cleanup) + security negatives (SSRF/DNS-rebind/redirect/MIME/oversized/invalid-rights/expired/draft-isolation) + Wave007 browser E2E PASS locally; fixture rights \u2260 legal clearance; HUMAN/RC2/V1 false; no whole-game Cursor Complete claim; B002 no push/PR."
       ],
       "severity": "blocker",
-      "sha": "77fef8992793e283f6609434100b15f87c7d3e87",
+      "sha": "db3ed8d55eb62a7d4d050b93c14b816104c51a7a",
       "independent_review_status": "not_started",
-      "cursor_complete_status": "in_progress",
-      "notes": "BL-LINK-005 remains in_progress. Server no longer trusts client matchedCatalogId. Private unpublished draft bytes can score when hash+chart+syncEligible. Browser production UI journey still required before complete."
+      "cursor_complete_status": "complete",
+      "notes": "BL-LINK-005 cursor_complete locally. Extended S5 beyond attach-only: full scored private-draft path with rematch cleanup; acquisition security suite; YouTube IFrame embed-only + API-key\u2260sync preserved (linkResolver + youtube_iframe tests); five-mode party loop + Wave007 mandatory Playwright PASS on integrated tip. independent_review not_started. No push."
     },
     {
       "req_id": "BL-LINK-006",
       "owner": "beatlink-party",
-      "expected_behavior": "Composition rights ≠ sound-recording rights; CC sync/adaptation require explicit attestation; no rip/DRM/lyric scrape.",
+      "expected_behavior": "Composition rights \u2260 sound-recording rights; CC sync/adaptation require explicit attestation; no rip/DRM/lyric scrape.",
       "verification_method": "unit_test",
       "layers": [
         1,
@@ -249,7 +249,8 @@
       },
       "art_status": "not_applicable",
       "limitations": [
-        "Exact-head CI/Wave007 pending after PR tip advances"
+        "Wave007 + five-mode browser E2E PASS locally on S5 tip; remote exact-head CI pending B001/B002 push authority",
+        "HUMAN/RC2/V1 remain false"
       ],
       "severity": "high",
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
@@ -285,7 +286,7 @@
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "independent_review_status=not_started on all rows."
+      "notes": "BETA/RC/LAUNCH/human commercial remain false. PVS pin GUNNCHOS3K_PVS@1.0.0 @ 935eb3a."
     }
   ]
 }
