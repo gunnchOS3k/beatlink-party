@@ -28,6 +28,7 @@ import {
   scorePhrasePitchCoverage,
   startLiveMicContinuousAnalysis,
   assessKaraokeSecureContext,
+  assessKaraokePhraseContinuity,
   planMobileHostPresentation,
   type LiveMicContinuousHandle,
   type MicMatrixState,
@@ -938,6 +939,18 @@ export default function PlayerPage() {
                     typeof window !== 'undefined' ? window.isSecureContext === true : false,
                   protocol: typeof window !== 'undefined' ? window.location.protocol : undefined,
                   hostname: typeof window !== 'undefined' ? window.location.hostname : undefined,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-phrase-continuity-banner"
+            >
+              {
+                assessKaraokePhraseContinuity({
+                  prompts: beatmap?.vocalPrompts ?? [],
+                  sampleTimesMs: [Math.max(0, gameTimeMs - 50), gameTimeMs, gameTimeMs + 50],
+                  pitchAnalysisActive,
                 }).honestyBanner
               }
             </p>

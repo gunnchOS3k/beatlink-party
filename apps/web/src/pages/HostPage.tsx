@@ -55,6 +55,7 @@ import {
   firstPartyOriginalRightsLayers,
   assessPartyRematchLoop,
   assessHostKaraokeStage,
+  assessPartyAudienceHonesty,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -796,11 +797,23 @@ export default function HostPage() {
           <div className="grid-2">
             <div className="panel stack" data-testid="host-lobby">
               <div className="row" style={{ justifyContent: 'space-between' }}>
-                <h3>
-                  Players ({room?.players.length ?? 0}/{MAX_PERFORMERS})
-                </h3>
+                <h3>Players ({room?.players.length ?? 0}/{MAX_PERFORMERS})</h3>
                 <span className="lobby-pulse" aria-hidden="true" title="Lobby live" />
               </div>
+              <p
+                className="label"
+                style={{ fontWeight: 400, marginTop: '-0.25rem' }}
+                data-testid="host-party-audience-honesty"
+              >
+                {
+                  assessPartyAudienceHonesty({
+                    performerCount: room?.players.length ?? 0,
+                    audienceCount: room?.audience.length ?? 0,
+                    maxPerformers: MAX_PERFORMERS,
+                    scriptedAudience: true,
+                  }).honestyBanner
+                }
+              </p>
               {(room?.players ?? []).map((p) => (
                 <div key={p.id} className="player-card" style={{ borderColor: p.color }}>
                   <div className="player-dot" style={{ background: p.color }} />

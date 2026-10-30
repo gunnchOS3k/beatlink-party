@@ -51,6 +51,8 @@ export * from './karaokeSecureContext.js';
 export * from './partyRematchLoop.js';
 export * from './musicalModeContinuity.js';
 export * from './hostKaraokeStage.js';
+export * from './karaokePhraseContinuity.js';
+export * from './partyAudienceHonesty.js';
 export * from './avFeedback.js';
 export * from './visualPackHarness.js';
 export * from './linkCapability.js';
