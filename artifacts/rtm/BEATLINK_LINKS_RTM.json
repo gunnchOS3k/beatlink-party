@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T22:55:00Z",
+  "generated_at": "2026-10-30T23:07:30Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S10 tip 96f0d8a; prior 22c522f CI SUCCESS. Vocalist handoff honesty. HUMAN/RC2/V1 false."
+      "notes": "S11 audience pitch gate atop \u22652d5d824 (Windows SUCCESS). HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -897,6 +897,42 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S10 karaoke vocalist handoff."
+    },
+    {
+      "req_id": "BL-PARTY-KARAOKE-AUDIENCE-PITCH-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Audience/host seats never authorize karaoke pitch even with strong synthetic claims; performer claims still require bounds; physical mic/humans stay false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_audience_pitch_gate.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeAudiencePitchGate.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital audience pitch gate only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "audience_pitch=false",
+        "physical_mic=false",
+        "independent_humans=false"
+      ],
+      "severity": "medium",
+      "sha": "PLACEHOLDER_S11",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S11 party karaoke audience pitch gate."
     }
   ]
 }

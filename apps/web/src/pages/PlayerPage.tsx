@@ -31,6 +31,7 @@ import {
   assessKaraokePhraseContinuity,
   assessKaraokeRevokeContinuity,
   assessPartyKaraokeHonesty,
+  assessPartyKaraokeAudiencePitchGate,
   assessKaraokeVocalistHandoff,
   planMobileHostPresentation,
   type LiveMicContinuousHandle,
@@ -986,6 +987,23 @@ export default function PlayerPage() {
                   fromSeatId: 'prior-vocalist',
                   toSeatId: player.role === 'vocalist' ? 'self' : String(player.role),
                   priorPitchActive: pitchAnalysisActive,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="party-karaoke-audience-pitch-gate-banner"
+            >
+              {
+                assessPartyKaraokeAudiencePitchGate({
+                  seatKind: 'performer',
+                  claim: {
+                    inputType: 'vocal_phrase',
+                    pitchAnalysisActive,
+                    pitchMatch: 0.5,
+                    voicedCoverage: 0.2,
+                    phraseFrames: 4,
+                  },
                 }).honestyBanner
               }
             </p>
