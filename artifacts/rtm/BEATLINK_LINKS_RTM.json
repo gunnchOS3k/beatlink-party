@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S10 94d2767 after 22c522f CI SUCCESS + tip 2d5d824. Vocalist handoff honesty. HUMAN/RC2/V1 false; physical claims false."
+      "notes": "S10 tip 96f0d8a; prior 22c522f CI SUCCESS. Vocalist handoff honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -893,7 +893,7 @@
         "pitchTransferred=false"
       ],
       "severity": "medium",
-      "sha": "94d2767f6ffc36bbff4b944f3b9e0019a88ca479",
+      "sha": "96f0d8a5d4fd3edcc1c82161d69dc9dcb5b4b106",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S10 karaoke vocalist handoff."
