@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T16:29:03Z",
+  "generated_at": "2026-10-30T17:04:34Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S6: FF-pushed S5 tip into draft PR #34; rights-assertion\u2260legal-clearance; security re-run; BL-LINK-002 live YT IFrame smoke PASS; Wave007+five-mode E2E PASS tip-local. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false."
+      "notes": "S7: party timing budgets + player background resync; karaoke real-mic path (mocked/stub \u2014 not physical phone); section-aware chart quality; host/player LAN dual-socket workflow. Exact-head CI on 55825f4 green (CI/Wave007/Gate1/Windows). Local tip ahead unpublished. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -236,29 +236,38 @@
       "tests": [
         "tests/five_modes_party_loop.test.ts",
         "tests/launch_song_library.test.ts",
-        "tests/musical_rights_mic_drafts.test.ts"
+        "tests/musical_rights_mic_drafts.test.ts",
+        "tests/musical_chart_quality.test.ts",
+        "tests/party_timing_budget.test.ts",
+        "tests/karaoke_real_mic_path.test.ts",
+        "tests/host_player_lan_workflow.test.ts"
       ],
       "automated_evidence": [
         "content/songs/offline-launch-catalog.json",
-        "artifacts/engineering_wave007/FIVE_MODES_BROWSER_RESULT.json"
+        "artifacts/engineering_wave007/FIVE_MODES_BROWSER_RESULT.json",
+        "packages/game-engine/src/partyTimingBudget.ts",
+        "apps/server/src/beatmaps/generator.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
       ],
       "native_physical": {
         "status": "partial",
         "platforms": [
-          "lan"
+          "lan",
+          "browser"
         ],
-        "notes": "LAN review packet present; exact-head Wave007 after PR advances."
+        "notes": "Socket dual-client LAN workflow + timing resync PASS tip-local; physical phone packet still PREPARED\u2014not executed. No physical phone claim."
       },
       "art_status": "not_applicable",
       "limitations": [
-        "Wave007 + five-mode browser E2E PASS locally on S6 tip; remote exact-head CI observational under B001",
-        "HUMAN/RC2/V1 remain false; no physical phone claim from browser-only"
+        "Wave007 + five-mode browser E2E held from S6 tip; S7 adds timing/mic/chart unit+socket evidence tip-local",
+        "HUMAN/RC2/V1 remain false; dual-socket \u2260 physical phone; proposed timing budgets claimedPassed=false",
+        "Exact-head remote CI observed green on 55825f4; S7 tip unpublished pending owner FF"
       ],
       "severity": "high",
-      "sha": "0844590d3b1b194bd080f110fcbacad569addcfe",
+      "sha": "17ee0aa2cf9b197e583edd6c5e267599e575e0c1",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "BETA/RC/LAUNCH/human commercial remain false."
+      "notes": "S7 extended five-mode/LAN/karaoke/timing engineering. BETA/RC/LAUNCH/human commercial remain false. Whole-game Cursor Complete not claimed."
     },
     {
       "req_id": "BL-LINK-008",
@@ -289,6 +298,112 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "BETA/RC/LAUNCH/human commercial remain false. PVS pin GUNNCHOS3K_PVS@1.0.0 @ 935eb3a. Whole-game Cursor Complete not claimed from BL-LINK-005 alone."
+    },
+    {
+      "req_id": "BL-PARTY-TIMING-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Host/player party timing uses proposed quantitative drift/jitter/resync budgets; background/rejoin/network-loss force authoritative server clock resync; budgets claimedPassed=false until measured physical evidence.",
+      "verification_method": "unit_test + socket dual-client",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_timing_budget.test.ts",
+        "tests/host_player_lan_workflow.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyTimingBudget.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser",
+          "lan"
+        ],
+        "notes": "Simulated scenarios + player visibility resync wired; physical multi-phone timing not run."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "PROPOSED_PARTY_TIMING_BUDGET.claimedPassed=false",
+        "No physical phone / Metal claim"
+      ],
+      "severity": "high",
+      "sha": "17ee0aa2cf9b197e583edd6c5e267599e575e0c1",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7 proposed budgets + resync path. independent_review not_started."
+    },
+    {
+      "req_id": "BL-KARAOKE-MIC-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke distinguishes real-mic ephemeral path vs synthetic; deny/grant/revoke; silence/noise never authorize MICROPHONE_PITCH_ANALYSIS; pitch default false; a11y tap fallback remains.",
+      "verification_method": "unit_test + optional Playwright mocked getUserMedia",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_real_mic_path.test.ts",
+        "tests/musical_rights_mic_drafts.test.ts",
+        "tests/e2e/karaoke_real_mic_path.playwright.spec.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeMicMatrix.ts",
+        "packages/game-engine/src/liveMicPipeline.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Path proven with mocked/stub MediaStream \u2014 not physical phone mic grant on secure LAN origin."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "Synthetic MediaStream stubs \u2260 physical phone",
+        "Secure-origin LAN mic still requires devices + PHYSICAL_LAN_REVIEW_PACKET"
+      ],
+      "severity": "high",
+      "sha": "17ee0aa2cf9b197e583edd6c5e267599e575e0c1",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7 real-mic path honesty. Physical phone false."
+    },
+    {
+      "req_id": "BL-CHART-QUALITY-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Launch charts are section-aware (chorus denser than intro) with type variety \u2014 duration padding is not musical completion.",
+      "verification_method": "unit_test",
+      "layers": [
+        2,
+        6
+      ],
+      "tests": [
+        "tests/musical_chart_quality.test.ts",
+        "tests/launch_song_library.test.ts"
+      ],
+      "automated_evidence": [
+        "apps/server/src/beatmaps/generator.ts"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Chart generation audit only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "Procedural section-aware charts \u2014 not human musical taste sign-off",
+        "HUMAN/RC2/V1 false"
+      ],
+      "severity": "medium",
+      "sha": "17ee0aa2cf9b197e583edd6c5e267599e575e0c1",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7 section-aware generator v1.2.0 + cache bump."
     }
   ]
 }

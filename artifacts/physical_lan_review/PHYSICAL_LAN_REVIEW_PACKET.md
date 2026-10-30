@@ -2,11 +2,13 @@
 
 **Status: PREPARED — not executed.** Fill only with real host + phones. Do not mark pass from CI, Playwright, or synthetic mic probes.
 
+S7 (2026-10-30) ran **loopback dual-socket** host/player LAN workflow + timing resync + karaoke mic-path stubs at `17ee0aa` — that is **not** a physical phone pass.
+
 ## Build identity (fill at session start)
 
 | Field | Value |
 |---|---|
-| Source SHA | `6474935ffb290f37ecbc46f2c19254af36e232d1` (PR tip candidate; fill tested build hash at session) |
+| Source SHA | `17ee0aa2cf9b197e583edd6c5e267599e575e0c1` (S7 eng tip candidate; fill tested build hash at physical session) |
 | Tested package / web build hash | _pending_ |
 | Server bind | LAN + TLS? _pending_ (require secure origin for mic grant) |
 | Host device / OS | _pending_ |
