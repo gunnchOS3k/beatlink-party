@@ -57,6 +57,7 @@ import {
   assessHostKaraokeStage,
   assessPartyAudienceHonesty,
   assessHostCalibrationHonesty,
+  assessPartyKaraokeHonesty,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -812,6 +813,21 @@ export default function HostPage() {
                     audienceCount: room?.audience.length ?? 0,
                     maxPerformers: MAX_PERFORMERS,
                     scriptedAudience: true,
+                  }).honestyBanner
+                }
+              </p>
+              <p
+                className="label"
+                style={{ fontWeight: 400, marginTop: '-0.25rem' }}
+                data-testid="host-party-karaoke-honesty"
+              >
+                {
+                  assessPartyKaraokeHonesty({
+                    performerCount: room?.players.length ?? 0,
+                    audienceCount: room?.audience.length ?? 0,
+                    maxPerformers: MAX_PERFORMERS,
+                    scriptedAudience: true,
+                    karaokeModeActive: (room?.gameMode ?? playMode) === 'KaraokePerformance',
                   }).honestyBanner
                 }
               </p>

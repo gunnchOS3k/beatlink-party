@@ -30,6 +30,7 @@ import {
   assessKaraokeSecureContext,
   assessKaraokePhraseContinuity,
   assessKaraokeRevokeContinuity,
+  assessPartyKaraokeHonesty,
   planMobileHostPresentation,
   type LiveMicContinuousHandle,
   type MicMatrixState,
@@ -960,6 +961,20 @@ export default function PlayerPage() {
               data-testid="karaoke-revoke-continuity-banner"
             >
               {assessKaraokeRevokeContinuity().honestyBanner}
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="party-karaoke-honesty-banner"
+            >
+              {
+                assessPartyKaraokeHonesty({
+                  performerCount: 1,
+                  audienceCount: 0,
+                  maxPerformers: 8,
+                  scriptedAudience: true,
+                  karaokeModeActive: true,
+                }).honestyBanner
+              }
             </p>
             <p
               style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}

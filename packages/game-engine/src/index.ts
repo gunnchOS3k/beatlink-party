@@ -55,6 +55,7 @@ export * from './karaokePhraseContinuity.js';
 export * from './partyAudienceHonesty.js';
 export * from './karaokeRevokeContinuity.js';
 export * from './hostCalibrationHonesty.js';
+export * from './partyKaraokeHonesty.js';
 export * from './avFeedback.js';
 export * from './visualPackHarness.js';
 export * from './linkCapability.js';

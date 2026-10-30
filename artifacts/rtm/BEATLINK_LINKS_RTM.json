@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T22:22:00Z",
+  "generated_at": "2026-10-30T22:33:59Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S9b tip 6661640; prior 0f8e60f CI SUCCESS. Karaoke revoke + host calibration honesty. HUMAN/RC2/V1 false."
+      "notes": "S9c tip pending; prior 22c522f CI SUCCESS. Party+karaoke honesty composite. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -825,6 +825,44 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S9b host calibration honesty."
+    },
+    {
+      "req_id": "BL-PARTY-KARAOKE-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Party karaoke composes audience honesty + mid-phrase revoke; audience never inherits pitch; physical mic/party/humans stay false.",
+      "verification_method": "unit_test + host/player banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital party karaoke only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "audience_pitch=false",
+        "physical_mic=false",
+        "independent_humans=false",
+        "physical_party=false"
+      ],
+      "severity": "medium",
+      "sha": "PENDING_TIP",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9c party karaoke honesty."
     }
   ]
 }
