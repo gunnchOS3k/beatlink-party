@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S8 tip 6278f4d exact-head CI/Wave007/Gate1/Windows SUCCESS; newer S8b tip 941c338 (rematch/karaoke-stage/mode-continuity) preserved. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; physical phone/TV false; API/license/synthetic mic/browser \u2260 commercial clearance or physical-device acceptance."
+      "notes": "S8 6278f4d CI/Wave007/Gate1/Windows SUCCESS; S8b implement 941c338 CI SUCCESS; RTM stamp 5cbe1fa. Rematch/karaoke-stage/mode-continuity. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; physical phone/TV false; API/license/synthetic mic/browser \u2260 commercial clearance or physical-device acceptance."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -595,21 +595,32 @@
       "owner": "beatlink-party",
       "expected_behavior": "Digital rematch/results dwell suggested cadence; rematchReady on results; never claims physical party or HUMAN first-fun.",
       "verification_method": "unit_test + host results banner",
-      "layers": [2, 5],
-      "tests": ["tests/party_rematch_loop.test.ts"],
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/party_rematch_loop.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/partyRematchLoop.ts",
         "apps/web/src/pages/HostPage.tsx"
       ],
       "native_physical": {
         "status": "partial",
-        "platforms": ["browser"],
-        "notes": "Digital rematch only — physical_party=false."
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital rematch only \u2014 physical_party=false."
       },
       "art_status": "not_applicable",
-      "limitations": ["physical_party=false", "human_first_fun=false", "HUMAN/RC2/V1 false"],
+      "limitations": [
+        "physical_party=false",
+        "human_first_fun=false",
+        "HUMAN/RC2/V1 false"
+      ],
       "severity": "medium",
-      "sha": "941c338cb752b82d933cf56c03d014ca8bb6c29b",
+      "sha": "5cbe1fa228190d0c941baffd3f354fc4b993be1a",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S8b party rematch loop honesty."
@@ -619,18 +630,29 @@
       "owner": "beatlink-party",
       "expected_behavior": "Five-mode musical continuity uses authorized audio kinds with note cues; commercialClearanceClaimed always false.",
       "verification_method": "unit_test",
-      "layers": [2, 6],
-      "tests": ["tests/musical_mode_continuity.test.ts", "tests/musical_product_modes.test.ts"],
-      "automated_evidence": ["packages/game-engine/src/musicalModeContinuity.ts"],
+      "layers": [
+        2,
+        6
+      ],
+      "tests": [
+        "tests/musical_mode_continuity.test.ts",
+        "tests/musical_product_modes.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/musicalModeContinuity.ts"
+      ],
       "native_physical": {
         "status": "not_applicable",
         "platforms": [],
         "notes": "Digital continuity audit only."
       },
       "art_status": "not_applicable",
-      "limitations": ["commercial_clearance=false", "Not HUMAN musical taste sign-off"],
+      "limitations": [
+        "commercial_clearance=false",
+        "Not HUMAN musical taste sign-off"
+      ],
       "severity": "medium",
-      "sha": "941c338cb752b82d933cf56c03d014ca8bb6c29b",
+      "sha": "5cbe1fa228190d0c941baffd3f354fc4b993be1a",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S8b five-mode continuity honesty."
@@ -640,21 +662,31 @@
       "owner": "beatlink-party",
       "expected_behavior": "Host karaoke stage surfaces phrase prompts; hostPitchClaimed and physicalMicAccepted stay false; a11y tap fallback available.",
       "verification_method": "unit_test + host banner",
-      "layers": [2, 5],
-      "tests": ["tests/host_karaoke_stage.test.ts"],
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/host_karaoke_stage.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/hostKaraokeStage.ts",
         "apps/web/src/pages/HostPage.tsx"
       ],
       "native_physical": {
         "status": "partial",
-        "platforms": ["browser"],
-        "notes": "Host browser phrases only — not physical mic."
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Host browser phrases only \u2014 not physical mic."
       },
       "art_status": "not_applicable",
-      "limitations": ["host_pitch=false", "physical_mic=false"],
+      "limitations": [
+        "host_pitch=false",
+        "physical_mic=false"
+      ],
       "severity": "medium",
-      "sha": "941c338cb752b82d933cf56c03d014ca8bb6c29b",
+      "sha": "5cbe1fa228190d0c941baffd3f354fc4b993be1a",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S8b host karaoke stage honesty."
