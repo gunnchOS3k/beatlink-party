@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S9 implement 570cf22 after exact-head CI SUCCESS on c77bc6e (CI/Wave007/Gate1/Windows). Karaoke phrase continuity + party audience honesty. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; physical mic/party false."
+      "notes": "S9 tip e5ddc6f (implement prior feat); c77bc6e CI/Wave007/Gate1/Windows SUCCESS preserved. Karaoke phrase continuity + audience honesty. HUMAN/RC2/V1 false; physical claims false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -720,7 +720,7 @@
         "pitchAnalysisActive \u2260 clearance"
       ],
       "severity": "medium",
-      "sha": "570cf223701b47a7fe51d1937676f0ea53063baa",
+      "sha": "e5ddc6f8388a1c16c476b515f857ad0480669bea",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S9 karaoke phrase continuity."
@@ -754,7 +754,7 @@
         "physical_party=false"
       ],
       "severity": "medium",
-      "sha": "570cf223701b47a7fe51d1937676f0ea53063baa",
+      "sha": "e5ddc6f8388a1c16c476b515f857ad0480669bea",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S9 party audience honesty."
