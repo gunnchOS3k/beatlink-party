@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S9c tip b7d7a61; prior 22c522f CI SUCCESS. Party+karaoke honesty. HUMAN/RC2/V1 false."
+      "notes": "S9c tip d5ef428; prior 22c522f CI SUCCESS. Party+karaoke honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -859,7 +859,7 @@
         "physical_party=false"
       ],
       "severity": "medium",
-      "sha": "b7d7a61b4f9bf19f57ce8dfbd68345f352fee1c3",
+      "sha": "d5ef428dc50bd030fd28921575c7689153c33ac2",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S9c party karaoke honesty."
