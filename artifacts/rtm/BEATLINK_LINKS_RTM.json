@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T21:50:00Z",
+  "generated_at": "2026-10-30T22:22:00Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S9 tip e5ddc6f (implement prior feat); c77bc6e CI/Wave007/Gate1/Windows SUCCESS preserved. Karaoke phrase continuity + audience honesty. HUMAN/RC2/V1 false; physical claims false."
+      "notes": "S9b 8948311 after 0f8e60f CI/Wave007/Gate1/Windows SUCCESS. Karaoke revoke + host calibration honesty. HUMAN/RC2/V1 false; physical claims false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -758,6 +758,73 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S9 party audience honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-REVOKE-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Mid-phrase mic revoke clears pitch claim; a11y tap fallback remains; physicalMicAccepted false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_revoke_continuity.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeRevokeContinuity.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital matrix only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_mic=false"
+      ],
+      "severity": "medium",
+      "sha": "89483116c2677c7a8dd36058d8f162f95a40a341",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9b karaoke revoke continuity."
+    },
+    {
+      "req_id": "BL-HOST-CAL-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Digital host calibration may accept tap samples; physicalLanTimingAccepted and timing claimedPassed stay false.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/host_calibration_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/hostCalibrationHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital calibration only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_lan_timing=false",
+        "claimedPassed=false"
+      ],
+      "severity": "medium",
+      "sha": "89483116c2677c7a8dd36058d8f162f95a40a341",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9b host calibration honesty."
     }
   ]
 }
