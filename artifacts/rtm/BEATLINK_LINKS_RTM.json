@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T23:40:24Z",
+  "generated_at": "2026-10-30T23:40:00Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S12 tip d44e870; soaked 5f16fc8 all SUCCESS. Karaoke rematch honesty. HUMAN/RC2/V1 false."
+      "notes": "S12 5c22345 after 5f16fc8 CI SUCCESS. Karaoke rematch honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -967,6 +967,40 @@
       ],
       "severity": "medium",
       "sha": "d44e870359b35e160441ebb7a043acb4c960ada5",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S12 party karaoke rematch honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-REMATCH-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke rematch clears prior pitch; audiencePitchAuthorized false; physical claims false.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_rematch_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeRematchHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital rematch only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_party=false",
+        "audience_pitch=false"
+      ],
+      "severity": "medium",
+      "sha": "5c223453633769271513b35c7b927ef10208a99b",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S12 party karaoke rematch honesty."
