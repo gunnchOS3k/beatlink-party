@@ -10,7 +10,7 @@ const contentRoot = join(__dirname, '../../../../content');
 
 let catalog: SongCatalogEntry[] = [];
 /** Versioned beatmap cache — charts are loaded once per beatmap id, not regenerated each play. */
-const BEATMAP_CACHE_VERSION = 3;
+const BEATMAP_CACHE_VERSION = 4;
 const beatmapCache = new Map<string, Beatmap>();
 
 function cacheKey(beatmapId: string): string {

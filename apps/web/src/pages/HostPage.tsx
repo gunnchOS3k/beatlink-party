@@ -42,6 +42,10 @@ import {
   upcomingSyncedNotes,
   openModePlayableSession,
   buildModeStageVisual,
+  buildHostDigitalWorkflow,
+  hostDigitalCompletionPercent,
+  hostDigitalHonestyBanner,
+  inferHostDigitalDone,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -377,6 +381,8 @@ export default function HostPage() {
   const createRoom = useCreateRoom();
   const [code, setCode] = useState(roomCode?.toUpperCase() ?? '');
   const [room, setRoom] = useState<RoomState | null>(null);
+  const [hostPausedOnce, setHostPausedOnce] = useState(false);
+  const [hostResumedOnce, setHostResumedOnce] = useState(false);
   const [songs, setSongs] = useState<SongCatalogEntry[]>([]);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkResult, setLinkResult] = useState<LinkResolveResult | null>(null);
@@ -882,10 +888,13 @@ export default function HostPage() {
                 <button
                   className="btn-secondary"
                   type="button"
+                  data-testid="host-session-pause-resume"
                   onClick={() => {
                     if (!socket || !code) return;
-                    const event =
-                      room?.phase === 'paused' ? 'room.session_resume' : 'room.session_pause';
+                    const pausing = room?.phase !== 'paused';
+                    const event = pausing ? 'room.session_pause' : 'room.session_resume';
+                    if (pausing) setHostPausedOnce(true);
+                    else setHostResumedOnce(true);
                     socket.emit(event, { code, hostToken }, () => undefined);
                   }}
                 >
@@ -1155,6 +1164,29 @@ export default function HostPage() {
             {room.gameMode === 'KaraokePerformance' ? ' · phrase prompts (pitch only if mic consented)' : ''}
             {room.gameMode === 'BandRoles' ? ' · band lanes live' : ''}
             {room.gameMode === 'BeatTap' ? ' · note-synced song bed' : ''}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-digital-workflow-banner"
+          >
+            {(() => {
+              const done = inferHostDigitalDone({
+                hasRoom: true,
+                playerCount: room.players.length,
+                readyCount: room.players.filter((p) => p.ready).length,
+                hasSong: Boolean(room.selectedSongId),
+                hasMode: Boolean(room.gameMode),
+                phase: room.phase,
+                calibrated: room.calibrationOffsetMs != null,
+                pausedOnce: hostPausedOnce,
+                resumedOnce: hostResumedOnce,
+              });
+              const steps = buildHostDigitalWorkflow(done);
+              return hostDigitalHonestyBanner({
+                physicalPhoneClaimed: false,
+                workflowPercent: hostDigitalCompletionPercent(steps),
+              });
+            })()}
           </p>
           {beatmap && selectedSong && (
             <p

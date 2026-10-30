@@ -1,6 +1,7 @@
 import type {
   CatalogKaraokePhrase,
   DifficultyId,
+  GameModeId,
   PlayerRole,
   SongCatalogEntry,
 } from '@beatlink/shared';
@@ -22,6 +23,27 @@ const SECTION_DENSITY: Record<string, number> = {
   bridge: 1.0,
   outro: 0.4,
 };
+
+/** Mode-specific density scale — CallAndResponse sparse in call, denser in response windows. */
+function modeDensityScale(mode: GameModeId | null | undefined, sectionId: string): number {
+  if (!mode) return 1;
+  switch (mode) {
+    case 'CallAndResponse':
+      // Call half of each section quieter; response half denser (echo).
+      return sectionId === 'chorus' || sectionId === 'bridge' ? 1.15 : 0.75;
+    case 'KaraokePerformance':
+      // Leave room for phrases — slightly sparser taps under vocals.
+      return sectionId === 'chorus' ? 0.95 : 0.7;
+    case 'PredictionTrivia':
+      // Cluster near section boundaries for lock-in windows.
+      return sectionId === 'intro' || sectionId === 'outro' ? 0.55 : 1.2;
+    case 'BandRoles':
+      return 1.05;
+    case 'BeatTap':
+    default:
+      return 1;
+  }
+}
 
 function sectionAt(sections: ChartSection[], t: number): ChartSection | null {
   return sections.find((s) => t >= s.startMs && t < s.endMs) ?? sections[sections.length - 1] ?? null;
@@ -50,6 +72,7 @@ function generateNotes(
   beatInterval: number,
   sections: ChartSection[],
   noteRoles: PlayerRole[],
+  primaryMode?: GameModeId | null,
 ) {
   const beatMs = (60 / bpm) * 1000;
   const notes = [];
@@ -62,9 +85,21 @@ function generateNotes(
   while (t < durationMs - endPad) {
     const section = sectionAt(sections, t);
     const sectionId = section?.id ?? 'verse';
-    const density = SECTION_DENSITY[sectionId] ?? 1;
+    const density =
+      (SECTION_DENSITY[sectionId] ?? 1) * modeDensityScale(primaryMode, sectionId);
     // Higher density → shorter step between notes (more musical activity in chorus).
-    const stepBeats = Math.max(0.25, beatInterval / density);
+    let stepBeats = Math.max(0.25, beatInterval / density);
+    // PredictionTrivia: tighten near section ends (lock window).
+    if (primaryMode === 'PredictionTrivia' && section) {
+      const remain = section.endMs - t;
+      if (remain > 0 && remain < beatMs * 4) stepBeats = Math.max(0.25, stepBeats * 0.7);
+    }
+    // CallAndResponse: alternate sparse/dense every ~2 beats inside section.
+    if (primaryMode === 'CallAndResponse') {
+      const intoSection = section ? t - section.startMs : 0;
+      const callHalf = Math.floor(intoSection / beatMs) % 4 < 2;
+      stepBeats = Math.max(0.25, stepBeats * (callHalf ? 1.4 : 0.75));
+    }
     const kind = pickKind(i, sectionId);
     const role = roles[i % roles.length]!;
 
@@ -246,11 +281,15 @@ export function createDemoBeatmap(
       : catalogEntry?.modes?.includes('BandRoles')
         ? ['beat_tapper', 'vocalist', 'hype_captain']
         : ['beat_tapper'];
-  const notes = generateNotes(bpm, durationMs, beatInterval, sections, noteRoles);
+  const primaryMode: GameModeId | null =
+    catalogEntry?.modes?.find((m) => m !== 'BeatTap') ??
+    catalogEntry?.modes?.[0] ??
+    null;
+  const notes = generateNotes(bpm, durationMs, beatInterval, sections, noteRoles, primaryMode);
   return {
     id,
     songId,
-    version: '1.2.0',
+    version: '1.3.0',
     bpm,
     offsetMs: 0,
     durationMs,

@@ -33,4 +33,20 @@ describe('five-mode musical chart quality — section-aware, not duration pad', 
       }
     }
   });
+
+  it('mode-aware charts differ BeatTap vs CallAndResponse / Karaoke density shape', () => {
+    const catalog = loadCatalog();
+    const tap = catalog.find((s) => s.id === 'launch-pd-tap-grid');
+    const call = catalog.find((s) => s.id === 'launch-orig-call-mirror');
+    const karaoke = catalog.find((s) => s.id === 'launch-cc-karaoke-warm');
+    expect(tap && call && karaoke).toBeTruthy();
+    const tapBm = getBeatmapForSong(tap!.id)!;
+    const callBm = getBeatmapForSong(call!.id)!;
+    const karaokeBm = getBeatmapForSong(karaoke!.id)!;
+    // Mode scaling must change note counts vs naive uniform BeatTap — not identical pads.
+    expect(tapBm.notes.length).not.toBe(callBm.notes.length);
+    expect(tapBm.notes.length).not.toBe(karaokeBm.notes.length);
+    expect(tapBm.version).toBe('1.3.0');
+  });
 });
+

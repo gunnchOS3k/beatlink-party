@@ -71,6 +71,7 @@ import {
   buildDeviceTimingProfile,
   createDefaultDeviceTimingProfile,
   beatmapFromPrivateDraft,
+  boundKaraokePitchClaim,
   buildDirectHttpsLobbyAttach,
   defaultCreatorDraftStore,
   evaluateCountdownPreconditions,
@@ -1578,25 +1579,16 @@ export class RoomManager {
           player.streak,
         );
         // Pitch bonus only when client reports continuous live DSP (never synthetic probe).
-        // Server bounds the scalar — this is NOT independent physical-mic attestation.
-        const pitchAnalysisActive =
-          input.type === 'vocal_phrase' && input.pitchAnalysisActive === true;
-        const pitchMatchRaw = input.pitchMatch;
-        const voicedCoverageRaw = input.voicedCoverage;
-        const voicedCoverage =
-          typeof voicedCoverageRaw === 'number' && Number.isFinite(voicedCoverageRaw)
-            ? Math.min(1, Math.max(0, voicedCoverageRaw))
-            : undefined;
-        // Reject stale/malformed pitch: require finite [0,1] and non-trivial voiced coverage when claimed.
-        const pitchMatch =
-          pitchAnalysisActive &&
-          typeof pitchMatchRaw === 'number' &&
-          Number.isFinite(pitchMatchRaw) &&
-          pitchMatchRaw >= 0 &&
-          pitchMatchRaw <= 1 &&
-          (voicedCoverage == null || voicedCoverage >= 0.15)
-            ? Math.min(1, Math.max(0, pitchMatchRaw))
-            : undefined;
+        // Server bounds — client flag alone NEVER grants pitch path. Not physical-mic attestation.
+        const pitchBound = boundKaraokePitchClaim({
+          inputType: input.type,
+          pitchAnalysisActive: input.pitchAnalysisActive,
+          pitchMatch: input.pitchMatch,
+          voicedCoverage: input.voicedCoverage,
+          phraseFrames: input.phraseFrames,
+        });
+        const pitchAnalysisActive = pitchBound.pitchAnalysisActive;
+        const pitchMatch = pitchBound.pitchMatch;
         const modeScore = scoreForMode({
           modeId: room.gameMode,
           difficulty: room.difficulty,
