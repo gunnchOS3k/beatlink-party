@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T13:42:15Z",
+  "generated_at": "2026-10-30T16:29:03Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S5 local: BL-LINK-005 + security/full-path/Wave007 on tip; whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; B002 no push."
+      "notes": "S6: FF-pushed S5 tip into draft PR #34; rights-assertion\u2260legal-clearance; security re-run; BL-LINK-002 live YT IFrame smoke PASS; Wave007+five-mode E2E PASS tip-local. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -63,27 +63,29 @@
         5
       ],
       "tests": [
-        "tests/youtube_iframe_api_retry.test.ts"
+        "tests/youtube_iframe_api_retry.test.ts",
+        "tests/e2e/youtube_iframe_lifecycle.playwright.spec.ts"
       ],
       "automated_evidence": [
         "apps/web/src/components/YouTubeOfficialPlayer.tsx"
       ],
       "native_physical": {
-        "status": "not_run",
+        "status": "partial",
         "platforms": [
           "browser"
         ],
-        "notes": "Live YouTube network smoke still required for buffer/reconnect UX."
+        "notes": "Live youtube.com iframe_api smoke PASS (visible player + reconnect) via BEATLINK_YT_SMOKE=1; not physical phone."
       },
       "art_status": "not_applicable",
       "limitations": [
-        "Requires live browser smoke against youtube.com iframe_api"
+        "Live smoke is browser Chromium only \u2014 no physical phone claim",
+        "IFrame embed \u2260 audio extraction / gameplay sync; YOUTUBE_API_KEY \u2260 sync"
       ],
       "severity": "medium",
-      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
+      "sha": "0844590d3b1b194bd080f110fcbacad569addcfe",
       "independent_review_status": "not_started",
-      "cursor_complete_status": "in_progress",
-      "notes": "Cached rejected promise cleared on failure + reconnect. S5 reconfirmed: YOUTUBE_API_KEY\u2260gameplay sync; IFrame embed-only path preserved (youtube_iframe_api_retry + linkResolver). Live youtube.com smoke still open."
+      "cursor_complete_status": "complete",
+      "notes": "S6: live IFrame lifecycle/reconnect smoke PASS; API key \u2260 gameplay sync preserved (linkResolver). independent_review not_started."
     },
     {
       "req_id": "BL-LINK-003",
@@ -142,10 +144,10 @@
         "Official widget deep integration pending \u2014 scaffolds \u2260 complete support"
       ],
       "severity": "low",
-      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
+      "sha": "0844590d3b1b194bd080f110fcbacad569addcfe",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "Honest SCAFFOLD classification preserved."
+      "notes": "Honest SCAFFOLD classification preserved; SoundCloud/Bandcamp/Vimeo/Audius embed_only \u2260 GAMEPLAY_SYNC (S6 reasserted)."
     },
     {
       "req_id": "BL-LINK-005",
@@ -184,13 +186,13 @@
       "art_status": "not_applicable",
       "limitations": [
         "Creator must attach attestation + hash; auto-publish remains false",
-        "2026-10-30 S5: full-path vitest (paste\u2192classify\u2192rights\u2260recording\u2192bytes\u2192hash/grid\u2192score\u2192results\u2192rematch/cleanup) + security negatives (SSRF/DNS-rebind/redirect/MIME/oversized/invalid-rights/expired/draft-isolation) + Wave007 browser E2E PASS locally; fixture rights \u2260 legal clearance; HUMAN/RC2/V1 false; no whole-game Cursor Complete claim; B002 no push/PR."
+        "2026-10-30 S6: rights assertion \u2260 verified legal clearance (describeRightsAssertionHonesty); security suite re-run PASS; fixture rights \u2260 legal clearance; HUMAN/RC2/V1 false; no whole-game Cursor Complete claim; draft PR #34 FF-pushed."
       ],
       "severity": "blocker",
-      "sha": "db3ed8d55eb62a7d4d050b93c14b816104c51a7a",
+      "sha": "0844590d3b1b194bd080f110fcbacad569addcfe",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "BL-LINK-005 cursor_complete locally. Extended S5 beyond attach-only: full scored private-draft path with rematch cleanup; acquisition security suite; YouTube IFrame embed-only + API-key\u2260sync preserved (linkResolver + youtube_iframe tests); five-mode party loop + Wave007 mandatory Playwright PASS on integrated tip. independent_review not_started. No push."
+      "notes": "BL-LINK-005 cursor_complete. S6 revalidated full-path + security + Wave007/five-mode on tip after PR FF. independent_review not_started."
     },
     {
       "req_id": "BL-LINK-006",
@@ -249,11 +251,11 @@
       },
       "art_status": "not_applicable",
       "limitations": [
-        "Wave007 + five-mode browser E2E PASS locally on S5 tip; remote exact-head CI pending B001/B002 push authority",
-        "HUMAN/RC2/V1 remain false"
+        "Wave007 + five-mode browser E2E PASS locally on S6 tip; remote exact-head CI observational under B001",
+        "HUMAN/RC2/V1 remain false; no physical phone claim from browser-only"
       ],
       "severity": "high",
-      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
+      "sha": "0844590d3b1b194bd080f110fcbacad569addcfe",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "BETA/RC/LAUNCH/human commercial remain false."
@@ -286,7 +288,7 @@
       "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
-      "notes": "BETA/RC/LAUNCH/human commercial remain false. PVS pin GUNNCHOS3K_PVS@1.0.0 @ 935eb3a."
+      "notes": "BETA/RC/LAUNCH/human commercial remain false. PVS pin GUNNCHOS3K_PVS@1.0.0 @ 935eb3a. Whole-game Cursor Complete not claimed from BL-LINK-005 alone."
     }
   ]
 }
