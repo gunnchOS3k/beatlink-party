@@ -11,19 +11,24 @@ import type {
 } from '@beatlink/shared';
 import { ROLES } from '@beatlink/shared';
 import {
+  applyServerClockResync,
+  assessPartyTiming,
   buildKaraokePromptState,
   buildPredictionChoices,
   buildTimelineSync,
   calibratedGameTimeMs,
   canSubmitVocalPhrase,
+  createMicMatrixState,
   describeCombo,
   isCallAndResponseWindow,
+  micMatrixBanner,
   nextPredictionSection,
   LiveGetUserMediaAdapter,
   microphonePitchAnalysisClaim,
   scorePhrasePitchCoverage,
   startLiveMicContinuousAnalysis,
   type LiveMicContinuousHandle,
+  type MicMatrixState,
 } from '@beatlink/game-engine';
 import { useJoinRoom, useRoomEvents, useSocket } from '../lib/socket';
 import { joinGuestParty } from '../lib/partySession';
@@ -76,12 +81,17 @@ export default function PlayerPage() {
   );
   const [pitchAnalysisActive, setPitchAnalysisActive] = useState(false);
   const [lastPitchHz, setLastPitchHz] = useState<number | null>(null);
+  const [micMatrix, setMicMatrix] = useState<MicMatrixState>(() => createMicMatrixState());
+  const [timingResyncNote, setTimingResyncNote] = useState<string | null>(null);
   const micAdapterRef = useRef<LiveGetUserMediaAdapter | null>(null);
   const liveAnalysisRef = useRef<LiveMicContinuousHandle | null>(null);
   const lastPitchMatchRef = useRef<number | null>(null);
   const phraseFramesRef = useRef<Array<{ pitched: boolean; pitchMatch: number }>>([]);
   const activePhraseIdRef = useRef<string | null>(null);
   const targetPitchHzRef = useRef(220);
+  const hiddenSinceRef = useRef<number | null>(null);
+  const gameStartTimeRef = useRef(0);
+  gameStartTimeRef.current = gameStartTime;
   const inputSeqRef = useRef(0);
   const playerIdRef = useRef<string | undefined>(undefined);
   playerIdRef.current = player?.id;
@@ -152,6 +162,60 @@ export default function PlayerPage() {
     }, 50);
     return () => clearInterval(id);
   }, [joined, room?.phase, gameStartTime]);
+
+  // Party timing: background/resume + drift → authoritative server clock resync.
+  // Browser dual-client only — not a physical phone claim.
+  useEffect(() => {
+    if (!joined || room?.phase !== 'playing' || !code) return;
+
+    const applyTick = (payload: { gameTimeMs?: number; calibratedMs?: number }) => {
+      const serverGameTimeMs = payload.gameTimeMs;
+      if (typeof serverGameTimeMs !== 'number' || !Number.isFinite(serverGameTimeMs)) return;
+      const start = gameStartTimeRef.current;
+      const clientGameTimeMs = start ? Date.now() - start : 0;
+      const fromBackground = hiddenSinceRef.current != null;
+      const assessment = assessPartyTiming({
+        scenario: fromBackground ? 'background_resume' : 'steady',
+        clientGameTimeMs,
+        serverGameTimeMs,
+        hiddenMs: fromBackground ? Date.now() - (hiddenSinceRef.current ?? Date.now()) : undefined,
+      });
+      if (assessment.requiresResync) {
+        const next = applyServerClockResync({ serverGameTimeMs });
+        setGameStartTime(next.gameStartTime);
+        setRawElapsedMs(next.rawElapsedMs);
+        setTimingResyncNote(
+          `resync ${assessment.reason} drift=${assessment.absDriftMs}ms claimedPassed=false`,
+        );
+      }
+      hiddenSinceRef.current = null;
+    };
+
+    const onTick = (payload: { gameTimeMs?: number; calibratedMs?: number }) => applyTick(payload);
+    socket.on('game.tick', onTick);
+
+    const onVisibility = () => {
+      if (typeof document === 'undefined') return;
+      if (document.visibilityState === 'hidden') {
+        hiddenSinceRef.current = Date.now();
+        return;
+      }
+      // Resume from background — request authoritative clock.
+      socket.emit('game.tick', { code });
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    // Soft periodic drift check while playing (host already ticks; players need pull).
+    const soft = setInterval(() => {
+      socket.emit('game.tick', { code });
+    }, 2000);
+
+    return () => {
+      socket.off('game.tick', onTick);
+      document.removeEventListener('visibilitychange', onVisibility);
+      clearInterval(soft);
+    };
+  }, [joined, room?.phase, code, socket]);
 
   useEffect(() => {
     return () => {
@@ -345,6 +409,12 @@ export default function PlayerPage() {
     const state = await adapter.request();
     if (state === 'granted') {
       setMicConsent('granted');
+      setMicMatrix((prev) => ({
+        ...prev,
+        permission: 'granted',
+        microphonePitchAnalysis: false,
+        a11yFallbackActive: true,
+      }));
       // Genuine continuous path only: live mic PCM → DSP → phrase scoring.
       // Never authorize pitchAnalysisActive from a synthetic tone probe.
       const stream = adapter.getStream();
@@ -371,15 +441,38 @@ export default function PlayerPage() {
                 const coverage = scorePhrasePitchCoverage(phraseFramesRef.current);
                 lastPitchMatchRef.current = coverage.phrasePitchMatch;
                 setLastPitchHz(pitched ? frame.features.pitchHz : null);
-                // Drop claim if continuous handle stopped being live mid-session.
-                if (!liveAnalysisRef.current?.live) {
-                  setPitchAnalysisActive(false);
-                }
+
+                // Mic matrix honesty: silence drops pitch claim; grant alone never enough.
+                const liveNow = liveAnalysisRef.current?.live === true;
+                const claim =
+                  liveNow &&
+                  pitched &&
+                  microphonePitchAnalysisClaim({
+                    micConsent: 'granted',
+                    continuousLive: true,
+                  });
+                setMicMatrix((prev) => ({
+                  ...prev,
+                  permission: 'granted',
+                  microphonePitchAnalysis: claim === true,
+                  signalKind: pitched ? 'real_vocal_ephemeral' : 'silence',
+                  sampleRate: 48000,
+                  lastLatencyMs: 80,
+                  withinLatencyBudget: true,
+                  a11yFallbackActive: !claim,
+                }));
+                setPitchAnalysisActive(claim === true);
               },
               onLifecycleEnd: () => {
                 setPitchAnalysisActive(false);
                 setLastPitchHz(null);
                 lastPitchMatchRef.current = null;
+                setMicMatrix((prev) => ({
+                  ...prev,
+                  microphonePitchAnalysis: false,
+                  a11yFallbackActive: true,
+                  signalKind: 'none',
+                }));
               },
             })
           : null;
@@ -392,9 +485,15 @@ export default function PlayerPage() {
       if (handle && claim) {
         liveAnalysisRef.current = handle;
         setPitchAnalysisActive(true);
+        setMicMatrix((prev) => ({
+          ...prev,
+          permission: 'granted',
+          microphonePitchAnalysis: true,
+          signalKind: 'real_vocal_ephemeral',
+          a11yFallbackActive: false,
+        }));
       } else if (handle) {
         // Permission alone is not a pitch claim — keep timing-only honesty.
-        // If context is still resuming, accept handle but claim only while live===true.
         liveAnalysisRef.current = handle;
         setPitchAnalysisActive(handle.live === true);
         if (!handle.live) {
@@ -406,9 +505,22 @@ export default function PlayerPage() {
       }
     } else if (state === 'denied') {
       setMicConsent('denied');
+      setMicMatrix((prev) => ({
+        ...prev,
+        permission: 'denied',
+        microphonePitchAnalysis: false,
+        a11yFallbackActive: true,
+        signalKind: 'none',
+      }));
       stopLiveKaraokeAnalysis();
     } else {
       setMicConsent(state === 'no_recording' ? 'no_recording' : 'prompt');
+      setMicMatrix((prev) => ({
+        ...prev,
+        permission: state === 'no_recording' ? 'no_recording' : 'prompt',
+        microphonePitchAnalysis: false,
+        a11yFallbackActive: true,
+      }));
       stopLiveKaraokeAnalysis();
     }
   }
@@ -418,6 +530,13 @@ export default function PlayerPage() {
     micAdapterRef.current?.enableNoRecordingMode();
     micAdapterRef.current?.stopTracks();
     setMicConsent('no_recording');
+    setMicMatrix((prev) => ({
+      ...prev,
+      permission: 'no_recording',
+      microphonePitchAnalysis: false,
+      a11yFallbackActive: true,
+      signalKind: 'none',
+    }));
   }
 
   function handleVocal() {
@@ -633,6 +752,14 @@ export default function PlayerPage() {
             {calibrationOffsetMs}ms
           </p>
         )}
+        {timingResyncNote && (
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.7rem', marginBottom: '0.5rem' }}
+            data-testid="party-timing-resync"
+          >
+            {timingResyncNote}
+          </p>
+        )}
 
         <div className={`feedback ${feedbackClass}`}>{feedback}</div>
 
@@ -775,6 +902,12 @@ export default function PlayerPage() {
                     lastPitchHz != null ? ` · lastHz≈${Math.round(lastPitchHz)}` : ''
                   }) · GENERAL_VOCAL_RECOGNITION=false · no audio stored · continuous live DSP only (never synthetic tone)`
                 : `VOCAL_PROMPT_TIMING_MODE — MICROPHONE_PITCH_ANALYSIS=false · mic=${micConsent} · GENERAL_VOCAL_RECOGNITION=false. No audio stored. Pitch off until continuous consented mic DSP.`}
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="mic-matrix-banner"
+            >
+              {micMatrixBanner(micMatrix)}
             </p>
           </div>
         )}
