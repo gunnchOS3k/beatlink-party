@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T22:33:59Z",
+  "generated_at": "2026-10-30T22:55:00Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S9c tip d5ef428; prior 22c522f CI SUCCESS. Party+karaoke honesty. HUMAN/RC2/V1 false."
+      "notes": "S10 94d2767 after 22c522f CI SUCCESS + tip 2d5d824. Vocalist handoff honesty. HUMAN/RC2/V1 false; physical claims false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -863,6 +863,40 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S9c party karaoke honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-HANDOFF-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Vocalist seat handoff does not transfer pitch; re-grant required; physicalMicAccepted false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_vocalist_handoff.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeVocalistHandoff.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital handoff only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_mic=false",
+        "pitchTransferred=false"
+      ],
+      "severity": "medium",
+      "sha": "94d2767f6ffc36bbff4b944f3b9e0019a88ca479",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S10 karaoke vocalist handoff."
     }
   ]
 }
