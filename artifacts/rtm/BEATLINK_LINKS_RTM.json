@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S9b 8948311 after 0f8e60f CI/Wave007/Gate1/Windows SUCCESS. Karaoke revoke + host calibration honesty. HUMAN/RC2/V1 false; physical claims false."
+      "notes": "S9b tip 6661640; prior 0f8e60f CI SUCCESS. Karaoke revoke + host calibration honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -787,7 +787,7 @@
         "physical_mic=false"
       ],
       "severity": "medium",
-      "sha": "89483116c2677c7a8dd36058d8f162f95a40a341",
+      "sha": "6661640b92ac1942628a28c91dcf6e574d1ac3b8",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S9b karaoke revoke continuity."
@@ -821,7 +821,7 @@
         "claimedPassed=false"
       ],
       "severity": "medium",
-      "sha": "89483116c2677c7a8dd36058d8f162f95a40a341",
+      "sha": "6661640b92ac1942628a28c91dcf6e574d1ac3b8",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S9b host calibration honesty."
