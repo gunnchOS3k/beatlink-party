@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S8 after exact-head CI SUCCESS on tip 95dac5c (CI/Wave007/Gate1/Windows): mobile host/presentation pairing; party networking membership honesty; karaoke secure-context gate; authorized-media assertion≠legal clearance. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; physical phone/TV false; API/license/synthetic mic/browser ≠ commercial clearance or physical-device acceptance."
+      "notes": "S8 implement 53a2159 on prior tip 95dac5c (CI/Wave007/Gate1/Windows SUCCESS preserved). Mobile host/presentation; party networking; karaoke secure-context; authorized-media honesty. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; physical phone/TV false; API/license/synthetic mic/browser \u2260 commercial clearance or physical-device acceptance."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -455,8 +455,13 @@
       "owner": "beatlink-party",
       "expected_behavior": "Docked TV host + handheld player presentation pairing is CSS/viewport only; never claims physical phone or TV acceptance.",
       "verification_method": "unit_test + host/player banners",
-      "layers": [2, 5],
-      "tests": ["tests/mobile_host_presentation.test.ts"],
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/mobile_host_presentation.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/mobileHostPresentation.ts",
         "apps/web/src/pages/HostPage.tsx",
@@ -464,8 +469,10 @@
       ],
       "native_physical": {
         "status": "partial",
-        "platforms": ["browser"],
-        "notes": "Presentation CSS only — PHYSICAL_LAN_REVIEW_PACKET still PREPARED."
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Presentation CSS only \u2014 PHYSICAL_LAN_REVIEW_PACKET still PREPARED."
       },
       "art_status": "not_applicable",
       "limitations": [
@@ -474,7 +481,7 @@
         "HUMAN/RC2/V1 false"
       ],
       "severity": "medium",
-      "sha": "PENDING_IMPLEMENT",
+      "sha": "53a215957f4ac28e6a5c648526955e0339ad87bf",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S8 mobile host/presentation honesty."
@@ -482,26 +489,35 @@
     {
       "req_id": "BL-PARTY-NET-001",
       "owner": "beatlink-party",
-      "expected_behavior": "Party networking membership requires host bound + ≥1 performer; loopback dual-socket ≠ physical LAN phone party.",
+      "expected_behavior": "Party networking membership requires host bound + \u22651 performer; loopback dual-socket \u2260 physical LAN phone party.",
       "verification_method": "unit_test + host banner",
-      "layers": [2, 4],
-      "tests": ["tests/party_networking.test.ts", "tests/host_player_lan_workflow.test.ts"],
+      "layers": [
+        2,
+        4
+      ],
+      "tests": [
+        "tests/party_networking.test.ts",
+        "tests/host_player_lan_workflow.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/partyNetworking.ts",
         "apps/web/src/pages/HostPage.tsx"
       ],
       "native_physical": {
         "status": "partial",
-        "platforms": ["browser", "lan"],
-        "notes": "Digital membership only — physicalLanAccepted=false."
+        "platforms": [
+          "browser",
+          "lan"
+        ],
+        "notes": "Digital membership only \u2014 physicalLanAccepted=false."
       },
       "art_status": "not_applicable",
       "limitations": [
         "physical_lan=false",
-        "Scripted tabs ≠ independent humans"
+        "Scripted tabs \u2260 independent humans"
       ],
       "severity": "high",
-      "sha": "PENDING_IMPLEMENT",
+      "sha": "53a215957f4ac28e6a5c648526955e0339ad87bf",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S8 party networking honesty."
@@ -509,26 +525,34 @@
     {
       "req_id": "BL-KARAOKE-SECURE-001",
       "owner": "beatlink-party",
-      "expected_behavior": "Insecure origins never authorize karaoke mic pitch path; secure context / HTTPS ≠ physical phone mic acceptance; synthetic MediaStream ≠ device mic.",
+      "expected_behavior": "Insecure origins never authorize karaoke mic pitch path; secure context / HTTPS \u2260 physical phone mic acceptance; synthetic MediaStream \u2260 device mic.",
       "verification_method": "unit_test + player banner",
-      "layers": [2, 5],
-      "tests": ["tests/karaoke_secure_context.test.ts", "tests/karaoke_pitch_claim_bound.test.ts"],
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_secure_context.test.ts",
+        "tests/karaoke_pitch_claim_bound.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/karaokeSecureContext.ts",
         "apps/web/src/pages/PlayerPage.tsx"
       ],
       "native_physical": {
         "status": "partial",
-        "platforms": ["browser"],
-        "notes": "Secure-context gate proven digitally — not physical phone mic on LAN."
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Secure-context gate proven digitally \u2014 not physical phone mic on LAN."
       },
       "art_status": "not_applicable",
       "limitations": [
         "physical_phone_mic=false",
-        "Synthetic MediaStream ≠ device mic"
+        "Synthetic MediaStream \u2260 device mic"
       ],
       "severity": "high",
-      "sha": "PENDING_IMPLEMENT",
+      "sha": "53a215957f4ac28e6a5c648526955e0339ad87bf",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S8 karaoke secure-context gate."
@@ -538,8 +562,13 @@
       "owner": "beatlink-party",
       "expected_behavior": "Authorized media / syncEligible gameplay gate assertion is never verified legal clearance or commercial license review.",
       "verification_method": "unit_test + host banner",
-      "layers": [1, 2],
-      "tests": ["tests/authorized_media_honesty.test.ts"],
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/authorized_media_honesty.test.ts"
+      ],
       "automated_evidence": [
         "packages/game-engine/src/rightsLayers.ts",
         "apps/web/src/pages/HostPage.tsx"
@@ -553,10 +582,10 @@
       "limitations": [
         "verifiedLegalClearance=false",
         "commercialEligible=false",
-        "API key ≠ gameplay sync"
+        "API key \u2260 gameplay sync"
       ],
       "severity": "blocker",
-      "sha": "PENDING_IMPLEMENT",
+      "sha": "53a215957f4ac28e6a5c648526955e0339ad87bf",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S8 authorized-media honesty reasserted."
