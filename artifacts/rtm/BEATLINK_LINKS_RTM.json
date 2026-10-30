@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T23:07:31Z",
+  "generated_at": "2026-10-30T23:40:24Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S11 tip 607ea16; soaked 2d5d824 Windows SUCCESS. Audience pitch gate. HUMAN/RC2/V1 false."
+      "notes": "S12 karaoke rematch honesty atop soaked 5f16fc8. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -933,6 +933,43 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S11 party karaoke audience pitch gate."
+    },
+    {
+      "req_id": "BL-PARTY-KARAOKE-REMATCH-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke rematch clears prior pitch; audience never inherits; physical mic/party/humans stay false.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_rematch_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeRematchHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital karaoke rematch only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "audience_pitch=false",
+        "physical_mic=false",
+        "physical_party=false",
+        "independent_humans=false"
+      ],
+      "severity": "medium",
+      "sha": "PLACEHOLDER_S12",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S12 party karaoke rematch honesty."
     }
   ]
 }

@@ -58,6 +58,7 @@ import {
   assessPartyAudienceHonesty,
   assessHostCalibrationHonesty,
   assessPartyKaraokeHonesty,
+  assessPartyKaraokeRematchHonesty,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -1410,6 +1411,21 @@ export default function HostPage() {
                   phase: 'results',
                   hasResults: Boolean(results),
                   modeId: room?.gameMode,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              data-testid="host-party-karaoke-rematch-honesty"
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.25rem' }}
+            >
+              {
+                assessPartyKaraokeRematchHonesty({
+                  rematchRound: room?.rematchRound ?? 0,
+                  phase: 'results',
+                  hasResults: Boolean(results),
+                  modeId: room?.gameMode,
+                  karaokeModeActive: room?.gameMode === 'KaraokePerformance',
+                  priorPitchActive: false,
                 }).honestyBanner
               }
             </p>

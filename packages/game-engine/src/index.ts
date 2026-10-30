@@ -58,6 +58,8 @@ export * from './hostCalibrationHonesty.js';
 export * from './partyKaraokeHonesty.js';
 export * from './karaokeVocalistHandoff.js';
 export * from './partyKaraokeAudiencePitchGate.js';
+export * from './partyKaraokeRematchHonesty.js';
+export * from './partyKaraokeRematchHonesty.js';
 export * from './avFeedback.js';
 export * from './visualPackHarness.js';
 export * from './linkCapability.js';
