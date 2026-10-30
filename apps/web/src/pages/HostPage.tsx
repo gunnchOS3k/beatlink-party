@@ -53,6 +53,8 @@ import {
   assessRightsLayers,
   describeRightsAssertionHonesty,
   firstPartyOriginalRightsLayers,
+  assessPartyRematchLoop,
+  assessHostKaraokeStage,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -1172,6 +1174,22 @@ export default function HostPage() {
             {room.gameMode === 'BandRoles' ? ' · band lanes live' : ''}
             {room.gameMode === 'BeatTap' ? ' · note-synced song bed' : ''}
           </p>
+          {room.gameMode === 'KaraokePerformance' ? (
+            <p
+              style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+              data-testid="host-karaoke-stage-banner"
+            >
+              {
+                assessHostKaraokeStage({
+                  modeIsKaraoke: true,
+                  phraseCount: beatmap?.vocalPrompts?.length ?? selectedSong?.karaokeMeta?.phrases?.length ?? 0,
+                  anyPlayerPitchClaim: false,
+                  secureOriginHost:
+                    typeof window !== 'undefined' ? window.isSecureContext === true : false,
+                }).honestyBanner
+              }
+            </p>
+          ) : null}
           <p
             style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
             data-testid="host-digital-workflow-banner"
@@ -1340,6 +1358,19 @@ export default function HostPage() {
             </p>
             <p data-testid="host-ledger-checksum" style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
               Ledger: {results?.ledgerChecksum ?? 'n/a'}
+            </p>
+            <p
+              data-testid="host-rematch-loop-banner"
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.5rem' }}
+            >
+              {
+                assessPartyRematchLoop({
+                  rematchRound: room?.rematchRound ?? 0,
+                  phase: 'results',
+                  hasResults: Boolean(results),
+                  modeId: room?.gameMode,
+                }).honestyBanner
+              }
             </p>
           </div>
 
