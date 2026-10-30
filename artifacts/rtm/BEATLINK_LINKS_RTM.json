@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T20:50:00Z",
+  "generated_at": "2026-10-30T21:50:00Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S8 6278f4d CI/Wave007/Gate1/Windows SUCCESS; S8b implement 941c338 CI SUCCESS; RTM stamp 5cbe1fa. Rematch/karaoke-stage/mode-continuity. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; physical phone/TV false; API/license/synthetic mic/browser \u2260 commercial clearance or physical-device acceptance."
+      "notes": "S9 implement 570cf22 after exact-head CI SUCCESS on c77bc6e (CI/Wave007/Gate1/Windows). Karaoke phrase continuity + party audience honesty. Whole-game Cursor Complete NOT claimed; HUMAN/RC2/V1 false; physical mic/party false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -690,6 +690,74 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S8b host karaoke stage honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-PHRASE-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke phrase windows remain timing-submittable with a11y fallback; physicalMicAccepted always false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_phrase_continuity.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokePhraseContinuity.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Phrase timing digital only \u2014 not physical mic."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_mic=false",
+        "pitchAnalysisActive \u2260 clearance"
+      ],
+      "severity": "medium",
+      "sha": "570cf223701b47a7fe51d1937676f0ea53063baa",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9 karaoke phrase continuity."
+    },
+    {
+      "req_id": "BL-PARTY-AUD-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Audience seats are distinct from performers; scripted tabs never claim independent humans or physical party.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        4
+      ],
+      "tests": [
+        "tests/party_audience_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyAudienceHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital audience seats only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "independent_humans=false",
+        "physical_party=false"
+      ],
+      "severity": "medium",
+      "sha": "570cf223701b47a7fe51d1937676f0ea53063baa",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9 party audience honesty."
     }
   ]
 }
