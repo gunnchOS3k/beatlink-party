@@ -8,7 +8,7 @@ S7 (2026-10-30) ran **loopback dual-socket** host/player LAN workflow + timing r
 
 | Field | Value |
 |---|---|
-| Source SHA | `17ee0aa2cf9b197e583edd6c5e267599e575e0c1` (S7 eng tip candidate; fill tested build hash at physical session) |
+| Source SHA | `95dac5c70b03afaacf55442bd5d50ddcafcb53bd` (S7b tip; S8 deepen pending stamp — fill tested build hash at physical session) |
 | Tested package / web build hash | _pending_ |
 | Server bind | LAN + TLS? _pending_ (require secure origin for mic grant) |
 | Host device / OS | _pending_ |

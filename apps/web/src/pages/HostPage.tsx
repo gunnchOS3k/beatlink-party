@@ -46,6 +46,13 @@ import {
   hostDigitalCompletionPercent,
   hostDigitalHonestyBanner,
   inferHostDigitalDone,
+  planMobileHostPresentation,
+  mobileHostPresentationBanner,
+  presentationTierForRole,
+  assessPartyNetworking,
+  assessRightsLayers,
+  describeRightsAssertionHonesty,
+  firstPartyOriginalRightsLayers,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -1186,6 +1193,49 @@ export default function HostPage() {
                 physicalPhoneClaimed: false,
                 workflowPercent: hostDigitalCompletionPercent(steps),
               });
+            })()}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-mobile-presentation-banner"
+          >
+            {mobileHostPresentationBanner(
+              planMobileHostPresentation({
+                hostRoleId: role,
+                playerRoleId: 'handheld_hybrid',
+              }),
+            )}{' '}
+            · activeTier={presentationTierForRole(role)}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-party-networking-banner"
+          >
+            {assessPartyNetworking({
+              seats: [
+                { role: 'host', connected: true },
+                ...room.players.map((p) => ({
+                  role: 'performer' as const,
+                  connected: true,
+                  ready: p.ready,
+                })),
+                ...room.audience.map(() => ({
+                  role: 'audience' as const,
+                  connected: true,
+                })),
+              ],
+              transportClass: 'loopback_dual_socket',
+            }).honestyBanner}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-authorized-media-honesty"
+          >
+            {(() => {
+              const assessed = describeRightsAssertionHonesty(
+                assessRightsLayers(firstPartyOriginalRightsLayers()),
+              );
+              return `AUTHORIZED_MEDIA songSelected=${Boolean(selectedSong)} syncEligible=${assessed.syncEligible} · verifiedLegalClearance=${assessed.verifiedLegalClearance} · commercialEligible=${assessed.commercialEligible} · assertion≠legal clearance`;
             })()}
           </p>
           {beatmap && selectedSong && (

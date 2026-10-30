@@ -27,6 +27,8 @@ import {
   microphonePitchAnalysisClaim,
   scorePhrasePitchCoverage,
   startLiveMicContinuousAnalysis,
+  assessKaraokeSecureContext,
+  planMobileHostPresentation,
   type LiveMicContinuousHandle,
   type MicMatrixState,
 } from '@beatlink/game-engine';
@@ -400,6 +402,23 @@ export default function PlayerPage() {
   }
 
   async function requestKaraokeMicConsent() {
+    const secure = assessKaraokeSecureContext({
+      isSecureContext: typeof window !== 'undefined' ? window.isSecureContext === true : false,
+      protocol: typeof window !== 'undefined' ? window.location.protocol : undefined,
+      hostname: typeof window !== 'undefined' ? window.location.hostname : undefined,
+    });
+    // Insecure origins never authorize pitch — a11y tap fallback remains.
+    if (!secure.micPathEligible) {
+      setMicConsent('denied');
+      setPitchAnalysisActive(false);
+      setMicMatrix((prev) => ({
+        ...prev,
+        permission: 'denied',
+        microphonePitchAnalysis: false,
+        a11yFallbackActive: true,
+      }));
+      return;
+    }
     if (!micAdapterRef.current) {
       micAdapterRef.current = new LiveGetUserMediaAdapter();
     }
@@ -908,6 +927,25 @@ export default function PlayerPage() {
               data-testid="mic-matrix-banner"
             >
               {micMatrixBanner(micMatrix)}
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-secure-context-banner"
+            >
+              {
+                assessKaraokeSecureContext({
+                  isSecureContext:
+                    typeof window !== 'undefined' ? window.isSecureContext === true : false,
+                  protocol: typeof window !== 'undefined' ? window.location.protocol : undefined,
+                  hostname: typeof window !== 'undefined' ? window.location.hostname : undefined,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="player-mobile-presentation-banner"
+            >
+              {planMobileHostPresentation({ playerRoleId: deviceRole }).honestyBanner}
             </p>
           </div>
         )}
