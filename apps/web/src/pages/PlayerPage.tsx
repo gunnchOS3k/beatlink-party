@@ -29,6 +29,7 @@ import {
   startLiveMicContinuousAnalysis,
   assessKaraokeSecureContext,
   assessKaraokePhraseContinuity,
+  assessKaraokeRevokeContinuity,
   planMobileHostPresentation,
   type LiveMicContinuousHandle,
   type MicMatrixState,
@@ -953,6 +954,12 @@ export default function PlayerPage() {
                   pitchAnalysisActive,
                 }).honestyBanner
               }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-revoke-continuity-banner"
+            >
+              {assessKaraokeRevokeContinuity().honestyBanner}
             </p>
             <p
               style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}

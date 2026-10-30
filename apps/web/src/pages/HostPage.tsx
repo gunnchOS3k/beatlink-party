@@ -56,6 +56,7 @@ import {
   assessPartyRematchLoop,
   assessHostKaraokeStage,
   assessPartyAudienceHonesty,
+  assessHostCalibrationHonesty,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -1225,6 +1226,17 @@ export default function HostPage() {
                 workflowPercent: hostDigitalCompletionPercent(steps),
               });
             })()}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-calibration-honesty-banner"
+          >
+            {
+              assessHostCalibrationHonesty({
+                accepted: room.calibrationOffsetMs != null,
+                offsetMs: room.calibrationOffsetMs ?? 0,
+              }).honestyBanner
+            }
           </p>
           <p
             style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
