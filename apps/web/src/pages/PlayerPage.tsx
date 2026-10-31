@@ -34,6 +34,7 @@ import {
   assessPartyKaraokeAudiencePitchGate,
   assessKaraokeVocalistHandoff,
   assessKaraokePitchExclusivity,
+  assessKaraokeSecureContextContinuity,
   planMobileHostPresentation,
   type LiveMicContinuousHandle,
   type MicMatrixState,
@@ -999,6 +1000,19 @@ export default function PlayerPage() {
                 assessKaraokePitchExclusivity([
                   { seatId: String(player.id ?? 'self'), pitchActive: pitchAnalysisActive },
                 ]).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-secure-context-continuity-banner"
+            >
+              {
+                assessKaraokeSecureContextContinuity({
+                  wasPitchActive: pitchAnalysisActive,
+                  isSecureContext:
+                    typeof window !== 'undefined' ? window.isSecureContext === true : false,
+                  protocol: typeof window !== 'undefined' ? window.location.protocol : undefined,
+                }).honestyBanner
               }
             </p>
             <p
