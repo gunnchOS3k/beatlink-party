@@ -11,10 +11,16 @@ import type {
   SongCatalogEntry,
 } from '@beatlink/shared';
 import { GAME_MODE_IDS, MAX_PERFORMERS, ROLES } from '@beatlink/shared';
-import { fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
+import { API_URL, fetchProviderStatus, fetchSongs, resolveLink } from '../lib/api';
 import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
-import { startCalibrationClicks, startHostMetronome, resumeAudioContext } from '../lib/hostAudio';
+import {
+  startCalibrationClicks,
+  startHostMetronome,
+  startHostCatalogAudio,
+  resumeAudioContext,
+} from '../lib/hostAudio';
 import { useCreateRoom, useRoomEvents, useSocket, loadHostToken, storeHostToken } from '../lib/socket';
+import { endHostParty } from '../lib/partySession';
 import {
   AccessibilityPanel,
   DeviceRolePicker,
@@ -25,12 +31,35 @@ import { NetworkStatus, SettingsDrawer } from '../components/NetworkStatus';
 import { BrandMark } from '../components/StageChrome';
 import { roleGlyph } from '../brand/glyphs';
 import { catalogEligibility, linkEligibility } from '../brand/complianceLabels';
+import { YouTubeOfficialPlayer } from '../components/YouTubeOfficialPlayer';
+import { DirectHttpsWorkflowPanel } from '../components/DirectHttpsWorkflowPanel';
 import {
   getGameMode,
   isCallAndResponseWindow,
   nextPredictionSection,
   resolveMediaDescriptor,
   evaluateStartPreconditions,
+  upcomingSyncedNotes,
+  openModePlayableSession,
+  buildModeStageVisual,
+  buildHostDigitalWorkflow,
+  hostDigitalCompletionPercent,
+  hostDigitalHonestyBanner,
+  inferHostDigitalDone,
+  planMobileHostPresentation,
+  mobileHostPresentationBanner,
+  presentationTierForRole,
+  assessPartyNetworking,
+  assessRightsLayers,
+  describeRightsAssertionHonesty,
+  firstPartyOriginalRightsLayers,
+  assessPartyRematchLoop,
+  assessHostKaraokeStage,
+  assessPartyAudienceHonesty,
+  assessHostCalibrationHonesty,
+  assessPartyKaraokeHonesty,
+  assessPartyKaraokeRematchHonesty,
+  assessPartyKaraokeNetworkingHonesty,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -40,13 +69,23 @@ function LinkPreview({ result }: { result: LinkResolveResult }) {
       className={`compliance-banner link-preview eligibility-${eligibility.cls}`}
       data-testid="host-link-compliance"
       data-eligibility={eligibility.cls}
+      data-capability={result.capabilityState}
+      data-classification={result.mediaClassification}
     >
       <div className="row" style={{ marginBottom: '0.75rem' }}>
         <span className={`status-badge ${eligibility.badgeClass}`}>{eligibility.label}</span>
         <span className="status-badge status-pending" style={{ fontWeight: 600 }}>
+          {result.capabilityState}
+        </span>
+        <span className="status-badge status-pending" style={{ fontWeight: 500, fontSize: '0.75rem' }}>
           {result.playbackStatus}
         </span>
         <span style={{ fontSize: '0.85rem' }}>{result.platform}</span>
+        {result.providerCredentialsPresent ? (
+          <span className="status-badge status-pending" title="Informational only — not music rights">
+            API KEY ≠ RIGHTS
+          </span>
+        ) : null}
       </div>
       <div className="row" style={{ alignItems: 'flex-start', gap: '1rem' }}>
         {result.artworkUrl ? (
@@ -67,11 +106,15 @@ function LinkPreview({ result }: { result: LinkResolveResult }) {
             </p>
           ) : null}
           <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>{result.message}</p>
+          <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+            Classification: <code>{result.mediaClassification}</code> · composition ≠ sound recording ·
+            no rip / DRM / lyric scrape
+          </p>
         </div>
       </div>
       {result.sourceId &&
-      (result.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM' ||
-        result.playbackStatus === 'METADATA_ONLY') ? (
+      (result.capabilityState === 'OFFICIAL_EMBED_AVAILABLE' ||
+        result.capabilityState === 'METADATA_AVAILABLE') ? (
         <ProviderEmbed result={result} />
       ) : null}
     </div>
@@ -80,40 +123,14 @@ function LinkPreview({ result }: { result: LinkResolveResult }) {
 
 function ProviderEmbed({ result }: { result: LinkResolveResult }) {
   if (!result.sourceId) return null;
-  const isAuthorized = result.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM';
   if (result.platform === 'youtube') {
-    return (
-      <div style={{ marginTop: '0.75rem' }}>
-        <p className="label">
-          {isAuthorized
-            ? 'Official YouTube embed (authorized platform path)'
-            : 'Official YouTube embed preview (no API key required)'}
-        </p>
-        <iframe
-          title="YouTube preview"
-          width="100%"
-          height="200"
-          src={`https://www.youtube.com/embed/${result.sourceId}`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          style={{ border: 0, borderRadius: 12 }}
-        />
-        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
-          Host hearing uses the official embed. Multiplayer scoring still follows catalog metronome /
-          calibration unless a future SDK auth path unlocks platform-synced rounds.
-        </p>
-      </div>
-    );
+    return <YouTubeOfficialPlayer videoId={result.sourceId} title={result.title ?? 'YouTube'} />;
   }
   if (result.platform === 'spotify' && result.sourceId.startsWith('track:')) {
     const id = result.sourceId.slice('track:'.length);
     return (
       <div style={{ marginTop: '0.75rem' }}>
-        <p className="label">
-          {isAuthorized
-            ? 'Official Spotify embed (authorized platform path)'
-            : 'Official Spotify embed preview (no client secret required for iframe)'}
-        </p>
+        <p className="label">Official Spotify embed — metadata / listen (not gameplay sync)</p>
         <iframe
           title="Spotify preview"
           style={{ borderRadius: 12, border: 0 }}
@@ -124,8 +141,7 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
           loading="lazy"
         />
         <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
-          User-initiated Spotify iframe playback is shown here. Synchronized controller rounds still
-          require catalog match or Spotify Web Playback SDK + user OAuth.
+          Spotify is metadata/embed/deep-link distinct from gameplay sync. Client ID ≠ music rights.
         </p>
       </div>
     );
@@ -136,7 +152,7 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
       : null;
     return (
       <div style={{ marginTop: '0.75rem' }}>
-        <p className="label">Apple Music — legal deep-link / MusicKit boundary</p>
+        <p className="label">Apple Music — deep-link / MusicKit boundary (not gameplay sync)</p>
         {deepLink ? (
           <a
             href={deepLink}
@@ -151,8 +167,56 @@ function ProviderEmbed({ result }: { result: LinkResolveResult }) {
           <p style={{ fontSize: '0.9rem' }}>Paste a song URL with a recognizable Apple Music song id.</p>
         )}
         <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
-          MusicKit JS playback needs a signed developer token from a secure server endpoint. BeatLink
-          does not embed private keys or mint tokens in the client.
+          Developer token ≠ composition or sound-recording sync rights for BeatLink scoring.
+        </p>
+      </div>
+    );
+  }
+  if (result.platform === 'soundcloud') {
+    return (
+      <div style={{ marginTop: '0.75rem' }}>
+        <p className="label">SoundCloud scaffold — official widget embed / listen-first</p>
+        <iframe
+          title="SoundCloud embed"
+          width="100%"
+          height="166"
+          allow="autoplay"
+          src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(`https://soundcloud.com/${result.sourceId}`)}&auto_play=false`}
+          style={{ border: 0, borderRadius: 12 }}
+        />
+        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+          Embed-only classification. Not playable-audio gameplay until rights-verified direct HTTPS.
+        </p>
+      </div>
+    );
+  }
+  if (result.platform === 'vimeo') {
+    return (
+      <div style={{ marginTop: '0.75rem' }}>
+        <p className="label">Vimeo scaffold — official visible player (no AV separation)</p>
+        <iframe
+          title="Vimeo embed"
+          src={`https://player.vimeo.com/video/${result.sourceId}`}
+          width="100%"
+          height="200"
+          allow="autoplay; fullscreen; picture-in-picture"
+          style={{ border: 0, borderRadius: 12 }}
+        />
+        <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+          Embed-only. No audio extraction.
+        </p>
+      </div>
+    );
+  }
+  if (result.platform === 'bandcamp' || result.platform === 'audius') {
+    return (
+      <div style={{ marginTop: '0.75rem' }}>
+        <p className="label">
+          {result.platform} scaffold — embed/listen-first ({result.mediaClassification})
+        </p>
+        <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
+          Honest stub: official embed path recognized. Not playable-audio gameplay. Prefer catalog or
+          rights-verified direct HTTPS WAV/MP3/OGG.
         </p>
       </div>
     );
@@ -167,7 +231,10 @@ function ConnectProviderCta({
   result: LinkResolveResult;
   providers: ProviderAuthStatus | null;
 }) {
-  if (result.playbackStatus !== 'METADATA_ONLY' && result.playbackStatus !== 'PLAYABLE_AUTHORIZED_PLATFORM') {
+  if (
+    result.capabilityState !== 'METADATA_AVAILABLE' &&
+    result.capabilityState !== 'OFFICIAL_EMBED_AVAILABLE'
+  ) {
     return null;
   }
   const configured =
@@ -181,32 +248,34 @@ function ConnectProviderCta({
 
   return (
     <div className="card stack" style={{ borderColor: 'var(--warning)' }}>
-      <h4>Connect Provider</h4>
+      <h4>Provider credentials ≠ music rights</h4>
       <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
-        Status:{' '}
+        Capability: <strong>{result.capabilityState}</strong> · Credentials:{' '}
         <strong>
           {configured
-            ? 'CREDENTIALS_PRESENT'
+            ? 'CREDENTIALS_PRESENT (metadata/SDK wiring only)'
             : (providers?.authState ?? 'EXTERNAL_PENDING')}
         </strong>
       </p>
       {!configured ? (
         <p style={{ fontSize: '0.9rem' }}>
-          Provider auth is <strong>EXTERNAL_PENDING</strong>. Use owned/open/local catalog songs.
-          Remaining <strong>METADATA_ONLY</strong> for platform links. Set provider env vars (
-          <code>SPOTIFY_CLIENT_ID</code>, <code>YOUTUBE_API_KEY</code>, or{' '}
-          <code>APPLE_MUSIC_DEVELOPER_TOKEN</code>) and restart the server. BeatLink never downloads
-          or rips platform audio.
+          Provider auth is <strong>EXTERNAL_PENDING</strong>. Use owned/open/local catalog songs or
+          rights-verified direct HTTPS. Env vars (<code>SPOTIFY_CLIENT_ID</code>,{' '}
+          <code>YOUTUBE_API_KEY</code>, <code>APPLE_MUSIC_DEVELOPER_TOKEN</code>) enrich metadata only
+          — they never authorize gameplay sync or ripping.
         </p>
       ) : (
         <p style={{ fontSize: '0.9rem' }}>
-          Provider auth path is available as <strong>PLAYABLE_AUTHORIZED_PLATFORM</strong>. Embed
-          preview may appear above when a source id is present. Gameplay still uses the approved
-          catalog metronome path when a catalog match exists.
+          Credentials are present but capability remains <strong>{result.capabilityState}</strong> —
+          not <code>GAMEPLAY_SYNC_AUTHORIZED</code>. Official embed ≠ rhythm-sync or audio-extraction
+          rights. Prefer approved catalog (path A/D) or direct HTTPS with rights + hash + beat grid.
         </p>
       )}
+      <p style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+        Source eligibility: link recognition alone is not full gameplay (paths E/F).
+      </p>
       <ul style={{ color: 'var(--muted)', fontSize: '0.85rem', paddingLeft: '1.25rem' }}>
-        {result.fallbackOptions.slice(0, 3).map((opt) => (
+        {result.fallbackOptions.slice(0, 5).map((opt) => (
           <li key={opt}>{opt}</li>
         ))}
       </ul>
@@ -326,6 +395,8 @@ export default function HostPage() {
   const createRoom = useCreateRoom();
   const [code, setCode] = useState(roomCode?.toUpperCase() ?? '');
   const [room, setRoom] = useState<RoomState | null>(null);
+  const [hostPausedOnce, setHostPausedOnce] = useState(false);
+  const [hostResumedOnce, setHostResumedOnce] = useState(false);
   const [songs, setSongs] = useState<SongCatalogEntry[]>([]);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkResult, setLinkResult] = useState<LinkResolveResult | null>(null);
@@ -444,28 +515,62 @@ export default function HostPage() {
     };
   }, [socket]);
 
-  // Host metronome for PLAYABLE_APPROVED catalog rounds (no copyrighted audio files).
+  // Host song bed for PLAYABLE_APPROVED catalog rounds (note-synced synth; no copyrighted stems).
   useEffect(() => {
     metronomeRef.current?.stop();
     metronomeRef.current = null;
     if (room?.phase !== 'playing') return;
     const playback = room.linkResolveResult?.playbackStatus;
-    const canMetronome =
+    const canPlay =
       playback === 'PLAYABLE_APPROVED' ||
       (!room.linkResolveResult && Boolean(room.selectedSongId));
-    if (!canMetronome) return;
+    if (!canPlay) return;
 
     const song = songs.find((s) => s.id === room.selectedSongId);
     const bpm = song?.bpm ?? beatmapBpm;
     const startedAt = room.gameStartTime ?? Date.now();
-    void resumeAudioContext();
-    metronomeRef.current = startHostMetronome({
-      bpm,
-      offsetMs: room.calibrationOffsetMs ?? 0,
-      durationMs: room.gameDurationMs,
-      startedAtMs: startedAt,
+    const noteTimesMs = beatmap?.notes.map((n) => n.timeMs) ?? [];
+    const phraseWindowsMs =
+      beatmap?.vocalPrompts.map((p) => ({
+        startMs: p.timeMs,
+        durationMs: p.durationMs,
+        targetPitchHz: p.targetPitchHz ?? undefined,
+      })) ?? [];
+    // Private draft playback uses retained draft bytes — never a launch catalog substitute.
+    const privateAudio = room.privateMedia?.audioPath
+      ? `${API_URL}${room.privateMedia.audioPath}`
+      : null;
+    const audioUrl =
+      privateAudio ??
+      (song?.audioAssetPath ? `/content/${song.audioAssetPath.replace(/^\/+/, '')}` : null);
+    let cancelled = false;
+    void resumeAudioContext().then(async () => {
+      if (cancelled) return;
+      const handle =
+        noteTimesMs.length > 0 || phraseWindowsMs.length > 0 || audioUrl
+          ? await startHostCatalogAudio({
+              bpm,
+              offsetMs: room.calibrationOffsetMs ?? 0,
+              durationMs: room.gameDurationMs,
+              startedAtMs: startedAt,
+              noteTimesMs,
+              phraseWindowsMs,
+              audioUrl,
+            })
+          : startHostMetronome({
+              bpm,
+              offsetMs: room.calibrationOffsetMs ?? 0,
+              durationMs: room.gameDurationMs,
+              startedAtMs: startedAt,
+            });
+      if (cancelled) {
+        handle.stop();
+        return;
+      }
+      metronomeRef.current = handle;
     });
     return () => {
+      cancelled = true;
       metronomeRef.current?.stop();
       metronomeRef.current = null;
     };
@@ -476,8 +581,10 @@ export default function HostPage() {
     room?.gameDurationMs,
     room?.calibrationOffsetMs,
     room?.linkResolveResult,
+    room?.privateMedia?.audioPath,
     songs,
     beatmapBpm,
+    beatmap,
   ]);
 
   useEffect(() => {
@@ -584,12 +691,14 @@ export default function HostPage() {
   }
 
   function endRoom() {
-    socket.emit('room.end', { code, hostToken }, (result?: { ok?: boolean; error?: string }) => {
-      if (result && result.ok === false) {
-        setCreateError(result.error ?? 'Failed to end room');
+    void endHostParty(code).then((ended) => {
+      if (!ended.ok) {
+        setCreateError(ended.error ?? 'Failed to end room');
         return;
       }
-      window.location.href = '/';
+      socket.emit('room.end', { code, hostToken }, () => {
+        window.location.href = '/';
+      });
     });
   }
 
@@ -692,11 +801,38 @@ export default function HostPage() {
           <div className="grid-2">
             <div className="panel stack" data-testid="host-lobby">
               <div className="row" style={{ justifyContent: 'space-between' }}>
-                <h3>
-                  Players ({room?.players.length ?? 0}/{MAX_PERFORMERS})
-                </h3>
+                <h3>Players ({room?.players.length ?? 0}/{MAX_PERFORMERS})</h3>
                 <span className="lobby-pulse" aria-hidden="true" title="Lobby live" />
               </div>
+              <p
+                className="label"
+                style={{ fontWeight: 400, marginTop: '-0.25rem' }}
+                data-testid="host-party-audience-honesty"
+              >
+                {
+                  assessPartyAudienceHonesty({
+                    performerCount: room?.players.length ?? 0,
+                    audienceCount: room?.audience.length ?? 0,
+                    maxPerformers: MAX_PERFORMERS,
+                    scriptedAudience: true,
+                  }).honestyBanner
+                }
+              </p>
+              <p
+                className="label"
+                style={{ fontWeight: 400, marginTop: '-0.25rem' }}
+                data-testid="host-party-karaoke-honesty"
+              >
+                {
+                  assessPartyKaraokeHonesty({
+                    performerCount: room?.players.length ?? 0,
+                    audienceCount: room?.audience.length ?? 0,
+                    maxPerformers: MAX_PERFORMERS,
+                    scriptedAudience: true,
+                    karaokeModeActive: (room?.gameMode ?? playMode) === 'KaraokePerformance',
+                  }).honestyBanner
+                }
+              </p>
               {(room?.players ?? []).map((p) => (
                 <div key={p.id} className="player-card" style={{ borderColor: p.color }}>
                   <div className="player-dot" style={{ background: p.color }} />
@@ -793,10 +929,13 @@ export default function HostPage() {
                 <button
                   className="btn-secondary"
                   type="button"
+                  data-testid="host-session-pause-resume"
                   onClick={() => {
                     if (!socket || !code) return;
-                    const event =
-                      room?.phase === 'paused' ? 'room.session_resume' : 'room.session_pause';
+                    const pausing = room?.phase !== 'paused';
+                    const event = pausing ? 'room.session_pause' : 'room.session_resume';
+                    if (pausing) setHostPausedOnce(true);
+                    else setHostResumedOnce(true);
                     socket.emit(event, { code, hostToken }, () => undefined);
                   }}
                 >
@@ -883,6 +1022,36 @@ export default function HostPage() {
                 </p>
               )}
 
+              <DirectHttpsWorkflowPanel
+                attachEnabled={Boolean(code && hostToken)}
+                onAttachToLobby={async (payload) => {
+                  if (!code) return null;
+                  return await new Promise((resolve) => {
+                    socket.emit(
+                      'room.attach_direct_https',
+                      { code, hostToken, attach: payload },
+                      (res?: {
+                        ok?: boolean;
+                        error?: string;
+                        scoredPlayAllowed?: boolean;
+                        message?: string;
+                      }) => {
+                        if (!res?.ok) {
+                          setCreateError(res?.error ?? 'Direct HTTPS lobby attach failed');
+                          resolve(null);
+                          return;
+                        }
+                        setLinkResult(null);
+                        resolve({
+                          scoredPlayAllowed: Boolean(res.scoredPlayAllowed),
+                          message: res.message ?? '',
+                        });
+                      },
+                    );
+                  });
+                }}
+              />
+
               <div className="row" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
                 <label style={{ flex: 1, minWidth: 140 }}>
                   <span className="label">Difficulty</span>
@@ -903,6 +1072,7 @@ export default function HostPage() {
                     value={room?.gameMode ?? playMode}
                     onChange={(e) => setRoomMode(e.target.value as GameModeId)}
                     style={{ width: '100%' }}
+                    data-testid="host-game-mode"
                   >
                     {GAME_MODE_IDS.map((id) => (
                       <option key={id} value={id}>
@@ -984,8 +1154,8 @@ export default function HostPage() {
                 ) : null}
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
-                Flow: song select → calibrate latency → countdown → play (host metronome for approved
-                catalog).
+                Flow: song select → calibrate latency → countdown → play (host note-synced song bed
+                for approved catalog).
               </p>
               <button className="btn-secondary btn-large" onClick={endRoom} type="button" data-testid="host-end-room">
                 End Room
@@ -1017,13 +1187,14 @@ export default function HostPage() {
 
       {room?.phase === 'playing' && (
         <div className="stage" data-testid="host-gameplay" data-phase="playing">
+          <div className="se-follow-spot" aria-hidden="true" />
           <h2 style={{ textAlign: 'center', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>
             LIVE ON STAGE
           </h2>
           <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '0.75rem' }}>
             Media: {mediaDescriptor.kind} — {mediaDescriptor.message}
           </p>
-          <p style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+          <p style={{ textAlign: 'center', marginBottom: '0.5rem' }} data-testid="host-mode-stage-line">
             {activeMode.label}
             {room.gameMode === 'CallAndResponse' && beatmap
               ? ` · ${isCallAndResponseWindow(beatmap.sections, gameTimeMs).phase}`
@@ -1031,11 +1202,172 @@ export default function HostPage() {
             {room.gameMode === 'PredictionTrivia' && beatmap
               ? ` · next: ${nextPredictionSection(beatmap.sections, gameTimeMs)?.label ?? '—'}`
               : ''}
+            {room.gameMode === 'KaraokePerformance' ? ' · phrase prompts (pitch only if mic consented)' : ''}
+            {room.gameMode === 'BandRoles' ? ' · band lanes live' : ''}
+            {room.gameMode === 'BeatTap' ? ' · note-synced song bed' : ''}
           </p>
-          <div className="beat-lane">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} className="beat-bar" style={{ animationDelay: `${i * 0.05}s` }} />
-            ))}
+          {room.gameMode === 'KaraokePerformance' ? (
+            <p
+              style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+              data-testid="host-karaoke-stage-banner"
+            >
+              {
+                assessHostKaraokeStage({
+                  modeIsKaraoke: true,
+                  phraseCount: beatmap?.vocalPrompts?.length ?? selectedSong?.karaokeMeta?.phrases?.length ?? 0,
+                  anyPlayerPitchClaim: false,
+                  secureOriginHost:
+                    typeof window !== 'undefined' ? window.isSecureContext === true : false,
+                }).honestyBanner
+              }
+            </p>
+          ) : null}
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-digital-workflow-banner"
+          >
+            {(() => {
+              const done = inferHostDigitalDone({
+                hasRoom: true,
+                playerCount: room.players.length,
+                readyCount: room.players.filter((p) => p.ready).length,
+                hasSong: Boolean(room.selectedSongId),
+                hasMode: Boolean(room.gameMode),
+                phase: room.phase,
+                calibrated: room.calibrationOffsetMs != null,
+                pausedOnce: hostPausedOnce,
+                resumedOnce: hostResumedOnce,
+              });
+              const steps = buildHostDigitalWorkflow(done);
+              return hostDigitalHonestyBanner({
+                physicalPhoneClaimed: false,
+                workflowPercent: hostDigitalCompletionPercent(steps),
+              });
+            })()}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-calibration-honesty-banner"
+          >
+            {
+              assessHostCalibrationHonesty({
+                accepted: room.calibrationOffsetMs != null,
+                offsetMs: room.calibrationOffsetMs ?? 0,
+              }).honestyBanner
+            }
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-mobile-presentation-banner"
+          >
+            {mobileHostPresentationBanner(
+              planMobileHostPresentation({
+                hostRoleId: role,
+                playerRoleId: 'handheld_hybrid',
+              }),
+            )}{' '}
+            · activeTier={presentationTierForRole(role)}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-party-networking-banner"
+          >
+            {assessPartyNetworking({
+              seats: [
+                { role: 'host', connected: true },
+                ...room.players.map((p) => ({
+                  role: 'performer' as const,
+                  connected: true,
+                  ready: p.ready,
+                })),
+                ...room.audience.map(() => ({
+                  role: 'audience' as const,
+                  connected: true,
+                })),
+              ],
+              transportClass: 'loopback_dual_socket',
+            }).honestyBanner}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-party-karaoke-networking-honesty"
+          >
+            {
+              assessPartyKaraokeNetworkingHonesty({
+                seats: [
+                  { role: 'host', connected: true },
+                  ...room.players.map((p) => ({
+                    role: 'performer' as const,
+                    connected: true,
+                    ready: p.ready,
+                  })),
+                  ...room.audience.map(() => ({
+                    role: 'audience' as const,
+                    connected: true,
+                  })),
+                ],
+                transportClass: 'loopback_dual_socket',
+                karaokeModeActive: room.gameMode === 'KaraokePerformance',
+              }).honestyBanner
+            }
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-authorized-media-honesty"
+          >
+            {(() => {
+              const assessed = describeRightsAssertionHonesty(
+                assessRightsLayers(firstPartyOriginalRightsLayers()),
+              );
+              return `AUTHORIZED_MEDIA songSelected=${Boolean(selectedSong)} syncEligible=${assessed.syncEligible} · verifiedLegalClearance=${assessed.verifiedLegalClearance} · commercialEligible=${assessed.commercialEligible} · assertion≠legal clearance`;
+            })()}
+          </p>
+          {beatmap && selectedSong && (
+            <p
+              className="label"
+              style={{ textAlign: 'center', marginBottom: '0.5rem' }}
+              data-testid="host-song-session"
+            >
+              {(() => {
+                const session = openModePlayableSession({
+                  modeId: room.gameMode,
+                  catalogEntry: selectedSong,
+                  beatmap,
+                  difficulty: room.difficulty,
+                });
+                const visual = buildModeStageVisual(session, beatmap, gameTimeMs, room.crowdMeter);
+                return `${visual.headline} · cue: ${visual.activeCueLabel ?? '—'} · ${session.audioKind}`;
+              })()}
+            </p>
+          )}
+          <div className="beat-lane" data-testid="host-synced-note-lane">
+            {beatmap
+              ? upcomingSyncedNotes(
+                  beatmap.notes.map((n) => ({
+                    noteId: n.id,
+                    timeMs: n.timeMs,
+                    lane: n.type === 'hold' ? 'hold' : n.type === 'swipe' ? 'swipe' : 'tap',
+                    label: n.type,
+                  })),
+                  gameTimeMs,
+                  1800,
+                )
+                  .slice(0, 16)
+                  .map((cue, i) => (
+                    <div
+                      key={cue.noteId}
+                      className="beat-bar"
+                      data-lane={cue.lane}
+                      style={{
+                        animationDelay: `${i * 0.04}s`,
+                        opacity: Math.max(0.35, 1 - (cue.timeMs - gameTimeMs) / 1800),
+                      }}
+                      title={cue.label}
+                    />
+                  ))
+              : Array.from({ length: 16 }).map((_, i) => (
+                  <div key={i} className="beat-bar" style={{ animationDelay: `${i * 0.05}s` }} />
+                ))}
           </div>
           <div className="row" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div>
@@ -1080,25 +1412,53 @@ export default function HostPage() {
         </div>
       )}
 
-      {room?.phase === 'results' && results && (
+      {room?.phase === 'results' && (
         <div className="stack" data-testid="host-results">
           <div className="stage" style={{ textAlign: 'center' }}>
             <h2 style={{ fontFamily: 'var(--font-display)' }}>Celebration</h2>
             <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--se-success-lime)' }}>
-              {results.teamScore}
+              {results?.teamScore ?? 0}
             </div>
             <p data-testid="host-results-meta">
-              Team Score · Crowd {results.crowdMeter}% · Round {(room?.rematchRound ?? 0) + 1}
+              Team Score · Crowd {results?.crowdMeter ?? 0}% · Round {(room?.rematchRound ?? 0) + 1}
             </p>
             <p data-testid="host-ledger-checksum" style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
-              Ledger: {results.ledgerChecksum ?? 'n/a'}
+              Ledger: {results?.ledgerChecksum ?? 'n/a'}
+            </p>
+            <p
+              data-testid="host-rematch-loop-banner"
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.5rem' }}
+            >
+              {
+                assessPartyRematchLoop({
+                  rematchRound: room?.rematchRound ?? 0,
+                  phase: 'results',
+                  hasResults: Boolean(results),
+                  modeId: room?.gameMode,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              data-testid="host-party-karaoke-rematch-honesty"
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.25rem' }}
+            >
+              {
+                assessPartyKaraokeRematchHonesty({
+                  rematchRound: room?.rematchRound ?? 0,
+                  phase: 'results',
+                  hasResults: Boolean(results),
+                  modeId: room?.gameMode,
+                  karaokeModeActive: room?.gameMode === 'KaraokePerformance',
+                  priorPitchActive: false,
+                }).honestyBanner
+              }
             </p>
           </div>
 
           <div className="grid-2">
             <div className="panel">
               <h3>Individual Scores</h3>
-              {results.players.map((p) => (
+              {(results?.players ?? []).map((p) => (
                 <div key={p.id} className="player-card">
                   <div>
                     <strong>{p.name}</strong>
@@ -1112,7 +1472,7 @@ export default function HostPage() {
             <div className="panel">
               <h3>Awards</h3>
               <div className="stack">
-                {results.awards.map((a) => (
+                {(results?.awards ?? []).map((a) => (
                   <div key={a.id} className="award-card">
                     <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>{a.label}</div>
                     <div>{a.playerName}</div>

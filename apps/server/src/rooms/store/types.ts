@@ -14,6 +14,7 @@ import type {
   RoomPhase,
   RoomPrivacySettings,
   RoomJoinQrPayload,
+  RoomState,
   CapacityProfile,
   TeamScoreboard,
 } from '@beatlink/shared';
@@ -31,6 +32,7 @@ export interface RoomSnapshot {
   selectedSongId: string | null;
   pastedLinkUrl: string | null;
   linkResolveResult: LinkResolveResult | null;
+  privateMedia?: RoomState['privateMedia'];
   gameMode: GameModeId;
   difficulty: DifficultyId;
   calibrationOffsetMs: number;

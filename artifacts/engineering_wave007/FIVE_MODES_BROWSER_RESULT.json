@@ -1,0 +1,63 @@
+{
+  "playwright_ran": true,
+  "playwright_skipped": false,
+  "browser": "chromium",
+  "room_code": "W4XE5",
+  "song_id": "demo-neon-groove",
+  "chart_license": "demo_generated_royalty_free",
+  "host_session_absent_from_guest": true,
+  "microphone_pitch_analysis": false,
+  "vocal_path_classification": "VOCAL_PROMPT_TIMING_MODE",
+  "modes": [
+    {
+      "mode": "BeatTap",
+      "completed": true,
+      "maxScore": 1100,
+      "ledger": "f27e5a623c725c60",
+      "banner": "MODE · BEAT TAP — HIT THE JUDGMENT LINE",
+      "detail": "scores=[1100,0,0]"
+    },
+    {
+      "mode": "CallAndResponse",
+      "completed": true,
+      "maxScore": 1500,
+      "ledger": "01d59fd4cb3b715e",
+      "banner": "MODE · CALL & RESPONSE — WAIT FOR THE ECHO WINDOW",
+      "detail": "scores=[1500,0,0]"
+    },
+    {
+      "mode": "KaraokePerformance",
+      "completed": true,
+      "maxScore": 105,
+      "ledger": "71e999be3512805c",
+      "banner": "MODE · KARAOKE — PHRASE TIMING (PITCH OFF UNTIL MIC CONSENT)",
+      "detail": "scores=[105,0,0]"
+    },
+    {
+      "mode": "BandRoles",
+      "completed": true,
+      "maxScore": 1400,
+      "ledger": "c4df63a25f808a31",
+      "banner": "MODE · BAND ROLES — STAY IN YOUR LANE; COVER ALL THREE SEATS FOR BAND LOCKED",
+      "detail": "scores=[1400,115,380]"
+    },
+    {
+      "mode": "PredictionTrivia",
+      "completed": true,
+      "maxScore": 275,
+      "ledger": "1c5b4789d4e7a100",
+      "banner": "MODE · PREDICTION TRIVIA — LOCK THE NEXT SECTION BEFORE IT STARTS",
+      "detail": "scores=[275,0,0]"
+    }
+  ],
+  "modes_completed": [
+    "BeatTap",
+    "CallAndResponse",
+    "KaraokePerformance",
+    "BandRoles",
+    "PredictionTrivia"
+  ],
+  "modes_completed_count": 5,
+  "all_five_completed": true,
+  "ok": true
+}

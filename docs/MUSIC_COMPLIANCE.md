@@ -33,18 +33,49 @@ The link resolver does **not**:
 
 | Path | MVP | Notes |
 |------|-----|-------|
-| Internal approved catalog | Yes | Demo generated tracks |
-| Creator-owned uploads | Planned | User confirms rights |
+| Internal approved catalog | Yes | Demo / synthetic song bed synced to chart notes |
+| Creator-owned uploads | Stub | `POST /content/creator-ingest` — attestation metadata only |
 | Licensed music packs | Future | Requires label deals |
 | Official platform playback | Future | Per-platform SDK + license |
-| Public-domain / royalty-free | Yes | Safe for demos |
+| First-party original / CC-released / royalty-free | Yes | Offline launch catalog + song beds (ownership ≠ license; no fake PD via metadata) |
+| Verified third-party public domain | Conditional | Only with ownershipClass=verified_public_domain + source evidence |
 
-## Playback Status Values
+LAN phone/TV bind (local-dev only): see [LAN_PARTY_PHONE_TV.md](LAN_PARTY_PHONE_TV.md).
 
-- `PLAYABLE_APPROVED` — matched to internal catalog; safe to play
-- `PLAYABLE_AUTHORIZED_PLATFORM` — future; official SDK playback
-- `METADATA_ONLY` — link recognized; no legal playback path
-- `NEEDS_USER_UPLOAD` — user must provide owned audio
+## Source eligibility router (A–F)
+
+Implemented by `resolveSourceEligibilityRouter` in `packages/game-engine/src/contentPaths.ts`.
+**Link recognition alone is not full gameplay.** Unsupported / metadata-only links must offer lawful catalog alternatives.
+
+| Letter | Meaning | Playable performance? |
+|--------|---------|------------------------|
+| **A** | Approved catalog (PD / RF / synthetic / demo / CC) | Yes — catalog audio + versioned beatmap cache |
+| **B** | Creator-attested upload | Yes when attestation is valid |
+| **C** | Licensed music pack | Yes when pack gate passes |
+| **D** | Link matched to approved catalog | Yes — play **catalog** audio only, never the pasted stream |
+| **E** | Platform metadata / official embed reference | No — YouTube/Spotify/Apple are not rip permission |
+| **F** | Unsupported or blocked | No — return catalog alternatives |
+
+YouTube may only be used under official player/embed rules when explicitly authorized; embed ≠ rhythm-sync or audio-extraction rights. Spotify is never a game-streaming content path under this policy.
+
+## Link capability states (primary)
+
+See [LINK_CAPABILITY_STATES.md](LINK_CAPABILITY_STATES.md).
+
+- `METADATA_AVAILABLE` — metadata only
+- `OFFICIAL_EMBED_AVAILABLE` — official embed / deep-link listen (not gameplay)
+- `DIRECT_AUDIO_RIGHTS_VERIFIED` — HTTPS WAV/MP3/OGG rights + hash (grid/charts still needed)
+- `GAMEPLAY_SYNC_AUTHORIZED` — catalog or rights-verified direct audio + beat grid + charts
+- `BLOCKED_OR_UNSUPPORTED` — blocked / unknown
+
+**API credentials ≠ music rights.** Never assign gameplay sync (or legacy `PLAYABLE_AUTHORIZED_PLATFORM`) merely because `YOUTUBE_API_KEY` / similar is set.
+
+## Playback Status Values (legacy companion)
+
+- `PLAYABLE_APPROVED` — matched to internal catalog or gameplay-sync-authorized direct audio
+- `PLAYABLE_AUTHORIZED_PLATFORM` — **deprecated**; reserved for future official sync SDK + rights; never from API keys
+- `METADATA_ONLY` — link recognized; no legal gameplay path (includes official embed listen)
+- `NEEDS_USER_UPLOAD` — user must provide owned audio / complete attestation
 - `NEEDS_LICENSE` — commercial license required
 - `UNSUPPORTED` — URL format not recognized
 - `BLOCKED_BY_POLICY` — blocked by platform or policy rules

@@ -1,0 +1,51 @@
+{
+  "schema": "beatlink.asset_rights.v2",
+  "trackId": "launch-orig-call-mirror",
+  "title": "Call Mirror",
+  "artist": "BeatLink Original Studio",
+  "author": "BeatLink Original Studio",
+  "license": "synthetic_original",
+  "licenseVersion": "original-v1",
+  "licenseLabel": "BeatLink original (synthetic_original)",
+  "sourceKind": "original",
+  "ownershipClass": "first_party_original",
+  "attribution": "BeatLink Original Studio — original-v1",
+  "attributionVerified": true,
+  "commercialEligible": false,
+  "commercialEligibilityNote": "false until verified human attribution + commercial review — metadata alone never grants commercial",
+  "thirdPartyLicense": null,
+  "ownershipEvidence": "First-party procedural composition (BeatLink studio generator v2); assetSha256=142bf074b3127846329acefaaec68a9ea8eedcd708f7fcc5699511561ea7eb0b; ownershipClass=first_party_original. Not a third-party PD scrape.",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": null,
+  "audioAssetPath": "songs/audio/launch-orig-call-mirror.wav",
+  "assetSha256": "142bf074b3127846329acefaaec68a9ea8eedcd708f7fcc5699511561ea7eb0b",
+  "compositionSha256": "92b91be919a28656cde8b76983564fec28c87168be9aca81b143224e50114dd7",
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationMs": 102000,
+  "bpm": 100,
+  "generatedBy": "scripts/generate_launch_songs.mjs",
+  "productionNotes": {
+    "structure": [
+      "intro",
+      "verse",
+      "pre",
+      "chorus",
+      "bridge",
+      "chorus",
+      "outro"
+    ],
+    "layers": [
+      "kick",
+      "hat",
+      "bass",
+      "pad_triad",
+      "lead_phrase_sync",
+      "sparkle"
+    ],
+    "mix": "stereo_width_by_section",
+    "master": "soft_knee_tanh_v2",
+    "chartSync": "phrase_pitch_and_bar_quantized_windows"
+  }
+}

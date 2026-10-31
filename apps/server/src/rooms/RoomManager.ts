@@ -70,18 +70,30 @@ import {
   applyDeviceTimingProfile,
   buildDeviceTimingProfile,
   createDefaultDeviceTimingProfile,
+  beatmapFromPrivateDraft,
+  boundKaraokePitchClaim,
+  buildDirectHttpsLobbyAttach,
+  defaultCreatorDraftStore,
   evaluateCountdownPreconditions,
   evaluateStartPreconditions,
   type DeviceTimingProfile,
+  type DirectHttpsLobbyAttachInput,
   type StartGateResult,
 } from '@beatlink/game-engine';
-import { getBeatmapForSong } from '../beatmaps/store.js';
+import { findSongIdByAssetSha256, getBeatmapForSong } from '../beatmaps/store.js';
 import {
   InMemoryRoomStore,
   deserializeRoom,
   serializeRoom,
   type RoomStore,
 } from './store/index.js';
+import {
+  addMember,
+  createParty,
+  disconnectMember,
+  endParty,
+} from './partyLifecycle.mjs';
+import { invalidateAuthority, invalidateMember, roomAuthority } from './roomHttp.mjs';
 
 const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
 const MAX_PLAYERS = MAX_PERFORMERS;
@@ -170,6 +182,7 @@ export class RoomManager {
   private dropRoom(code: string): void {
     const key = code.toUpperCase();
     this.rooms.delete(key);
+    invalidateAuthority(key);
     this.store.delete(key);
     this.sessionModes.delete(key);
     this.rankFloor.delete(key);
@@ -204,6 +217,7 @@ export class RoomManager {
       selectedSongId: null,
       pastedLinkUrl: null,
       linkResolveResult: null,
+      privateMedia: null,
       gameMode: options.gameMode ?? DEFAULT_GAME_MODE,
       difficulty: options.difficulty ?? DEFAULT_DIFFICULTY,
       calibrationOffsetMs: 0,
@@ -233,6 +247,9 @@ export class RoomManager {
     };
     this.commit(room);
     this.socketToHostRoom.set(hostSocketId, code);
+    roomAuthority.parties.set(code, createParty({ code, hostId: hostSocketId }));
+    roomAuthority.hostSessions.set(code, room.hostToken);
+    roomAuthority.expiresAt.set(code, expiresAt);
     this.sessionModes.set(code, new Set());
     this.rankFloor.set(code, new Map());
     this.achievements.reportEvent('party_started', 1);
@@ -417,6 +434,12 @@ export class RoomManager {
     room.playerTokens.set(player.id, playerToken);
     this.playerToRoom.set(player.id, room.code);
     this.socketToPlayer.set(socketId, player.id);
+    const storedParty = roomAuthority.parties.get(room.code);
+    const hostId = room.hostId;
+    const party =
+      storedParty ?? (hostId !== null ? createParty({ code: room.code, hostId }) : undefined);
+    const nextParty = addMember(party, player.id);
+    if (nextParty) roomAuthority.parties.set(room.code, nextParty);
     emitTelemetry('player_join', room.code, { playerCount: room.players.length });
     return { room: this.publish(room), player, playerToken };
   }
@@ -477,6 +500,8 @@ export class RoomManager {
     player.connected = true;
     this.socketToPlayer.set(socketId, player.id);
     this.playerToRoom.set(player.id, room.code);
+    const restored = addMember(roomAuthority.parties.get(room.code), player.id);
+    if (restored) roomAuthority.parties.set(room.code, restored);
     this.achievements.reportEvent('player_reconnected', 1);
     pulsePartyPace('disconnect_reconnect', playerId);
     presentAvFeedback('disconnect_warn', 'Player reconnected');
@@ -798,6 +823,9 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     const player = room.players.find((p) => p.id === playerId);
+    invalidateMember(code, playerId);
+    const party = disconnectMember(roomAuthority.parties.get(code), playerId);
+    if (party) roomAuthority.parties.set(code, party);
     if (player) player.connected = false;
     this.socketToPlayer.delete(socketId);
     emitTelemetry('disconnect', room.code, { seat: 'player' });
@@ -808,6 +836,9 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     if (room.hostId !== hostSocketId) return null;
+    const party = roomAuthority.parties.get(room.code);
+    if (party && !endParty(party, hostSocketId)) return null;
+    roomAuthority.parties.delete(room.code);
     return this.shutdownRoom(code, { reason: 'host_end', hostSocketId });
   }
 
@@ -949,6 +980,7 @@ export class RoomManager {
               timeMs: 700,
               text: 'Prompt timing — tap the phrase window',
               durationMs: 2000,
+              targetPitchHz: 220,
             },
             ...beatmap.vocalPrompts.filter((v) => v.timeMs < durationMs - 500).slice(0, 2),
           ]
@@ -978,6 +1010,93 @@ export class RoomManager {
       }
     }
     return this.publish(room);
+  }
+
+  /**
+   * Attach a direct-HTTPS evaluation to the lobby.
+   * Scored song selection requires GAMEPLAY_SYNC_AUTHORIZED + server-verified asset hash
+   * (launch catalog OR private creator draft). Client matchedCatalogId never authorizes.
+   * syncEligible=false never selects a beatmap (playback/preview message only).
+   */
+  attachDirectHttps(
+    code: string,
+    input: DirectHttpsLobbyAttachInput,
+  ): { room: RoomState; attach: ReturnType<typeof buildDirectHttpsLobbyAttach> } | null {
+    const room = this.getRoom(code);
+    if (!room || (room.phase !== 'lobby' && room.phase !== 'song_select')) return null;
+
+    // Server authority: derive identity from content hash only — never client catalog id.
+    const hashMatchedId = findSongIdByAssetSha256(input.contentSha256 ?? null);
+    const privateDraft = hashMatchedId
+      ? null
+      : defaultCreatorDraftStore.findBySha256(input.contentSha256 ?? null);
+    const serverVerifiedCatalogId = hashMatchedId ?? privateDraft?.trackId ?? null;
+
+    const attach = buildDirectHttpsLobbyAttach({
+      ...input,
+      // Preserve client declaration only so forge detection can compare.
+      matchedCatalogId: input.matchedCatalogId ?? null,
+      serverVerifiedCatalogId,
+      privateDraft: Boolean(privateDraft),
+      privateDraftId: privateDraft?.draftId ?? null,
+      chartRevision: privateDraft?.chartEditor?.revision ?? null,
+    });
+
+    room.pastedLinkUrl = input.url;
+    room.linkResolveResult = attach.linkResolve;
+
+    if (attach.scoredPlayAllowed && attach.selectSongId && privateDraft) {
+      const draftBeatmap = beatmapFromPrivateDraft(privateDraft);
+      if (!draftBeatmap || !privateDraft.audioBytes?.byteLength) {
+        room.privateMedia = null;
+        return {
+          room: this.publish(room)!,
+          attach: {
+            ...attach,
+            scoredPlayAllowed: false,
+            selectSongId: null,
+            message:
+              'Private draft hash matched but durable audio bytes or chart are missing — scored attach denied.',
+          },
+        };
+      }
+      room.selectedSongId = privateDraft.trackId;
+      room.beatmap = {
+        ...draftBeatmap,
+        offsetMs: room.calibrationOffsetMs,
+      };
+      room.gameDurationMs = draftBeatmap.durationMs;
+      room.phase = 'song_select';
+      room.privateMedia = {
+        draftId: privateDraft.draftId,
+        trackId: privateDraft.trackId,
+        contentSha256: privateDraft.sha256,
+        chartRevision: privateDraft.chartEditor?.revision ?? 0,
+        audioPath: `/content/creator-drafts/${privateDraft.draftId}/audio`,
+      };
+      return { room: this.publish(room)!, attach };
+    }
+
+    if (attach.scoredPlayAllowed && attach.selectSongId) {
+      room.privateMedia = null;
+      const selected = this.selectSong(code, attach.selectSongId);
+      if (!selected) {
+        // Keep the honest link snapshot even if beatmap lookup failed.
+        return {
+          room: this.publish(room)!,
+          attach: { ...attach, scoredPlayAllowed: false, selectSongId: null },
+        };
+      }
+      return { room: selected, attach };
+    }
+
+    // Deny scored attach: peers see the snapshot; independently chosen catalog songs stay.
+    if (attach.forgedCatalogAttempt) {
+      room.privateMedia = null;
+      room.selectedSongId = null;
+      room.beatmap = null;
+    }
+    return { room: this.publish(room)!, attach };
   }
 
   explainStartGate(code: string): StartGateResult {
@@ -1385,6 +1504,8 @@ export class RoomManager {
           streak: tap.streak,
           meta: {
             role: player.role,
+            bandCoverage:
+              room.gameMode === 'BandRoles' && this.bandCoverageSeated(room),
             responseMatched:
               room.gameMode === 'CallAndResponse' &&
               responseMatchedForCallAndResponse(
@@ -1457,6 +1578,17 @@ export class RoomManager {
           gameTimeMs,
           player.streak,
         );
+        // Pitch bonus only when client reports continuous live DSP (never synthetic probe).
+        // Server bounds — client flag alone NEVER grants pitch path. Not physical-mic attestation.
+        const pitchBound = boundKaraokePitchClaim({
+          inputType: input.type,
+          pitchAnalysisActive: input.pitchAnalysisActive,
+          pitchMatch: input.pitchMatch,
+          voicedCoverage: input.voicedCoverage,
+          phraseFrames: input.phraseFrames,
+        });
+        const pitchAnalysisActive = pitchBound.pitchAnalysisActive;
+        const pitchMatch = pitchBound.pitchMatch;
         const modeScore = scoreForMode({
           modeId: room.gameMode,
           difficulty: room.difficulty,
@@ -1465,7 +1597,12 @@ export class RoomManager {
           streak: vocal.streak,
           meta: {
             role: player.role,
-            noRecording: true,
+            // Fallback tap / timing-only remains no-recording; live pitch path is ephemeral DSP only.
+            noRecording: !pitchAnalysisActive,
+            pitchAnalysisActive,
+            ...(pitchMatch != null ? { pitchMatch } : {}),
+            bandCoverage:
+              room.gameMode === 'BandRoles' && this.bandCoverageSeated(room),
             responseMatched:
               room.gameMode === 'CallAndResponse' &&
               responseMatchedForCallAndResponse(
@@ -1598,7 +1735,27 @@ export class RoomManager {
       }
       const event = findNearestHypeEvent(room.beatmap.hypeEvents, gameTimeMs, 300);
       const targetTime = event?.timeMs ?? gameTimeMs;
-      const result = scoreHypeAction(gameTimeMs, targetTime, player.streak);
+      const hype = scoreHypeAction(gameTimeMs, targetTime, player.streak);
+      // BandRoles must go through scoreForMode so role + coverage bonuses apply.
+      const modeScore = scoreForMode({
+        modeId: room.gameMode,
+        difficulty: room.difficulty,
+        grade: hype.grade,
+        basePoints: hype.points,
+        streak: hype.streak,
+        meta: {
+          role: player.role,
+          bandCoverage:
+            room.gameMode === 'BandRoles' && this.bandCoverageSeated(room),
+        },
+      });
+      const result = {
+        ...hype,
+        points: modeScore.points,
+        message:
+          room.gameMode === 'BandRoles' ? modeScore.message : hype.message,
+        crowdBoost: modeScore.crowdBoost,
+      };
       Object.assign(player, updatePlayerStats(player, result));
       room.teamScore += result.points;
       room.teamScores = recomputeTeamScores(room.players);
@@ -1682,6 +1839,7 @@ export class RoomManager {
     room.gameStartTime = null;
     room.pastedLinkUrl = null;
     room.linkResolveResult = null;
+    room.privateMedia = null;
     room.calibrationOffsetMs = 0;
     room.calibrationSamples = [];
     room.selectedSongId = null;
@@ -1735,6 +1893,16 @@ export class RoomManager {
   /** @deprecated Prefer rematch() — keeps seats; still supported for host UI. */
   replay(code: string): RoomState | null {
     return this.rematch(code);
+  }
+
+  /** True when Beat Tapper, Vocalist, and Hype Captain seats are all filled. */
+  private bandCoverageSeated(room: InternalRoom): boolean {
+    const roles = new Set(
+      room.players.map((p) => p.role).filter((role): role is NonNullable<typeof role> => Boolean(role)),
+    );
+    return (
+      roles.has('beat_tapper') && roles.has('vocalist') && roles.has('hype_captain')
+    );
   }
 
   private noteModeRound(room: InternalRoom): void {

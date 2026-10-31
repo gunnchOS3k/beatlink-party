@@ -27,7 +27,9 @@ wave007:
 	@test -f artifacts/engineering_wave007/VIEWPORT_RESPONSIVE_RESULT.json
 	@test -f artifacts/engineering_wave007/EVENT_IDEMPOTENCY_RESULT.json
 	@test -f artifacts/engineering_wave007/DEAD_CONTROL_RESULT.json
+	@test -f artifacts/engineering_wave007/FIVE_MODES_BROWSER_RESULT.json
 	@python3 -c "import json; r=json.load(open('artifacts/engineering_wave007/BROWSER_E2E_RESULT.json')); assert r.get('playwright_ran') is True; assert r.get('playwright_skipped') is False"
+	@python3 -c "import json; r=json.load(open('artifacts/engineering_wave007/FIVE_MODES_BROWSER_RESULT.json')); assert r.get('ok') is True; assert r.get('all_five_completed') is True; assert len(r.get('modes_completed') or [])==5"
 	@python3 -c "import json; r=json.load(open('artifacts/engineering_wave007/WAVE007_RESULT.json')); assert r.get('UNCONDITIONAL_TRUE_CLASSIFIERS',1)==0; assert r.get('UNCONDITIONAL_TRUE_CLASSIFIERS_COMPUTED') is True; assert r.get('BEHAVIORAL_NEGATIVE_CONTROLS_PASS') is True; assert r['claim_flags']['COMMERCIAL_MEDIA_RIPPED'] is False; assert r['claim_flags']['LINK_EQUALS_RIP_PERMISSION'] is False; assert r['OS_PLATFORM_020_UNTOUCHED'] is True; assert r['BASELINE_COUNTS_UPDATED'] is False; assert r.get('PLAYWRIGHT_SKIPPED') is False"
 
 verify:

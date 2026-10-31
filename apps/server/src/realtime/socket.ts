@@ -5,6 +5,7 @@ import type {
   LinkResolveResult,
   PlayerInputEvent,
 } from '@beatlink/shared';
+import type { DirectHttpsLobbyAttachInput } from '@beatlink/game-engine';
 import { roomManager } from '../rooms/RoomManager.js';
 import { resolveLink } from '../music/linkResolver.js';
 
@@ -24,6 +25,16 @@ export function setupRealtime(httpServer: Server, corsOrigin: string) {
   const io = new SocketServer(httpServer, {
     cors: { origin: corsOrigin, methods: ['GET', 'POST'] },
   });
+
+  /** Per-room auto-end timers — must clear on rematch/force_end or a prior round ends the next mode. */
+  const autoEndTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  const clearAutoEnd = (code: string) => {
+    const existing = autoEndTimers.get(code);
+    if (existing) {
+      clearTimeout(existing);
+      autoEndTimers.delete(code);
+    }
+  };
 
   io.on('connection', (socket) => {
     // Every handler below assumes well-formed payloads (e.g. `data.code.toUpperCase()`
@@ -416,6 +427,71 @@ socket.on(
     );
 
     socket.on(
+      'room.attach_direct_https',
+      (
+        data: {
+          code: string;
+          hostToken?: string;
+          attach: DirectHttpsLobbyAttachInput;
+        },
+        cb?: (result: {
+          ok: boolean;
+          error?: string;
+          scoredPlayAllowed?: boolean;
+          selectSongId?: string | null;
+          message?: string;
+          room?: unknown;
+        }) => void,
+      ) => {
+        const code = data.code.toUpperCase();
+        if (!requireHost(code, socket.id, data.hostToken)) {
+          cb?.({ ok: false, error: 'Host auth required' });
+          return;
+        }
+        if (!data.attach?.url || !data.attach.composition || !data.attach.soundRecording) {
+          cb?.({ ok: false, error: 'url, composition, and soundRecording are required' });
+          return;
+        }
+        // Host auth ≠ trust client catalog declarations. Strip serverVerified* —
+        // RoomManager re-derives identity from contentSha256 only.
+        const attachIn = { ...data.attach } as DirectHttpsLobbyAttachInput & Record<string, unknown>;
+        delete attachIn.serverVerifiedCatalogId;
+        delete attachIn.privateDraft;
+        delete attachIn.privateDraftId;
+        delete attachIn.chartRevision;
+        const attached = roomManager.attachDirectHttps(code, {
+          ...attachIn,
+          matchedCatalogId: attachIn.matchedCatalogId ?? null,
+        });
+        if (!attached) {
+          cb?.({ ok: false, error: 'Unable to attach direct HTTPS on room' });
+          return;
+        }
+        // Independent enforcement: rejected / forged evaluations never report scored ok.
+        if (attached.attach.forgedCatalogAttempt || !attached.attach.decision.ok) {
+          io.to(code).emit('room.state', attached.room);
+          cb?.({
+            ok: false,
+            error: attached.attach.message,
+            scoredPlayAllowed: false,
+            selectSongId: null,
+            message: attached.attach.message,
+            room: attached.room,
+          });
+          return;
+        }
+        io.to(code).emit('room.state', attached.room);
+        cb?.({
+          ok: true,
+          scoredPlayAllowed: attached.attach.scoredPlayAllowed,
+          selectSongId: attached.attach.selectSongId,
+          message: attached.attach.message,
+          room: attached.room,
+        });
+      },
+    );
+
+    socket.on(
       'game.start_calibration',
       (
         data: { code: string; hostToken?: string },
@@ -500,6 +576,7 @@ socket.on(
       (data: { code: string; hostToken?: string }) => {
         const code = data.code.toUpperCase();
         if (!requireHost(code, socket.id, data.hostToken)) return;
+        clearAutoEnd(code);
         const results = roomManager.endGame(code);
         const finalRoom = roomManager.getRoom(code);
         if (results && finalRoom) {
@@ -619,6 +696,7 @@ socket.on(
         }
         cb?.({ ok: true });
         io.to(code).emit('game.countdown', { room, countdown: room.countdown });
+        clearAutoEnd(code);
         const interval = setInterval(() => {
           const updated = roomManager.tickCountdown(code);
           if (!updated) {
@@ -634,14 +712,22 @@ socket.on(
               startTime: Date.now(),
             });
             const duration = updated.gameDurationMs;
-            setTimeout(() => {
+            clearAutoEnd(code);
+            const timer = setTimeout(() => {
+              autoEndTimers.delete(code);
+              // Only auto-end the round that scheduled this timer.
+              const live = roomManager.getRoom(code);
+              if (!live || live.phase !== 'playing') return;
               const results = roomManager.endGame(code);
               const finalRoom = roomManager.getRoom(code);
-              io.to(code).emit('game.ended', {
-                room: roomManager.stripInternal(finalRoom!),
-                results,
-              });
+              if (results && finalRoom) {
+                io.to(code).emit('game.ended', {
+                  room: roomManager.stripInternal(finalRoom),
+                  results,
+                });
+              }
             }, duration + 500);
+            autoEndTimers.set(code, timer);
           } else {
             io.to(code).emit('game.countdown', {
               room: updated,
@@ -670,6 +756,7 @@ socket.on(
     socket.on('game.replay', (data: { code: string; hostToken?: string }) => {
       const code = data.code.toUpperCase();
       if (!requireHost(code, socket.id, data.hostToken)) return;
+      clearAutoEnd(code);
       const room = roomManager.rematch(code);
       if (room) io.to(code).emit('room.state', room);
     });
@@ -677,6 +764,7 @@ socket.on(
     socket.on('game.rematch', (data: { code: string; hostToken?: string }) => {
       const code = data.code.toUpperCase();
       if (!requireHost(code, socket.id, data.hostToken)) return;
+      clearAutoEnd(code);
       const room = roomManager.rematch(code);
       if (room) io.to(code).emit('room.state', room);
     });
@@ -684,6 +772,7 @@ socket.on(
     socket.on('game.next', (data: { code: string; hostToken?: string }) => {
       const code = data.code.toUpperCase();
       if (!requireHost(code, socket.id, data.hostToken)) return;
+      clearAutoEnd(code);
       const room = roomManager.nextRound(code);
       if (room) io.to(code).emit('room.state', room);
     });
@@ -715,6 +804,7 @@ socket.on(
       'room.end',
       (data: { code: string; hostToken?: string }, cb?: (result: { ok: boolean; error?: string }) => void) => {
         const code = data.code.toUpperCase();
+        clearAutoEnd(code);
         if (!requireHost(code, socket.id, data.hostToken)) {
           cb?.({ ok: false, error: 'Host auth required' });
           return;

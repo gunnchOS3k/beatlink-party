@@ -1,0 +1,80 @@
+{
+  "generated_at_utc": "2026-10-29T14:34:56.834Z",
+  "sampleRate": 44100,
+  "channels": 2,
+  "mastering": "soft_knee_tanh_v2",
+  "songs": [
+    {
+      "id": "launch-pd-tap-grid",
+      "audioAssetPath": "songs/audio/launch-pd-tap-grid.wav",
+      "assetSha256": "7bf2880b6f944ac17f66850a5ca3aae2dcc86fd055ddac36f73b24fad4b4e484",
+      "durationMs": 96000,
+      "bpm": 120,
+      "sampleRate": 44100,
+      "channels": 2,
+      "ownershipClass": "first_party_original",
+      "license": "synthetic_original",
+      "commercialEligible": false
+    },
+    {
+      "id": "launch-orig-call-mirror",
+      "audioAssetPath": "songs/audio/launch-orig-call-mirror.wav",
+      "assetSha256": "142bf074b3127846329acefaaec68a9ea8eedcd708f7fcc5699511561ea7eb0b",
+      "durationMs": 102000,
+      "bpm": 100,
+      "sampleRate": 44100,
+      "channels": 2,
+      "ownershipClass": "first_party_original",
+      "license": "synthetic_original",
+      "commercialEligible": false
+    },
+    {
+      "id": "launch-cc-karaoke-warm",
+      "audioAssetPath": "songs/audio/launch-cc-karaoke-warm.wav",
+      "assetSha256": "6140c95c711cb1872391afc981693d8216bc4663a9019d879a5bec18cb19ec62",
+      "durationMs": 108000,
+      "bpm": 96,
+      "sampleRate": 44100,
+      "channels": 2,
+      "ownershipClass": "first_party_original",
+      "license": "creative_commons",
+      "commercialEligible": false
+    },
+    {
+      "id": "launch-creator-band-stomp",
+      "audioAssetPath": "songs/audio/launch-creator-band-stomp.wav",
+      "assetSha256": "fc7805a3b29dd7d6f23cf4caf5fa3f1b0b6f54c0f3fa404ada19678124206679",
+      "durationMs": 99000,
+      "bpm": 126,
+      "sampleRate": 44100,
+      "channels": 2,
+      "ownershipClass": "creator_attested",
+      "license": "creator_owned",
+      "commercialEligible": false
+    },
+    {
+      "id": "launch-pd-predict-pulse",
+      "audioAssetPath": "songs/audio/launch-pd-predict-pulse.wav",
+      "assetSha256": "a37d17e591278a81692ead109f557ee5fdf9a4c90b5ee7ffcba87f1f2682952d",
+      "durationMs": 90000,
+      "bpm": 130,
+      "sampleRate": 44100,
+      "channels": 2,
+      "ownershipClass": "first_party_original",
+      "license": "synthetic_original",
+      "commercialEligible": false
+    },
+    {
+      "id": "launch-cc-multi-party",
+      "audioAssetPath": "songs/audio/launch-cc-multi-party.wav",
+      "assetSha256": "1271a71b24c68cf4abf09e07a0159b415ce47785dbf32b6a0343d55b33a75fff",
+      "durationMs": 114000,
+      "bpm": 118,
+      "sampleRate": 44100,
+      "channels": 2,
+      "ownershipClass": "first_party_original",
+      "license": "creative_commons",
+      "commercialEligible": false
+    }
+  ]
+}

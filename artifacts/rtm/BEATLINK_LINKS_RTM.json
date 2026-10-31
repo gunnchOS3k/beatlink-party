@@ -1,0 +1,1146 @@
+{
+  "schema_version": "1.0.0",
+  "contract_id": "GUNNCHOS3K_PVS",
+  "contract_version": "1.0.0",
+  "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
+  "product_id": "beatlink-party",
+  "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
+  "generated_at": "2026-10-31T00:48:00Z",
+  "honesty_flags": {
+    "HUMAN": false,
+    "RC2": false,
+    "V1": false
+  },
+  "phase_summary": {
+    "cursor_complete": {
+      "status": "in_progress",
+      "notes": "S14 tip c53b392; prior eba2bd9 CI SUCCESS. Secure-context continuity. HUMAN/RC2/V1 false."
+    },
+    "codex_independently_verified": {
+      "status": "not_started"
+    },
+    "human_approval": {
+      "status": "not_started"
+    }
+  },
+  "rows": [
+    {
+      "req_id": "BL-LINK-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Link capability states are separate from provider API credentials; YOUTUBE_API_KEY never grants GAMEPLAY_SYNC_AUTHORIZED.",
+      "verification_method": "unit_test",
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/linkResolver.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/linkCapability.ts",
+        "tests/linkResolver.test.ts"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Logic-only capability matrix."
+      },
+      "art_status": "not_applicable",
+      "limitations": [],
+      "severity": "high",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "Keep regression: credentials \u2260 gameplay sync."
+    },
+    {
+      "req_id": "BL-LINK-002",
+      "owner": "beatlink-party",
+      "expected_behavior": "YouTube official IFrame API visible player exposes load/buffer/error/reconnect; rejected API-load promise does not poison retry.",
+      "verification_method": "unit_test + browser smoke",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/youtube_iframe_api_retry.test.ts",
+        "tests/e2e/youtube_iframe_lifecycle.playwright.spec.ts"
+      ],
+      "automated_evidence": [
+        "apps/web/src/components/YouTubeOfficialPlayer.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Live youtube.com iframe_api smoke PASS (visible player + reconnect) via BEATLINK_YT_SMOKE=1; not physical phone."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "Live smoke is browser Chromium only \u2014 no physical phone claim",
+        "IFrame embed \u2260 audio extraction / gameplay sync; YOUTUBE_API_KEY \u2260 sync"
+      ],
+      "severity": "medium",
+      "sha": "0844590d3b1b194bd080f110fcbacad569addcfe",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S6: live IFrame lifecycle/reconnect smoke PASS; API key \u2260 gameplay sync preserved (linkResolver). independent_review not_started."
+    },
+    {
+      "req_id": "BL-LINK-003",
+      "owner": "beatlink-party",
+      "expected_behavior": "Spotify/Apple Music metadata/embed/deep-link remain distinct from gameplay sync; API credentials enrich metadata only.",
+      "verification_method": "unit_test",
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/linkResolver.test.ts"
+      ],
+      "automated_evidence": [
+        "apps/server/src/music/linkResolver.ts",
+        "packages/game-engine/src/linkProviders.ts"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Metadata/embed classification only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "MusicKit/Web Playback SDK remains EXTERNAL"
+      ],
+      "severity": "medium",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "metadata/embed \u2260 gameplay"
+    },
+    {
+      "req_id": "BL-LINK-004",
+      "owner": "beatlink-party",
+      "expected_behavior": "SoundCloud/Bandcamp/Vimeo/Audius are embed/listen-first scaffolds \u2014 not complete gameplay support.",
+      "verification_method": "unit_test",
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/linkResolver.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/linkProviders.ts",
+        "tests/linkResolver.test.ts"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Scaffold adapters only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "Official widget deep integration pending \u2014 scaffolds \u2260 complete support"
+      ],
+      "severity": "low",
+      "sha": "0844590d3b1b194bd080f110fcbacad569addcfe",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "Honest SCAFFOLD classification preserved; SoundCloud/Bandcamp/Vimeo/Audius embed_only \u2260 GAMEPLAY_SYNC (S6 reasserted)."
+    },
+    {
+      "req_id": "BL-LINK-005",
+      "owner": "beatlink-party",
+      "expected_behavior": "Direct HTTPS WAV/MP3/OGG preferred gameplay route requires rights + hash + beat grid + charts; GAMEPLAY_SYNC_AUTHORIZED requires rights.syncEligible (not rights.ok alone). URL paste alone cannot attest. Redirects refused by default.",
+      "verification_method": "unit_test",
+      "layers": [
+        1,
+        2,
+        3
+      ],
+      "tests": [
+        "tests/linkResolver.test.ts",
+        "tests/direct_https_sync_eligible.test.ts",
+        "tests/direct_https_lobby_attach.test.ts",
+        "tests/direct_https_private_draft_gameplay.test.ts",
+        "tests/direct_https_attach_socket.test.ts",
+        "packages/game-engine/src/startPreconditions.test.ts",
+        "tests/e2e/direct_https_attach.playwright.spec.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/directHttpsMedia.ts",
+        "packages/game-engine/src/rightsLayers.ts",
+        "packages/game-engine/src/creatorBinaryIngest.ts",
+        "packages/game-engine/src/directHttpsLobbyAttach.ts",
+        "packages/game-engine/src/privateDraftBeatmap.ts",
+        "packages/game-engine/src/creatorDraftStore.ts",
+        "apps/server/src/rooms/RoomManager.ts",
+        "apps/web/src/components/DirectHttpsWorkflowPanel.tsx"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Rights/hash/grid evaluation is local."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "Creator must attach attestation + hash; auto-publish remains false",
+        "2026-10-30 S6: rights assertion \u2260 verified legal clearance (describeRightsAssertionHonesty); security suite re-run PASS; fixture rights \u2260 legal clearance; HUMAN/RC2/V1 false; no whole-game Cursor Complete claim; draft PR #34 FF-pushed."
+      ],
+      "severity": "blocker",
+      "sha": "0844590d3b1b194bd080f110fcbacad569addcfe",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "BL-LINK-005 cursor_complete. S6 revalidated full-path + security + Wave007/five-mode on tip after PR FF. independent_review not_started."
+    },
+    {
+      "req_id": "BL-LINK-006",
+      "owner": "beatlink-party",
+      "expected_behavior": "Composition rights \u2260 sound-recording rights; CC sync/adaptation require explicit attestation; no rip/DRM/lyric scrape.",
+      "verification_method": "unit_test",
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/musical_rights_mic_drafts.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/rightsLayers.ts",
+        "docs/LINK_CAPABILITY_STATES.md"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Policy honesty layer."
+      },
+      "art_status": "not_applicable",
+      "limitations": [],
+      "severity": "high",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "CC sync/adaptation caveats surface in rightsLayers findings."
+    },
+    {
+      "req_id": "BL-LINK-007",
+      "owner": "beatlink-party",
+      "expected_behavior": "Preserve five modes, rooms, six launch songs, karaoke mic consent, creator drafts with no auto-publish, and LAN party bind safety.",
+      "verification_method": "regression_suite",
+      "layers": [
+        2,
+        4,
+        7
+      ],
+      "tests": [
+        "tests/five_modes_party_loop.test.ts",
+        "tests/launch_song_library.test.ts",
+        "tests/musical_rights_mic_drafts.test.ts",
+        "tests/musical_chart_quality.test.ts",
+        "tests/party_timing_budget.test.ts",
+        "tests/karaoke_real_mic_path.test.ts",
+        "tests/host_player_lan_workflow.test.ts",
+        "tests/host_digital_workflow.test.ts",
+        "tests/karaoke_pitch_claim_bound.test.ts"
+      ],
+      "automated_evidence": [
+        "content/songs/offline-launch-catalog.json",
+        "artifacts/engineering_wave007/FIVE_MODES_BROWSER_RESULT.json",
+        "packages/game-engine/src/partyTimingBudget.ts",
+        "apps/server/src/beatmaps/generator.ts",
+        "apps/web/src/pages/PlayerPage.tsx",
+        "packages/game-engine/src/hostDigitalWorkflow.ts",
+        "packages/game-engine/src/karaokePitchClaimBound.ts"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "lan",
+          "browser"
+        ],
+        "notes": "Socket dual-client LAN workflow + timing resync PASS tip-local; physical phone packet still PREPARED\u2014not executed. No physical phone claim."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "S7 tip 5f29b93 FF into draft PR #34; S7b tip local then FF if CI green",
+        "HUMAN/RC2/V1 false; dual-socket/browser \u2260 physical phone; timing claimedPassed=false",
+        "API key \u2260 gameplay sync preserved"
+      ],
+      "severity": "high",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7b host digital + karaoke bound + mode charts. Whole-game Cursor Complete not claimed."
+    },
+    {
+      "req_id": "BL-LINK-008",
+      "owner": "beatlink-party",
+      "expected_behavior": "BETA/RC/LAUNCH/human commercial honesty flags remain false; RTM bound to GUNNCHOS3K_PVS@1.0.0 with JSON Schema validation in CI.",
+      "verification_method": "token_audit + schema_validation",
+      "layers": [
+        1,
+        7
+      ],
+      "tests": [
+        "scripts/validate_links_rtm.py"
+      ],
+      "automated_evidence": [
+        "docs/BETA_RC_TOKENS.json",
+        "artifacts/rtm/BEATLINK_LINKS_RTM.json",
+        "docs/quality/schemas/requirements_to_evidence_matrix.schema.json"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Honesty tokens + schema gate."
+      },
+      "art_status": "not_applicable",
+      "limitations": [],
+      "severity": "blocker",
+      "sha": "972ced37832ade05a81d21309bfd37c092b17b7e",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "BETA/RC/LAUNCH/human commercial remain false. PVS pin GUNNCHOS3K_PVS@1.0.0 @ 935eb3a. Whole-game Cursor Complete not claimed from BL-LINK-005 alone."
+    },
+    {
+      "req_id": "BL-PARTY-TIMING-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Host/player party timing uses proposed quantitative drift/jitter/resync budgets; background/rejoin/network-loss force authoritative server clock resync; budgets claimedPassed=false until measured physical evidence.",
+      "verification_method": "unit_test + socket dual-client",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_timing_budget.test.ts",
+        "tests/host_player_lan_workflow.test.ts",
+        "tests/host_digital_workflow.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyTimingBudget.ts",
+        "apps/web/src/pages/PlayerPage.tsx",
+        "packages/game-engine/src/hostDigitalWorkflow.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser",
+          "lan"
+        ],
+        "notes": "Simulated scenarios + player visibility resync wired; physical multi-phone timing not run."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "PROPOSED_PARTY_TIMING_BUDGET.claimedPassed=false",
+        "No physical phone / Metal claim"
+      ],
+      "severity": "high",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7b host digital workflow + pause/resume clock assess. physical phone false. claimedPassed=false."
+    },
+    {
+      "req_id": "BL-KARAOKE-MIC-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke distinguishes real-mic ephemeral path vs synthetic; deny/grant/revoke; silence/noise never authorize MICROPHONE_PITCH_ANALYSIS; pitch default false; a11y tap fallback remains.",
+      "verification_method": "unit_test + optional Playwright mocked getUserMedia",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_real_mic_path.test.ts",
+        "tests/musical_rights_mic_drafts.test.ts",
+        "tests/e2e/karaoke_real_mic_path.playwright.spec.ts",
+        "tests/karaoke_pitch_claim_bound.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeMicMatrix.ts",
+        "packages/game-engine/src/liveMicPipeline.ts",
+        "apps/web/src/pages/PlayerPage.tsx",
+        "packages/game-engine/src/karaokePitchClaimBound.ts",
+        "apps/server/src/rooms/RoomManager.ts"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Path proven with mocked/stub MediaStream \u2014 not physical phone mic grant on secure LAN origin."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "Synthetic MediaStream stubs \u2260 physical phone",
+        "Secure-origin LAN mic still requires devices + PHYSICAL_LAN_REVIEW_PACKET"
+      ],
+      "severity": "high",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7b server boundKaraokePitchClaim \u2014 client flag alone never grants pitch. Physical phone false."
+    },
+    {
+      "req_id": "BL-CHART-QUALITY-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Launch charts are section-aware (chorus denser than intro) with type variety \u2014 duration padding is not musical completion.",
+      "verification_method": "unit_test",
+      "layers": [
+        2,
+        6
+      ],
+      "tests": [
+        "tests/musical_chart_quality.test.ts",
+        "tests/launch_song_library.test.ts"
+      ],
+      "automated_evidence": [
+        "apps/server/src/beatmaps/generator.ts"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Chart generation audit only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "Procedural section-aware charts \u2014 not human musical taste sign-off",
+        "HUMAN/RC2/V1 false"
+      ],
+      "severity": "medium",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7b mode-aware chart density (CallAndResponse/Karaoke/Prediction). Not human taste sign-off."
+    },
+    {
+      "req_id": "BL-HOST-DIGITAL-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Digital host workflow checklist covers create\u2192calibrate\u2192play\u2192pause/resume\u2192results with honesty banner; browser/loopback only; never claims physical phone.",
+      "verification_method": "unit_test + host UI banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/host_digital_workflow.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/hostDigitalWorkflow.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital host path only \u2014 PHYSICAL_LAN_REVIEW_PACKET still PREPARED."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_phone=false",
+        "HUMAN/RC2/V1 false"
+      ],
+      "severity": "medium",
+      "sha": "db3304c40272adf52f2313b1be4b7250eb9b0d06",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S7b digital host workflow."
+    },
+    {
+      "req_id": "BL-MOBILE-PRESENT-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Docked TV host + handheld player presentation pairing is CSS/viewport only; never claims physical phone or TV acceptance.",
+      "verification_method": "unit_test + host/player banners",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/mobile_host_presentation.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/mobileHostPresentation.ts",
+        "apps/web/src/pages/HostPage.tsx",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Presentation CSS only \u2014 PHYSICAL_LAN_REVIEW_PACKET still PREPARED."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_phone=false",
+        "physical_tv=false",
+        "HUMAN/RC2/V1 false"
+      ],
+      "severity": "medium",
+      "sha": "53a215957f4ac28e6a5c648526955e0339ad87bf",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S8 mobile host/presentation honesty."
+    },
+    {
+      "req_id": "BL-PARTY-NET-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Party networking membership requires host bound + \u22651 performer; loopback dual-socket \u2260 physical LAN phone party.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        4
+      ],
+      "tests": [
+        "tests/party_networking.test.ts",
+        "tests/host_player_lan_workflow.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyNetworking.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser",
+          "lan"
+        ],
+        "notes": "Digital membership only \u2014 physicalLanAccepted=false."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_lan=false",
+        "Scripted tabs \u2260 independent humans"
+      ],
+      "severity": "high",
+      "sha": "53a215957f4ac28e6a5c648526955e0339ad87bf",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S8 party networking honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-SECURE-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Insecure origins never authorize karaoke mic pitch path; secure context / HTTPS \u2260 physical phone mic acceptance; synthetic MediaStream \u2260 device mic.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_secure_context.test.ts",
+        "tests/karaoke_pitch_claim_bound.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeSecureContext.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Secure-context gate proven digitally \u2014 not physical phone mic on LAN."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_phone_mic=false",
+        "Synthetic MediaStream \u2260 device mic"
+      ],
+      "severity": "high",
+      "sha": "53a215957f4ac28e6a5c648526955e0339ad87bf",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S8 karaoke secure-context gate."
+    },
+    {
+      "req_id": "BL-MEDIA-HONESTY-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Authorized media / syncEligible gameplay gate assertion is never verified legal clearance or commercial license review.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        1,
+        2
+      ],
+      "tests": [
+        "tests/authorized_media_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/rightsLayers.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Honesty assertion only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "verifiedLegalClearance=false",
+        "commercialEligible=false",
+        "API key \u2260 gameplay sync"
+      ],
+      "severity": "blocker",
+      "sha": "53a215957f4ac28e6a5c648526955e0339ad87bf",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S8 authorized-media honesty reasserted."
+    },
+    {
+      "req_id": "BL-REMATCH-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Digital rematch/results dwell suggested cadence; rematchReady on results; never claims physical party or HUMAN first-fun.",
+      "verification_method": "unit_test + host results banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/party_rematch_loop.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyRematchLoop.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital rematch only \u2014 physical_party=false."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_party=false",
+        "human_first_fun=false",
+        "HUMAN/RC2/V1 false"
+      ],
+      "severity": "medium",
+      "sha": "5cbe1fa228190d0c941baffd3f354fc4b993be1a",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S8b party rematch loop honesty."
+    },
+    {
+      "req_id": "BL-MODE-CONT-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Five-mode musical continuity uses authorized audio kinds with note cues; commercialClearanceClaimed always false.",
+      "verification_method": "unit_test",
+      "layers": [
+        2,
+        6
+      ],
+      "tests": [
+        "tests/musical_mode_continuity.test.ts",
+        "tests/musical_product_modes.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/musicalModeContinuity.ts"
+      ],
+      "native_physical": {
+        "status": "not_applicable",
+        "platforms": [],
+        "notes": "Digital continuity audit only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "commercial_clearance=false",
+        "Not HUMAN musical taste sign-off"
+      ],
+      "severity": "medium",
+      "sha": "5cbe1fa228190d0c941baffd3f354fc4b993be1a",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S8b five-mode continuity honesty."
+    },
+    {
+      "req_id": "BL-HOST-KARAOKE-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Host karaoke stage surfaces phrase prompts; hostPitchClaimed and physicalMicAccepted stay false; a11y tap fallback available.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/host_karaoke_stage.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/hostKaraokeStage.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Host browser phrases only \u2014 not physical mic."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "host_pitch=false",
+        "physical_mic=false"
+      ],
+      "severity": "medium",
+      "sha": "5cbe1fa228190d0c941baffd3f354fc4b993be1a",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S8b host karaoke stage honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-PHRASE-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke phrase windows remain timing-submittable with a11y fallback; physicalMicAccepted always false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_phrase_continuity.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokePhraseContinuity.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Phrase timing digital only \u2014 not physical mic."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_mic=false",
+        "pitchAnalysisActive \u2260 clearance"
+      ],
+      "severity": "medium",
+      "sha": "e5ddc6f8388a1c16c476b515f857ad0480669bea",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9 karaoke phrase continuity."
+    },
+    {
+      "req_id": "BL-PARTY-AUD-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Audience seats are distinct from performers; scripted tabs never claim independent humans or physical party.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        4
+      ],
+      "tests": [
+        "tests/party_audience_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyAudienceHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital audience seats only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "independent_humans=false",
+        "physical_party=false"
+      ],
+      "severity": "medium",
+      "sha": "e5ddc6f8388a1c16c476b515f857ad0480669bea",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9 party audience honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-REVOKE-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Mid-phrase mic revoke clears pitch claim; a11y tap fallback remains; physicalMicAccepted false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_revoke_continuity.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeRevokeContinuity.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital matrix only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_mic=false"
+      ],
+      "severity": "medium",
+      "sha": "6661640b92ac1942628a28c91dcf6e574d1ac3b8",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9b karaoke revoke continuity."
+    },
+    {
+      "req_id": "BL-HOST-CAL-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Digital host calibration may accept tap samples; physicalLanTimingAccepted and timing claimedPassed stay false.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/host_calibration_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/hostCalibrationHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital calibration only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_lan_timing=false",
+        "claimedPassed=false"
+      ],
+      "severity": "medium",
+      "sha": "6661640b92ac1942628a28c91dcf6e574d1ac3b8",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9b host calibration honesty."
+    },
+    {
+      "req_id": "BL-PARTY-KARAOKE-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Party karaoke composes audience honesty + mid-phrase revoke; audience never inherits pitch; physical mic/party/humans stay false.",
+      "verification_method": "unit_test + host/player banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital party karaoke only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "audience_pitch=false",
+        "physical_mic=false",
+        "independent_humans=false",
+        "physical_party=false"
+      ],
+      "severity": "medium",
+      "sha": "d5ef428dc50bd030fd28921575c7689153c33ac2",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S9c party karaoke honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-HANDOFF-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Vocalist seat handoff does not transfer pitch; re-grant required; physicalMicAccepted false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_vocalist_handoff.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeVocalistHandoff.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital handoff only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_mic=false",
+        "pitchTransferred=false"
+      ],
+      "severity": "medium",
+      "sha": "96f0d8a5d4fd3edcc1c82161d69dc9dcb5b4b106",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S10 karaoke vocalist handoff."
+    },
+    {
+      "req_id": "BL-PARTY-KARAOKE-AUDIENCE-PITCH-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Audience/host seats never authorize karaoke pitch even with strong synthetic claims; performer claims still require bounds; physical mic/humans stay false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_audience_pitch_gate.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeAudiencePitchGate.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital audience pitch gate only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "audience_pitch=false",
+        "physical_mic=false",
+        "independent_humans=false"
+      ],
+      "severity": "medium",
+      "sha": "607ea1668af31bbd781ba80ef9d89e589f27d5a2",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S11 party karaoke audience pitch gate."
+    },
+    {
+      "req_id": "BL-PARTY-KARAOKE-REMATCH-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke rematch clears prior pitch; audience never inherits; physical mic/party/humans stay false.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_rematch_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeRematchHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital karaoke rematch only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "audience_pitch=false",
+        "physical_mic=false",
+        "physical_party=false",
+        "independent_humans=false"
+      ],
+      "severity": "medium",
+      "sha": "d44e870359b35e160441ebb7a043acb4c960ada5",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S12 party karaoke rematch honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-REMATCH-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke rematch clears prior pitch; audiencePitchAuthorized false; physical claims false.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_rematch_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeRematchHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital rematch only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_party=false",
+        "audience_pitch=false"
+      ],
+      "severity": "medium",
+      "sha": "b0025f3cf5cd77238b71ba20067ac2ab64a006f3",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S12 party karaoke rematch honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-EXCL-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "At most one seat holds pitch claim; multiPitchAllowed and physicalMultiMicAccepted false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_pitch_exclusivity.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokePitchExclusivity.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital exclusivity only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_multi_mic=false"
+      ],
+      "severity": "medium",
+      "sha": "31369b13cd5f604be1722f5ef3ff98be12c8a5f1",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S13 karaoke pitch exclusivity."
+    },
+    {
+      "req_id": "BL-KARAOKE-NET-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke-active loopback membership does not authorize audience pitch or physical LAN.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_networking_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeNetworkingHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Loopback only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_lan=false",
+        "audience_pitch=false"
+      ],
+      "severity": "medium",
+      "sha": "31369b13cd5f604be1722f5ef3ff98be12c8a5f1",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S13 party karaoke networking honesty."
+    },
+    {
+      "req_id": "BL-PARTY-KARAOKE-NET-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke-active loopback membership \u2260 physical LAN; audience seats never authorize pitch over the wire.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_networking_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeNetworkingHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital karaoke networking only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "audience_pitch=false",
+        "physical_lan=false",
+        "physical_mic=false",
+        "independent_humans=false"
+      ],
+      "severity": "medium",
+      "sha": "cabdb90dd5ad7b4475c24c88afe2d1550b8e18a9",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S13 party karaoke networking honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-SECURE-CONT-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Pitch clears when secure context is lost; physicalMicAccepted false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_secure_context_continuity.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeSecureContextContinuity.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital secure-context gate only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_mic=false"
+      ],
+      "severity": "medium",
+      "sha": "c53b39215ef201e33123fb19e542b8c1382c8e4f",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S14 karaoke secure-context continuity."
+    }
+  ]
+}

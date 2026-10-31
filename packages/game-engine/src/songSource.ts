@@ -7,6 +7,7 @@ import type { LinkResolveResult, PlaybackStatus, SongCatalogEntry } from '@beatl
 import {
   AuthorizedCatalogEmbedProvider,
   ProceduralMetronomeProvider,
+  ProceduralSongBedProvider,
   selectMediaProvider,
   type MediaDescriptor,
   type MediaResolveInput,
@@ -18,6 +19,7 @@ export type SongSourceKind =
   | 'authorized_platform_playback'
   | 'provider_reference_only'
   | 'procedural_fixture'
+  | 'procedural_song_bed'
   | 'user_attested_upload'
   | 'blocked';
 
@@ -65,6 +67,12 @@ const ALLOWED_PROVIDER_HOSTS = new Set([
   'youtu.be',
   'music.apple.com',
   'itunes.apple.com',
+  'soundcloud.com',
+  'on.soundcloud.com',
+  'bandcamp.com',
+  'vimeo.com',
+  'player.vimeo.com',
+  'audius.co',
 ]);
 
 export function detectRipIntent(signals: string[] = []): boolean {
@@ -133,8 +141,8 @@ export function resolveSongSource(input: SongSourceResolveInput): SongSource {
   let canGameplayStream = false;
   let canCacheMedia = false;
 
-  if (media.kind === 'catalog_approved') {
-    kind = 'approved_catalog';
+  if (media.kind === 'catalog_approved' || media.kind === 'procedural_song_bed') {
+    kind = media.kind === 'procedural_song_bed' ? 'procedural_song_bed' : 'approved_catalog';
     canGameplayStream = media.playbackStatus === 'PLAYABLE_APPROVED';
     canCacheMedia = false;
   } else if (media.kind === 'procedural_metronome') {
@@ -142,8 +150,12 @@ export function resolveSongSource(input: SongSourceResolveInput): SongSource {
     canGameplayStream = true;
     canCacheMedia = false;
   } else if (media.kind === 'authorized_embed') {
-    // Only claim authorized platform playback when status proves it.
-    if (media.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM') {
+    // Official embed / legacy "authorized platform" from API keys is reference-only.
+    // Gameplay stream requires GAMEPLAY_SYNC_AUTHORIZED (catalog or rights-verified direct audio).
+    const syncOk =
+      input.linkResult?.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED' &&
+      media.playbackStatus === 'PLAYABLE_APPROVED';
+    if (syncOk) {
       kind = 'authorized_platform_playback';
       canGameplayStream = true;
       canCacheMedia = false;
@@ -253,5 +265,6 @@ export function songSourceFromLinkResult(
 export {
   AuthorizedCatalogEmbedProvider,
   ProceduralMetronomeProvider,
+  ProceduralSongBedProvider,
   createRightsAttestation,
 };

@@ -33,6 +33,9 @@ export function runBehavioralNegatives() {
       linkResult: {
         platform: 'spotify',
         playbackStatus: 'METADATA_ONLY',
+        capabilityState: 'OFFICIAL_EMBED_AVAILABLE',
+        mediaClassification: 'embed_only',
+        providerCredentialsPresent: false,
         title: 'Meta',
         artist: null,
         album: null,
