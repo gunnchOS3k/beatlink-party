@@ -60,6 +60,7 @@ export * from './karaokeVocalistHandoff.js';
 export * from './partyKaraokeAudiencePitchGate.js';
 export * from './partyKaraokeRematchHonesty.js';
 export * from './partyKaraokeNetworkingHonesty.js';
+export * from './karaokePitchExclusivity.js';
 export * from './avFeedback.js';
 export * from './visualPackHarness.js';
 export * from './linkCapability.js';
