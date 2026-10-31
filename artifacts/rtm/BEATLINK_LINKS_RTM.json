@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T23:13:00Z",
+  "generated_at": "2026-10-31T00:13:11Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S13 tip 31369b1; prior a9e5f7f CI SUCCESS. Pitch exclusivity + karaoke networking honesty. HUMAN/RC2/V1 false."
+      "notes": "S13 karaoke networking honesty atop soaked a9e5f7f. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -1068,6 +1068,43 @@
       ],
       "severity": "medium",
       "sha": "31369b13cd5f604be1722f5ef3ff98be12c8a5f1",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S13 party karaoke networking honesty."
+    },
+    {
+      "req_id": "BL-PARTY-KARAOKE-NET-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke-active loopback membership \u2260 physical LAN; audience seats never authorize pitch over the wire.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        4,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_networking_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeNetworkingHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital karaoke networking only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "audience_pitch=false",
+        "physical_lan=false",
+        "physical_mic=false",
+        "independent_humans=false"
+      ],
+      "severity": "medium",
+      "sha": "PLACEHOLDER_S13",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S13 party karaoke networking honesty."
