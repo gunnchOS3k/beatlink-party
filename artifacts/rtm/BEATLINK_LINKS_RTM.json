@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S13 tip 0b168b1; soaked a9e5f7f all SUCCESS. Karaoke networking honesty. HUMAN/RC2/V1 false."
+      "notes": "S13 tip cabdb90; soaked a9e5f7f all SUCCESS. Karaoke networking honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -1104,7 +1104,7 @@
         "independent_humans=false"
       ],
       "severity": "medium",
-      "sha": "0b168b1f89b4c7a30771768b03fe0d619fe46eef",
+      "sha": "cabdb90dd5ad7b4475c24c88afe2d1550b8e18a9",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S13 party karaoke networking honesty."
