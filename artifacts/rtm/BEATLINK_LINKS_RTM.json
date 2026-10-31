@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S14 458e430 after eba2bd9 CI SUCCESS. Secure-context continuity. HUMAN/RC2/V1 false."
+      "notes": "S14 tip c53b392; prior eba2bd9 CI SUCCESS. Secure-context continuity. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -1137,7 +1137,7 @@
         "physical_mic=false"
       ],
       "severity": "medium",
-      "sha": "458e4306039a06e2ba8d9690a2c2b49a1a6ef98e",
+      "sha": "c53b39215ef201e33123fb19e542b8c1382c8e4f",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S14 karaoke secure-context continuity."
