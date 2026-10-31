@@ -59,6 +59,7 @@ import {
   assessHostCalibrationHonesty,
   assessPartyKaraokeHonesty,
   assessPartyKaraokeRematchHonesty,
+  assessPartyKaraokeNetworkingHonesty,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -1286,6 +1287,29 @@ export default function HostPage() {
               ],
               transportClass: 'loopback_dual_socket',
             }).honestyBanner}
+          </p>
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}
+            data-testid="host-party-karaoke-networking-honesty"
+          >
+            {
+              assessPartyKaraokeNetworkingHonesty({
+                seats: [
+                  { role: 'host', connected: true },
+                  ...room.players.map((p) => ({
+                    role: 'performer' as const,
+                    connected: true,
+                    ready: p.ready,
+                  })),
+                  ...room.audience.map(() => ({
+                    role: 'audience' as const,
+                    connected: true,
+                  })),
+                ],
+                transportClass: 'loopback_dual_socket',
+                karaokeModeActive: room.gameMode === 'KaraokePerformance',
+              }).honestyBanner
+            }
           </p>
           <p
             style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.75rem', marginBottom: '0.5rem' }}

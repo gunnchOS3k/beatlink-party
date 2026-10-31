@@ -33,6 +33,7 @@ import {
   assessPartyKaraokeHonesty,
   assessPartyKaraokeAudiencePitchGate,
   assessKaraokeVocalistHandoff,
+  assessKaraokePitchExclusivity,
   planMobileHostPresentation,
   type LiveMicContinuousHandle,
   type MicMatrixState,
@@ -988,6 +989,16 @@ export default function PlayerPage() {
                   toSeatId: player.role === 'vocalist' ? 'self' : String(player.role),
                   priorPitchActive: pitchAnalysisActive,
                 }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-pitch-exclusivity-banner"
+            >
+              {
+                assessKaraokePitchExclusivity([
+                  { seatId: String(player.id ?? 'self'), pitchActive: pitchAnalysisActive },
+                ]).honestyBanner
               }
             </p>
             <p
