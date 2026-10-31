@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-31T00:13:11Z",
+  "generated_at": "2026-10-31T00:48:00Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S13 tip cabdb90; soaked a9e5f7f all SUCCESS. Karaoke networking honesty. HUMAN/RC2/V1 false."
+      "notes": "S14 458e430 after eba2bd9 CI SUCCESS. Secure-context continuity. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -1108,6 +1108,39 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S13 party karaoke networking honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-SECURE-CONT-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Pitch clears when secure context is lost; physicalMicAccepted false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_secure_context_continuity.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokeSecureContextContinuity.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital secure-context gate only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_mic=false"
+      ],
+      "severity": "medium",
+      "sha": "458e4306039a06e2ba8d9690a2c2b49a1a6ef98e",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S14 karaoke secure-context continuity."
     }
   ]
 }
