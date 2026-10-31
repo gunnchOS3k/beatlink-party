@@ -92,3 +92,21 @@ See `artifacts/physical_lan_review/PHYSICAL_LAN_REVIEW_PACKET.md`. Do **not** ma
 - This doc is the runbook. A recorded multi-device capture on your LAN is separate physical evidence.
 - Human commercial / V1 / BETA / RC / LAUNCH gates stay **false** until earned elsewhere.
 - Scripted browser tabs are not a physical phone party.
+
+
+## Digital karaoke exhaustion (2026-10-31)
+
+Soaked tip `eba2bd9` (PR #34 `fix/loopback-room-lifecycle`): CI / Wave007 / Gate1 / Windows Pilot **Success**.
+
+Digital karaoke + party-net honesty rows are implemented for loopback/browser only. **Stop karaoke-only digital churn** until physical evidence exists.
+
+### EXTERNAL blockers (do not invent)
+
+| Gate | Status |
+|---|---|
+| Physical phone party (2–6 independent devices) | **EXTERNAL** — packet PREPARED, not executed |
+| Physical TV host presentation acceptance | **EXTERNAL** — CSS/viewport dock ≠ TV pass |
+| Secure-origin LAN mic grant on real phones | **EXTERNAL** — stub MediaStream ≠ device mic |
+| HUMAN / RC2 / V1 / commercial | **false** |
+
+Next digital (non-karaoke) may continue on host-cal / rematch / audience / timing honesty without claiming phone/TV.

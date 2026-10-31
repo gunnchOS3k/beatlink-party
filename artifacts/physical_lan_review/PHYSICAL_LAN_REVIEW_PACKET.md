@@ -8,7 +8,7 @@ S7 (2026-10-30) ran **loopback dual-socket** host/player LAN workflow + timing r
 
 | Field | Value |
 |---|---|
-| Source SHA | `95dac5c70b03afaacf55442bd5d50ddcafcb53bd` (S7b tip; S8 deepen pending stamp — fill tested build hash at physical session) |
+| Source SHA | `eba2bd9f0c755f6cfcc2f8456cc5966c0ffa2542` (PR #34 soaked tip; Windows Success 2026-10-31 — fill tested package hash at physical session) |
 | Tested package / web build hash | _pending_ |
 | Server bind | LAN + TLS? _pending_ (require secure origin for mic grant) |
 | Host device / OS | _pending_ |
