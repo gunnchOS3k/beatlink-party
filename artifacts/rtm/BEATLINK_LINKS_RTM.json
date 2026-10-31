@@ -5,7 +5,7 @@
   "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
   "product_id": "beatlink-party",
   "product_repo": "https://github.com/gunnchOS3k/beatlink-party",
-  "generated_at": "2026-10-30T23:40:00Z",
+  "generated_at": "2026-10-30T23:13:00Z",
   "honesty_flags": {
     "HUMAN": false,
     "RC2": false,
@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S12 tip b0025f3; prior 5f16fc8 CI SUCCESS. Karaoke rematch honesty. HUMAN/RC2/V1 false."
+      "notes": "S13 08b8e16 after a9e5f7f CI SUCCESS. Pitch exclusivity + karaoke networking honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -1004,6 +1004,73 @@
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S12 party karaoke rematch honesty."
+    },
+    {
+      "req_id": "BL-KARAOKE-EXCL-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "At most one seat holds pitch claim; multiPitchAllowed and physicalMultiMicAccepted false.",
+      "verification_method": "unit_test + player banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/karaoke_pitch_exclusivity.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/karaokePitchExclusivity.ts",
+        "apps/web/src/pages/PlayerPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Digital exclusivity only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_multi_mic=false"
+      ],
+      "severity": "medium",
+      "sha": "08b8e16654fcb7a9a1a2ec45bbdaf5f8f5cab0f9",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S13 karaoke pitch exclusivity."
+    },
+    {
+      "req_id": "BL-KARAOKE-NET-001",
+      "owner": "beatlink-party",
+      "expected_behavior": "Karaoke-active loopback membership does not authorize audience pitch or physical LAN.",
+      "verification_method": "unit_test + host banner",
+      "layers": [
+        2,
+        5
+      ],
+      "tests": [
+        "tests/party_karaoke_networking_honesty.test.ts"
+      ],
+      "automated_evidence": [
+        "packages/game-engine/src/partyKaraokeNetworkingHonesty.ts",
+        "apps/web/src/pages/HostPage.tsx"
+      ],
+      "native_physical": {
+        "status": "partial",
+        "platforms": [
+          "browser"
+        ],
+        "notes": "Loopback only."
+      },
+      "art_status": "not_applicable",
+      "limitations": [
+        "physical_lan=false",
+        "audience_pitch=false"
+      ],
+      "severity": "medium",
+      "sha": "08b8e16654fcb7a9a1a2ec45bbdaf5f8f5cab0f9",
+      "independent_review_status": "not_started",
+      "cursor_complete_status": "complete",
+      "notes": "S13 party karaoke networking honesty."
     }
   ]
 }
