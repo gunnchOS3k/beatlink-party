@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S13 08b8e16 after a9e5f7f CI SUCCESS. Pitch exclusivity + karaoke networking honesty. HUMAN/RC2/V1 false."
+      "notes": "S13 tip 31369b1; prior a9e5f7f CI SUCCESS. Pitch exclusivity + karaoke networking honesty. HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
@@ -1033,7 +1033,7 @@
         "physical_multi_mic=false"
       ],
       "severity": "medium",
-      "sha": "08b8e16654fcb7a9a1a2ec45bbdaf5f8f5cab0f9",
+      "sha": "31369b13cd5f604be1722f5ef3ff98be12c8a5f1",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S13 karaoke pitch exclusivity."
@@ -1067,7 +1067,7 @@
         "audience_pitch=false"
       ],
       "severity": "medium",
-      "sha": "08b8e16654fcb7a9a1a2ec45bbdaf5f8f5cab0f9",
+      "sha": "31369b13cd5f604be1722f5ef3ff98be12c8a5f1",
       "independent_review_status": "not_started",
       "cursor_complete_status": "complete",
       "notes": "S13 party karaoke networking honesty."
