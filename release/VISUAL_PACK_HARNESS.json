@@ -7,18 +7,48 @@
   "VISUAL_MODEL_REVIEW": "HISTORICAL_CAPTURES_ONLY",
   "label": "VISUAL",
   "surfaces": [
-    { "id": "landing", "kind": "screen", "capture": "HISTORICAL" },
-    { "id": "host_lobby", "kind": "screen", "capture": "HISTORICAL" },
-    { "id": "player_phone", "kind": "screen", "capture": "DEFERRED" },
-    { "id": "audience_seat", "kind": "screen", "capture": "DEFERRED" },
-    { "id": "results_awards", "kind": "screen", "capture": "DEFERRED" },
-    { "id": "five_mode_transitions", "kind": "flow", "capture": "DEFERRED" }
+    {
+      "id": "landing",
+      "kind": "screen",
+      "capture": "HISTORICAL"
+    },
+    {
+      "id": "host_lobby",
+      "kind": "screen",
+      "capture": "HISTORICAL"
+    },
+    {
+      "id": "player_phone",
+      "kind": "screen",
+      "capture": "DEFERRED"
+    },
+    {
+      "id": "audience_seat",
+      "kind": "screen",
+      "capture": "DEFERRED"
+    },
+    {
+      "id": "results_awards",
+      "kind": "screen",
+      "capture": "DEFERRED"
+    },
+    {
+      "id": "five_mode_transitions",
+      "kind": "flow",
+      "capture": "DEFERRED"
+    },
+    {
+      "id": "beat_tap_stage",
+      "kind": "stage",
+      "capture": "DEFERRED"
+    }
   ],
   "deferred_heavy_work": [
     "repeated video capture of five-mode session",
+    "Beat Tap stage art / lighting pass (procedural\u2260finished)",
     "large Android/iOS export batches",
     "additional QEMU device soaks",
     "heavy multiplayer load simulations beyond unit harness"
   ],
-  "notes": "Harness + historical landing/host captures only. No invented pixel critique. Heavy capture deferred while Product-Use QEMU is active."
+  "notes": "Harness + historical landing/host captures only. Beat Tap stage surface listed DEFERRED \u2014 art/stage unfinished. No invented pixel critique. Rights not weakened. Heavy capture deferred under Product-Use QEMU rule."
 }
