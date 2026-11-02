@@ -1,0 +1,30 @@
+{
+  "schema": "beat.s16_call_and_response_digital_continue.v1",
+  "human_false": true,
+  "rc2_false": true,
+  "v1_false": true,
+  "rights": {
+    "LINK_EQUALS_RIP_PERMISSION": false,
+    "GAMEPLAY_SYNC_AUTHORIZED": false,
+    "karaoke_mode_active_on_surface": false,
+    "rights_not_weakened": true
+  },
+  "mode": {
+    "id": "CallAndResponse",
+    "first_mode_still_beat_tap": true,
+    "digital_only": true,
+    "physical_party_claimed": false
+  },
+  "iv_packet": {
+    "path": "artifacts/physical_lan_review/PHYSICAL_LAN_REVIEW_PACKET.md",
+    "preserved_at": "ab7a8d9",
+    "status": "PREPARED — not executed",
+    "untouched_this_continue": true
+  },
+  "tests": {
+    "party_call_and_response_loop_honesty": "PASS",
+    "party_beat_tap_loop_honesty": "PASS"
+  },
+  "notes": "Non-karaoke digital continue after Beat Tap honesty; IV physical LAN packet preserved.",
+  "base_tip": "8823d38"
+}
