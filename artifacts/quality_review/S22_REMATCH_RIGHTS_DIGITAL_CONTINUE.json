@@ -1,0 +1,19 @@
+{
+  "schema": "beat.s22_rematch_rights_digital_continue.v1",
+  "human_false": true,
+  "rc2_false": true,
+  "v1_false": true,
+  "rights": {
+    "LINK_EQUALS_RIP_PERMISSION": false,
+    "GAMEPLAY_SYNC_AUTHORIZED": false,
+    "rematchElevatesRights": false,
+    "scoredRematchAuthorized": false,
+    "rights_not_weakened": true
+  },
+  "iv_packet": {
+    "preserved_at": "ab7a8d9",
+    "untouched_this_continue": true,
+    "codex_launched": false
+  },
+  "base_tip": "02c0797"
+}
