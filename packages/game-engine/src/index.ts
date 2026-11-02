@@ -76,3 +76,4 @@ export * from './privateDraftBeatmap.js';
 export * from './rightsLayers.js';
 export * from './partyNonKaraokeModeCatalogHonesty.js';
 export * from './partyAudienceRightsHonesty.js';
+export * from './partyStartGateRightsHonesty.js';
