@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S19 non-karaoke mode catalog digital continue after S18 @79b051b; IV package still READY_FOR_CODEX_IV_WHEN_AUTHORIZED @ab7a8d9 floor; rights not weakened; HUMAN/RC2/V1 false."
+      "notes": "S20 audience rights digital continue after S19 @80cbda1; IV package still READY_FOR_CODEX_IV_WHEN_AUTHORIZED @ab7a8d9 floor; rights not weakened; HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
