@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S16 non-karaoke CallAndResponse digital continue after S15 Beat Tap @8823d38; IV package still READY_FOR_CODEX_IV_WHEN_AUTHORIZED @ab7a8d9 floor; rights not weakened; HUMAN/RC2/V1 false."
+      "notes": "S17 Band Roles digital continue after S16 @b0af8f4; IV package still READY_FOR_CODEX_IV_WHEN_AUTHORIZED @ab7a8d9 floor; rights not weakened; HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
