@@ -61,6 +61,7 @@ import {
   assessPartyKaraokeRematchHonesty,
   assessPartyKaraokeNetworkingHonesty,
   assessPartyRematchRightsHonesty,
+  assessPartyStartGateRightsHonesty,
 } from '@beatlink/game-engine';
 
 function LinkPreview({ result }: { result: LinkResolveResult }) {
@@ -1135,6 +1136,23 @@ export default function HostPage() {
                     : canStartCalibration
                       ? 'Ready — calibration opens next, then countdown.'
                       : startDisabledReason ?? 'Complete party setup to start'}
+                </p>
+                <p
+                  data-testid="host-party-start-gate-rights-honesty"
+                  style={{ fontSize: '0.75rem', color: 'var(--muted)', margin: 0 }}
+                >
+                  {
+                    assessPartyStartGateRightsHonesty({
+                      previewOnlyLink:
+                        displayResult?.platform === 'direct_https' &&
+                        displayResult?.capabilityState !== 'GAMEPLAY_SYNC_AUTHORIZED',
+                      hasMatchedCatalogId: Boolean(
+                        displayResult?.matchedCatalogId ?? room?.selectedSongId,
+                      ),
+                      syncEligible:
+                        displayResult?.capabilityState === 'GAMEPLAY_SYNC_AUTHORIZED',
+                    }).honestyBanner
+                  }
                 </p>
                 {startError ? (
                   <button

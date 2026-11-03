@@ -14,7 +14,7 @@
   "phase_summary": {
     "cursor_complete": {
       "status": "in_progress",
-      "notes": "S22 rematch-rights digital continue after S21 @02c0797; rematchReady≠GAMEPLAY_SYNC; IV package still READY_FOR_CODEX_IV_WHEN_AUTHORIZED @ab7a8d9 floor; rights not weakened; HUMAN/RC2/V1 false."
+      "notes": "S23 start-gate host wiring after S22 @ef02d6e; syncEligible≠legal clearance/scored-start authority; IV package still READY_FOR_CODEX_IV_WHEN_AUTHORIZED @ab7a8d9 floor; rights not weakened; HUMAN/RC2/V1 false."
     },
     "codex_independently_verified": {
       "status": "not_started"
