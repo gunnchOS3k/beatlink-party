@@ -299,6 +299,17 @@ export class RoomManager {
     if (typeof room.audienceEnergyMultiplier !== 'number') {
       room.audienceEnergyMultiplier = 1;
     }
+    if (room.gameMode === 'KaraokePerformance' && !room.scoredTargets.has('karaoke-pitch-policy:1')) {
+      // An older snapshot cannot tell whether a prior vocal score included
+      // pitch. Conservatively seal those phrases, preserving timing scores;
+      // never reconstruct a historical microphone/pitch claim from guesswork.
+      for (const prompt of room.beatmap?.vocalPrompts ?? []) {
+        if (room.players.some((player) => room.scoredTargets.has(`${player.id}:vocal:${prompt.id}`))) {
+          room.scoredTargets.add(`karaoke-pitch:${prompt.id}`);
+        }
+      }
+      room.scoredTargets.add('karaoke-pitch-policy:1');
+    }
     for (const p of room.players) {
       if (!room.deviceTimingProfiles.has(p.id)) {
         room.deviceTimingProfiles.set(
@@ -1421,7 +1432,7 @@ export class RoomManager {
     }
     if (room.phase !== 'playing') return null;
     const player = room.players.find((p) => p.id === input.playerId);
-    if (!player) return null;
+    if (!player || !player.connected) return null;
 
     const roundId = input.round_id ?? room.round_id ?? `${room.code}-r${room.rematchRound}`;
     if (input.round_id && room.round_id && input.round_id !== room.round_id) {
@@ -1578,8 +1589,9 @@ export class RoomManager {
           gameTimeMs,
           player.streak,
         );
-        // Pitch bonus only when client reports continuous live DSP (never synthetic probe).
-        // Server bounds — client flag alone NEVER grants pitch path. Not physical-mic attestation.
+        // These bounded scalars remain client reports, not microphone permission
+        // or audio provenance. Only one karaoke pitch contribution may score
+        // for this phrase; all other vocalists keep ordinary timing scoring.
         const pitchBound = boundKaraokePitchClaim({
           inputType: input.type,
           pitchAnalysisActive: input.pitchAnalysisActive,
@@ -1587,8 +1599,16 @@ export class RoomManager {
           voicedCoverage: input.voicedCoverage,
           phraseFrames: input.phraseFrames,
         });
-        const pitchAnalysisActive = pitchBound.pitchAnalysisActive;
-        const pitchMatch = pitchBound.pitchMatch;
+        const karaokePitchTarget = `karaoke-pitch:${prompt.id}`;
+        const pitchContended = room.gameMode === 'KaraokePerformance' &&
+          pitchBound.pitchAnalysisActive && room.scoredTargets.has(karaokePitchTarget);
+        const pitchAnalysisActive = pitchBound.pitchAnalysisActive && !pitchContended;
+        const pitchMatch = pitchAnalysisActive ? pitchBound.pitchMatch : undefined;
+        if (room.gameMode === 'KaraokePerformance' && pitchAnalysisActive) {
+          // The existing scored-target snapshot persists this allocation across
+          // reconnect/hydration and clears it only with the normal round reset.
+          room.scoredTargets.add(karaokePitchTarget);
+        }
         const modeScore = scoreForMode({
           modeId: room.gameMode,
           difficulty: room.difficulty,
@@ -1615,7 +1635,9 @@ export class RoomManager {
         const result = {
           ...vocal,
           points: modeScore.points,
-          message: modeScore.message,
+          message: pitchContended
+            ? (vocal.grade === 'miss' ? 'Missed phrase' : 'Phrase hit (timing; pitch already counted)')
+            : modeScore.message,
           crowdBoost: modeScore.crowdBoost,
         };
         Object.assign(player, updatePlayerStats(player, result));
@@ -1644,6 +1666,8 @@ export class RoomManager {
           meta: {
             inputType: input.type,
             fallback: input.type === 'vocal_fallback_tap',
+            karaokePitchContribution: room.gameMode === 'KaraokePerformance' && pitchAnalysisActive,
+            karaokePitchContended: pitchContended,
           },
         });
       }

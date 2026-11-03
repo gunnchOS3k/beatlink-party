@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" fill="none">
+  <!-- Original editable BeatLink venue study, Codex 2026-11-02.
+       Fictional rooftop architecture; no geographic, performer or final-art claim. -->
+  <defs>
+    <linearGradient id="sky" x1="600" y1="0" x2="600" y2="350" gradientUnits="userSpaceOnUse"><stop stop-color="#131b3a"/><stop offset=".65" stop-color="#414765"/><stop offset="1" stop-color="#ca8f86"/></linearGradient>
+    <linearGradient id="deck" x1="600" y1="316" x2="600" y2="460" gradientUnits="userSpaceOnUse"><stop stop-color="#655364"/><stop offset="1" stop-color="#20283c"/></linearGradient>
+    <linearGradient id="canopy" x1="550" y1="57" x2="670" y2="240" gradientUnits="userSpaceOnUse"><stop stop-color="#d6b997"/><stop offset="1" stop-color="#a56573"/></linearGradient>
+    <linearGradient id="edge" x1="170" y1="350" x2="1000" y2="350" gradientUnits="userSpaceOnUse"><stop stop-color="#f1bd92"/><stop offset=".5" stop-color="#d2b2dd"/><stop offset="1" stop-color="#72d4da"/></linearGradient>
+    <radialGradient id="moon"><stop stop-color="#f2c6a3" stop-opacity=".2"/><stop offset="1" stop-color="#efc4a4" stop-opacity="0"/></radialGradient>
+    <pattern id="windows" width="24" height="25" patternUnits="userSpaceOnUse"><path d="M7 7h4v7H7zm8 0h3v7h-3z" fill="#a3a7c4" opacity=".25"/></pattern>
+  </defs>
+  <path d="M0 0h1200v460H0z" fill="url(#sky)"/>
+  <circle cx="1005" cy="89" r="112" fill="url(#moon)"/><circle cx="1005" cy="89" r="27" fill="#e5c1aa"/><path d="M1017 64a27 27 0 0 0 0 50 27 27 0 0 1 0-50" fill="#eecfb7"/>
+  <g fill="#56617c"><path d="M0 246h41v-46h45v67h30v-92h29v-13h36v110h29v-72h48v85h33v-111h39v37h23v85h74v-93h47v87h51v-50h54v65h39v-108h26v-23h42v121h24v-64h51v64h54v-91h43v-22h23v112h51v-61h40v74h28v-117h44v29h31v91h26v-86h47v21h29v84h45v-56h50v96H0z"/></g>
+  <path d="M0 289h63V181h52v108h35v-47h62v59h35V206h61v99h52v-62h58v73h42v-46h66v45h34v-95h48v100h46v-46h63v45h34v-87h55v84h45v-53h62v55h45v-87h49v89h50v-58h59v62h32v-94h47v90h69V238h36v100H0z" fill="#303d5a"/>
+  <path d="M0 289h63V181h52v108h35v-47h62v59h35V206h61v99h52v-62h58v73h42v-46h66v45h34v-95h48v100h46v-46h63v45h34v-87h55v84h45v-53h62v55h45v-87h49v89h50v-58h59v62h32v-94h47v90h69V238h36v100H0z" fill="url(#windows)"/>
+  <!-- Cantilevered fabric canopy and asymmetric service pergolas. -->
+  <path d="M185 40v277m830-277v277" stroke="#9c8c91" stroke-width="8"/>
+  <path d="M185 45 600 118 1015 45M185 45l72 178M1015 45l-72 178" stroke="#675a71" stroke-width="2"/>
+  <path d="M257 91Q600 5 943 91L836 204Q600 139 364 204Z" fill="url(#canopy)"/>
+  <path d="M257 91q343 40 686 0M364 204q236-104 472 0M600 55v115" stroke="#e4c4ae" stroke-opacity=".45"/>
+  <path d="M34 174h123v12H34zm12 10h9v141h-9zm91 0h9v141h-9zM1043 174h123v12h-123zm12 10h9v141h-9zm91 0h9v141h-9z" fill="#30334a"/>
+  <path d="M37 167h116m-108-9h107m897 9h116m-108-9h107" stroke="#9a7d87" stroke-width="5"/>
+  <!-- Lamps follow a deliberately sagging cable rather than a repeated grid. -->
+  <path d="M35 38Q300 150 600 86Q891 145 1165 38" stroke="#151c30" stroke-width="3"/>
+  <g fill="#f6cf97" stroke="#efb988" stroke-width="2"><path d="m90 59-8 19h16zM211 97l-8 19h16zM347 108l-8 19h16zM479 102l-8 19h16zM719 102l-8 19h16zM855 110l-8 19h16zM989 96l-8 19h16zM1110 59l-8 19h16z"/></g>
+  <!-- Rear balcony and original planters anchor the room in a built space. -->
+  <path d="M0 305h1200v8H0z" fill="#303b53"/><path d="M0 282h1200M18 282v43m74-43v43m74-43v43m868-43v43m74-43v43m74-43v43" stroke="#78859d" stroke-width="2"/>
+  <g fill="#303d4d"><path d="M27 301h100l-10 40H39zm1046 0h100l-12 40h-76z"/></g>
+  <g stroke="#6e9b93" stroke-width="4" stroke-linecap="round"><path d="m76 307-17-57m17 57 20-69m-20 69-1-75m1048 75-17-57m17 57 20-69m-20 69-1-75"/></g>
+  <g fill="#668b87"><path d="M60 267q-24-27-17-37 21 6 17 37m31-5q8-35 25-29-1 24-25 29m-16-11q-15-37 1-44 15 19-1 44m1032 16q-24-27-17-37 21 6 17 37m31-5q8-35 25-29-1 24-25 29m-16-11q-15-37 1-44 15 19-1 44"/></g>
+  <path d="M0 323h1200v137H0z" fill="url(#deck)"/>
+  <path d="m0 401 1200-38M0 447l1200-46M233 323 84 460m278-137-76 137m219-137-4 137m147-137 73 137m68-137 149 137" stroke="#b293a3" stroke-opacity=".16"/>
+  <path d="m178 338 181-28h482l181 28v40L842 410H358l-180-32Z" fill="#272b42" stroke="#77667c"/>
+  <path d="m178 338 181-28h482l181 28-180 39H358Z" fill="#574459"/>
+  <path d="m178 342 180 39h484l180-39" stroke="url(#edge)" stroke-width="3"/>
+  <path d="m220 340 159-22h442l159 22-159 29H379Z" stroke="#b79aac" stroke-opacity=".25"/>
+  <!-- Small side tables and practical floor monitors; center remains performable. -->
+  <g fill="#1b263b" stroke="#7d7b95"><path d="m217 306 38-4 12 32-48 5zM933 302l38 4-2 33-48-5z"/><ellipse cx="76" cy="372" rx="35" ry="8"/><ellipse cx="1124" cy="372" rx="35" ry="8"/><path d="M76 380v40m1048-40v40"/></g>
+  <path d="m244 321 10-2m690 0 10 2" stroke="#82dadd" stroke-width="3"/>
+</svg>

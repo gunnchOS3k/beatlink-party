@@ -1,0 +1,398 @@
+{
+  "scope": "Complete24-surface BeatLink visual inventory, with source-integrated candidate deltas. No whole-game art completion.",
+  "baseline_preflight": "outputs/cross-game-art-20261102/beatlink-inventory.json",
+  "baseline_sha": "240d77863d06ac495217cced1dd2c094570ff26c",
+  "reconciled_cursor_sha": "ef02d6eeaec2e1b210236264fa1296aa4cd481ab",
+  "inventory": [
+    {
+      "id": "BL-ART-001",
+      "surface": "Link Room venue architecture",
+      "status": "runtime_integrated_production_candidate",
+      "observed": "Preserved Link Room SVG bytes unchanged, with new source-integrated performer overlay and selector. Prior SVG review remains valid only for unchanged art; changed composition needs fresh runtime and distinct review.",
+      "source_hooks": [
+        "apps/web/public/brand/concert-ribbon-stage.svg",
+        "apps/web/src/components/ConcertStage.tsx:9",
+        "docs/art/CONCERT_STAGE_PROVENANCE.json"
+      ],
+      "next_production": "Preserve original; add depth, authored prop families and performer staging rather than overwrite with a recolor.",
+      "human_approved_final": false,
+      "preflight_status": "runtime_integrated_production_candidate",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "One original1200x460 hand-authored SVG: linked ribbon screen, truss fixtures, acoustic stacks, raised oval deck and quiet floor. Previously separately reviewed with limitations; no new runtime capture in this preflight.",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT"
+    },
+    {
+      "id": "BL-ART-002",
+      "surface": "Multiple distinct venue identities",
+      "status": "original_art_candidate",
+      "observed": "Three actual editable venue sources now wired to the host cosmetic selector: preserved Link Room, open-sky canopy/skyline Afterglow Terrace, and enclosed ribbed/resonator Resonance Hall. New venues have not yet been seen in running gameplay.",
+      "source_hooks": [
+        "apps/web/src/components/ConcertStage.tsx:40",
+        "apps/web/src/pages/HostPage.tsx:1179"
+      ],
+      "next_production": "Author at least2 additional architecturally different editable stages and deterministic selection with an explicit unapproved candidate designation.",
+      "human_approved_final": false,
+      "preflight_status": "missing",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT",
+      "candidate_batch": "original-venues-and-role-performances-20261102",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "ConcertStage hardcodes one SVG and THE LINK ROOM for countdown, all5 playing modes and results. No venue registry or alternate original stages."
+    },
+    {
+      "id": "BL-ART-003",
+      "surface": "Dynamic venue lighting and atmosphere",
+      "status": "original_art_candidate",
+      "observed": "New haze angles/opacity and performer joints sample calibrated gameTimeMs, BPM and chart offset. Free11s haze loop and parent stage wash/countdown loops are suppressed for the clock-driven stage. No audio-spectrum response is claimed; unchanged generic CSS elsewhere remains outside this batch.",
+      "source_hooks": [
+        "apps/web/src/components/ConcertStage.tsx:29",
+        "apps/web/src/components/concert-stage.css:38",
+        "apps/web/src/styles/stage-energy.css:320"
+      ],
+      "next_production": "Drive beam angle, deck rim and haze intensity from calibrated game timeline/section/beat phase; eliminate autonomous rhythm-looking loops; provide reduced-motion stills and restrained flash limits.",
+      "human_approved_final": false,
+      "preflight_status": "procedural_candidate",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT",
+      "candidate_batch": "original-venues-and-role-performances-20261102",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "Four beat indicators use timeMs*bpm. Haze uses11s infinite CSS sweep; generic stage wash4.5/1.8s and follow spot5.5/2.4s are independent timers. They are decorative, not measured audio response."
+    },
+    {
+      "id": "BL-ART-004",
+      "surface": "Concert screens and background animation",
+      "status": "original_art_candidate",
+      "observed": "Static linked-ribbon screen includes play triangle. Four numbered beats and song progress are live, but no section-aware animated graphic program.",
+      "source_hooks": [
+        "apps/web/public/brand/concert-ribbon-stage.svg",
+        "packages/game-engine/src/modePlayableSession.ts:206"
+      ],
+      "next_production": "Create original screen programs per venue using actual section boundaries, avoiding fake audio equalizer claims.",
+      "human_approved_final": false,
+      "preflight_status": "original_art_candidate",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-005",
+      "surface": "Stage props and decorations",
+      "status": "original_art_candidate",
+      "observed": "Speaker stacks, light rail, fixtures, deck and floor are integrated vector art; no modeled instrument/backline family.",
+      "source_hooks": [
+        "apps/web/public/brand/concert-ribbon-stage.svg"
+      ],
+      "next_production": "Author distinct original microphones, pads, drum/synth stands, cable routes and venue dressing as editable layered assets.",
+      "human_approved_final": false,
+      "preflight_status": "original_art_candidate",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-006",
+      "surface": "Performers and player representation",
+      "status": "original_art_candidate",
+      "observed": "Original articulated2D representations now render only actual connected role-assigned player seats. Three distinct beat/vocal/hype silhouettes have clothing, hair, face/hand details and role props. They are unnamed original candidates, not approved cast,3D models or final avatars.",
+      "source_hooks": [
+        "apps/web/src/pages/HostPage.tsx:1249",
+        "apps/web/src/brand/glyphs.tsx",
+        "packages/shared/src/types.ts:128"
+      ],
+      "next_production": "Produce clearly labeled original unnamed player-representation candidates for beat/vocal/hype roles; retain real seat names and roles without inventing approved canon.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT",
+      "candidate_batch": "original-venues-and-role-performances-20261102",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "Players appear as name, color dot, role glyph, score/streak cards. No canonical character design registry, performer mesh, articulated vector puppet, face or outfit. Catalog artist display strings do not establish official cast."
+    },
+    {
+      "id": "BL-ART-007",
+      "surface": "Performer outfits and accessories",
+      "status": "original_art_candidate",
+      "observed": "Three authored role outfit families have layered closed jackets/coat/poncho panels, trousers, stage footwear, wrist/head accessories and cosmetic seat accents. They are fixed candidate illustrations, not an implemented wardrobe/customization system.",
+      "source_hooks": [
+        "apps/web/public/brand/glyphs/beat.svg",
+        "apps/web/public/brand/glyphs/vocal.svg",
+        "apps/web/public/brand/glyphs/hype.svg"
+      ],
+      "next_production": "Author coordinated but distinct original jackets/tops/trousers/footwear/accessory silhouettes for the proposed representations; palette variants remain cosmetic, not new canon or gameplay powers.",
+      "human_approved_final": false,
+      "preflight_status": "missing",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT",
+      "candidate_batch": "original-venues-and-role-performances-20261102",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "No tracked blend/GLB/FBX or costume/garment assets in the inspected owned web asset tree. Role glyphs are functional symbols, not wearable art."
+    },
+    {
+      "id": "BL-ART-008",
+      "surface": "Microphones and instrument presentation",
+      "status": "original_art_candidate",
+      "observed": "New authored mic grille/handle/cable/grip, percussion pad pair/stand/sticks and hype hand/wrist accessories are integrated into articulated role sources. Runtime hand contact and visual quality remain unassessed.",
+      "source_hooks": [
+        "apps/web/src/brand/glyphs.tsx:46",
+        "apps/web/src/pages/PlayerPage.tsx:850"
+      ],
+      "next_production": "Create readable original microphone, drum pad and crowd-light props with hand contact, grip and no floating attachment.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT",
+      "candidate_batch": "original-venues-and-role-performances-20261102",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "Vocal glyph has a microphone shape; phone controllers have tap/swipe/vocal/hype buttons. No full performance instrument asset."
+    },
+    {
+      "id": "BL-ART-009",
+      "surface": "Expressive performer motion and choreography",
+      "status": "original_art_candidate",
+      "observed": "Real room-clock samples now drive body/head/shoulder/arm poses. Accepted score grades drive bounded response gestures; vocalist mouth follows actual phrase-active/closing state; results use a held completion pose. No autonomous performer timer,3D rig or final animation acceptance is claimed.",
+      "source_hooks": [
+        "apps/web/src/components/ConcertStage.tsx",
+        "apps/web/src/pages/HostPage.tsx:490"
+      ],
+      "next_production": "Author2D articulated source poses and role-specific sequences (head/shoulder/hand/prop coordination) sampled from actual beat, phrase windows and accepted outcome events; rigged3D can follow once an intentional renderer exists.",
+      "human_approved_final": false,
+      "preflight_status": "missing",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT",
+      "candidate_batch": "original-venues-and-role-performances-20261102",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "No performer joints, idle/anticipation/contact/recovery poses, sing acting, facial expressions or entrance/end sequence. CSS lighting is not character animation."
+    },
+    {
+      "id": "BL-ART-010",
+      "surface": "Audience environment and reactions",
+      "status": "placeholder",
+      "observed": "No visible authored crowd in Link Room. AudiencePage has moderated Hype/Encore buttons, text accepted/rejected feedback and4s cooldown; RoomState holds actual spectator seats.",
+      "source_hooks": [
+        "apps/web/src/pages/AudiencePage.tsx",
+        "packages/shared/src/types.ts:148",
+        "apps/web/src/lib/socket.ts:114"
+      ],
+      "next_production": "Author original crowd silhouettes/expressive motions and react only to accepted audience.influence/actual crowdMeter; separate decorative crowd from real participant count.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-011",
+      "surface": "Camera and stage composition",
+      "status": "runtime_integrated_production_candidate",
+      "observed": "Host layout places fixed2D venue beside live cues/note lane and player cards; mobile stacks. No authored cinematic camera path or depth-aware framing.",
+      "source_hooks": [
+        "apps/web/src/components/concert-stage.css:256",
+        "apps/web/src/pages/HostPage.tsx:1191"
+      ],
+      "next_production": "Compose a stable normal gameplay view first; add subtle clock/section-based framing only where lyrics and note targets remain stationary/readable.",
+      "human_approved_final": false,
+      "preflight_status": "runtime_integrated_production_candidate",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-012",
+      "surface": "Song start/end and between-song transitions",
+      "status": "original_art_candidate",
+      "observed": "Actual countdown/playing/paused/results stages retain the selected venue and real roster; paused calibrated snapshot holds pose; countdown/results have original ready/completion poses. Full entrance, camera and encore choreography remain future work.",
+      "source_hooks": [
+        "apps/web/src/pages/HostPage.tsx:1179",
+        "apps/web/src/pages/HostPage.tsx:1402",
+        "apps/web/src/pages/PlayerPage.tsx:744"
+      ],
+      "next_production": "Author ready poses, first-downbeat reveal, end-pose/encore and rematch reset derived from actual lifecycle state; avoid invented elapsed song continuation while paused/disconnected.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT",
+      "candidate_batch": "original-venues-and-role-performances-20261102",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "Countdown numbers, same static ConcertStage during countdown/results, and phase copy. No original entrance, bow, venue reveal or encore choreography."
+    },
+    {
+      "id": "BL-ART-013",
+      "surface": "Timed note highway",
+      "status": "runtime_integrated_production_candidate",
+      "observed": "Original3rail tap/hold/swipe glyph lane uses chart time minus current time,1800ms lookahead; no autonomous note CSS animation. Hold is fixed-width symbol, not duration-tail art.",
+      "source_hooks": [
+        "apps/web/src/components/ConcertStage.tsx:119",
+        "packages/shared/src/beatmapSchema.ts:5"
+      ],
+      "next_production": "Refine approach/hit-line hierarchy and draw actual hold duration/lanes from chart data; keep symbol/text distinctions and gameplay geometry unchanged.",
+      "human_approved_final": false,
+      "preflight_status": "runtime_integrated_production_candidate",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-014",
+      "surface": "Hit and miss feedback",
+      "status": "original_art_candidate",
+      "observed": "Host now retains the accepted game.score_update event and anchors bounded per-seat hit/miss visual response to observed room-clock time, rejecting stale rounds/future samples. Exact contact timestamps are absent from ScoreEvent. Player controller feedback remains unchanged.",
+      "source_hooks": [
+        "apps/web/src/pages/PlayerPage.tsx:138",
+        "apps/web/src/pages/HostPage.tsx:490",
+        "apps/web/src/lib/socket.ts:93"
+      ],
+      "next_production": "Retain accepted score event with bounded round identity for spectator VFX; animate readable graded shapes and performer contact/recovery using clock-aged envelopes rather than a free-running beat timer.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT",
+      "candidate_batch": "original-venues-and-role-performances-20261102",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "Player receives real ScoreEvent and shows grade-colored message for800ms via setTimeout. Host currently accepts onScore(room) and discards the already-provided ScoreEvent. No authored accepted-hit burst or miss choreography."
+    },
+    {
+      "id": "BL-ART-015",
+      "surface": "Combo and streak effects",
+      "status": "placeholder",
+      "observed": "Score/streak/combo values and text MEGA labels exist; no distinct authored combo visual family.",
+      "source_hooks": [
+        "apps/web/src/pages/PlayerPage.tsx:768",
+        "packages/game-engine/src/combo.ts"
+      ],
+      "next_production": "Create bounded original streak ribbons/role accents driven by accepted score state; do not manufacture scoring success or reward on client-only input.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-016",
+      "surface": "Score and crowd visualization",
+      "status": "runtime_integrated_production_candidate",
+      "observed": "Team number, percentage meter, per-player score cards and song progress are integrated. Crowd is a real room aggregate, not proof of physical spectators.",
+      "source_hooks": [
+        "apps/web/src/pages/HostPage.tsx:1231",
+        "apps/web/src/components/ConcertStage.tsx:89"
+      ],
+      "next_production": "Improve spectator hierarchy, safe count-up/reaction accents and team identity while keeping actual numbers continuously readable.",
+      "human_approved_final": false,
+      "preflight_status": "runtime_integrated_production_candidate",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-017",
+      "surface": "Lyrics and karaoke readability",
+      "status": "runtime_integrated_production_candidate",
+      "observed": "Host cue outside details renders actual upcoming/active prompt; player displays phrase plus progress. Prompt schema has phrase time/duration only, no word or syllable timestamps.",
+      "source_hooks": [
+        "apps/web/src/pages/HostPage.tsx:1207",
+        "apps/web/src/pages/PlayerPage.tsx:875",
+        "packages/game-engine/src/karaoke.ts:21"
+      ],
+      "next_production": "Author clear current/next phrase layout and phrase-timed highlight; do not invent word-level lyric sync or scrape unauthorized lyrics.",
+      "human_approved_final": false,
+      "preflight_status": "runtime_integrated_production_candidate",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-018",
+      "surface": "Vocalist feedback and pitch display",
+      "status": "placeholder",
+      "observed": "Continuous consented DSP path exposes lastHz and pitch/timing mode text; no authored pitch contour or expressive vocalist. Client pitchAnalysisActive remains a claim, not hardware attestation.",
+      "source_hooks": [
+        "apps/web/src/pages/PlayerPage.tsx:920",
+        "packages/game-engine/src/hostKaraokeStage.ts"
+      ],
+      "next_production": "Create understandable target/observed pitch and voiced-coverage visualization from ephemeral existing data; timing-only fallback stays clear; no recording, fake live sound, physical mic or musical accuracy acceptance claim.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-019",
+      "surface": "Participant/role identity and social interactions",
+      "status": "original_art_candidate",
+      "observed": "Real seat names/roles/colors now bind original2D role representations, while existing participant cards remain available. Representation is cosmetic; no invented participants or finished identity customization claim.",
+      "source_hooks": [
+        "packages/shared/src/types.ts:128",
+        "apps/web/src/brand/glyphs.tsx",
+        "apps/web/src/pages/HostPage.tsx:1249"
+      ],
+      "next_production": "Add original player representation silhouettes, visible role props, name/role labels and respectful diverse styling; never replace actual roster count with invented people.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "independent_review_of_new_batch": false,
+      "preflight_observed": "Names,6color palette, role glyphs, role selection, readiness, player dot and team state. No expressive avatar/customization family or shared celebration acting.",
+      "source_integrated": true,
+      "runtime_visual_assessment": "PENDING_RESOURCE_SLOT"
+    },
+    {
+      "id": "BL-ART-020",
+      "surface": "Mode-specific stage identity",
+      "status": "placeholder",
+      "observed": "5actual modes share the same venue. buildModeStageVisual exposes section, cue, karaoke/call-response/prediction phases, currently mostly text.",
+      "source_hooks": [
+        "packages/game-engine/src/modePlayableSession.ts:206",
+        "apps/web/src/pages/HostPage.tsx:1196"
+      ],
+      "next_production": "Author visual gestures/lighting/call-response treatments per actual mode using existing phase contracts, not new unsupported game modes.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-021",
+      "surface": "Rematch, awards and victory moments",
+      "status": "placeholder",
+      "observed": "Real awards and individual/team results shown as cards; generic results stripe/shimmer and same venue, no performer/audience choreography.",
+      "source_hooks": [
+        "apps/web/src/pages/HostPage.tsx:1400",
+        "apps/web/src/pages/PlayerPage.tsx:1090",
+        "packages/game-engine/src/awards.ts"
+      ],
+      "next_production": "Create original award emblems, role-specific celebration poses and actual rematch entrance/reset; preserve Cursor S22 rights messaging and score authority.",
+      "human_approved_final": false,
+      "preflight_status": "placeholder",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-022",
+      "surface": "Phone-to-TV presentation",
+      "status": "runtime_integrated_production_candidate",
+      "observed": "Distinct host/player class contracts, room-code hero, portrait controller and host note lane; original role glyphs. No new physical device/8human acceptance obtained.",
+      "source_hooks": [
+        "apps/web/src/components/StageChrome.tsx",
+        "apps/web/src/styles/stage-energy.css:130"
+      ],
+      "next_production": "Keep TV lyric/score contrast and phone input targets clear while integrating stage artwork; capture same real round on host plus controller after production.",
+      "human_approved_final": false,
+      "preflight_status": "runtime_integrated_production_candidate",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-023",
+      "surface": "Accessibility and low-bandwidth art fallback",
+      "status": "procedural_candidate",
+      "observed": "Reduced motion/high contrast settings and CSS exist. Fonts are GoogleCDN with no tracked localwoff2. index viewport currently maximum-scale1/user-scalable=no. No new visual stress/browser tests in this task.",
+      "source_hooks": [
+        "apps/web/src/lib/deviceSettings.tsx",
+        "apps/web/src/components/concert-stage.css:387",
+        "apps/web/src/styles/stage-energy.css:842",
+        "apps/web/index.html:5"
+      ],
+      "next_production": "Preserve readable static state, non-color grade cues and control size; evaluate/remedy zoom restriction and local fonts alongside actual visual production, not as substitute.",
+      "human_approved_final": false,
+      "preflight_status": "procedural_candidate",
+      "independent_review_of_new_batch": false
+    },
+    {
+      "id": "BL-ART-024",
+      "surface": "Audio/visual rights and provenance",
+      "status": "runtime_integrated_production_candidate",
+      "observed": "Original vector venue has editable source and no external imagery/fonts; music metadata/embed remains distinct from gameplay authorization.6WAV assets tracked in Cursor committed source but intentionally absent from the owned sparse snapshot; existing audio code falls back to chart synth.",
+      "source_hooks": [
+        "docs/art/CONCERT_STAGE_PROVENANCE.json",
+        "apps/web/src/lib/hostAudio.ts:115",
+        "content/songs/LAUNCH_AUDIO_MANIFEST.json"
+      ],
+      "next_production": "Use exact original/authorized media and preserve rights assertions/commercialEligible=false; restore needed committed WAV assets only under bounded integration scope, never rip provider streams.",
+      "human_approved_final": false,
+      "preflight_status": "runtime_integrated_production_candidate",
+      "independent_review_of_new_batch": false
+    }
+  ],
+  "candidate_provenance": "docs/art/VENUES_PERFORMANCE_PROVENANCE.json",
+  "HUMAN": false,
+  "RC2": false,
+  "V1": false
+}

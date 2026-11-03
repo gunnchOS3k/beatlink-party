@@ -8,6 +8,7 @@ import type {
   LinkResolveResult,
   ProviderAuthStatus,
   RoomState,
+  ScoreEvent,
   SongCatalogEntry,
 } from '@beatlink/shared';
 import { GAME_MODE_IDS, MAX_PERFORMERS, ROLES } from '@beatlink/shared';
@@ -29,6 +30,8 @@ import {
 } from '../lib/deviceSettings';
 import { NetworkStatus, SettingsDrawer } from '../components/NetworkStatus';
 import { BrandMark } from '../components/StageChrome';
+import { ConcertStage, ConcertNoteHighway } from '../components/ConcertStage';
+import { observeStageScore, type StageReaction, type StageVenueId } from '../components/stagePerformance';
 import { roleGlyph } from '../brand/glyphs';
 import { catalogEligibility, linkEligibility } from '../brand/complianceLabels';
 import { YouTubeOfficialPlayer } from '../components/YouTubeOfficialPlayer';
@@ -39,9 +42,9 @@ import {
   nextPredictionSection,
   resolveMediaDescriptor,
   evaluateStartPreconditions,
-  upcomingSyncedNotes,
   openModePlayableSession,
   buildModeStageVisual,
+  buildKaraokePromptState,
   buildHostDigitalWorkflow,
   hostDigitalCompletionPercent,
   hostDigitalHonestyBanner,
@@ -405,6 +408,10 @@ export default function HostPage() {
   const [providers, setProviders] = useState<ProviderAuthStatus | null>(null);
   const [resolving, setResolving] = useState(false);
   const [gameTimeMs, setGameTimeMs] = useState(0);
+  const [stageVenueId, setStageVenueId] = useState<StageVenueId>('link-room');
+  const [stageReactions, setStageReactions] = useState<StageReaction[]>([]);
+  const stageClockRef = useRef(0);
+  stageClockRef.current = gameTimeMs;
   const [results, setResults] = useState<GameResults | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [songsError, setSongsError] = useState<string | null>(null);
@@ -468,6 +475,9 @@ export default function HostPage() {
     () => ({
       onState: (r: RoomState) => {
         setRoom(r);
+        if (r.phase === 'paused' && Number.isFinite(r.pauseElapsedGameMs)) {
+          setGameTimeMs(Math.max(0, r.pauseElapsedGameMs! - (r.calibrationOffsetMs ?? 0)));
+        }
         if (r.linkResolveResult) setLinkResult(r.linkResolveResult);
         if (r.pastedLinkUrl) setLinkUrl(r.pastedLinkUrl);
         if (r.phase === 'calibrating' || r.phase === 'countdown' || r.phase === 'playing') {
@@ -482,13 +492,21 @@ export default function HostPage() {
       },
       onStarted: (r: RoomState, nextBeatmap: Beatmap | null) => {
         setRoom(r);
+        setStageReactions([]);
+        setGameTimeMs(0);
+        stageClockRef.current = 0;
         setResults(null);
         setStartPending(false);
         setStartError(null);
         if (nextBeatmap) setBeatmap(nextBeatmap);
         if (nextBeatmap?.bpm) setBeatmapBpm(nextBeatmap.bpm);
       },
-      onScore: (r: RoomState) => setRoom(r),
+      onScore: (r: RoomState, event: ScoreEvent | null) => {
+        setRoom(r);
+        if (r.phase === 'playing') {
+          setStageReactions(previous => observeStageScore(previous, event, stageClockRef.current, r.round_id ?? `round-${r.rematchRound}`));
+        }
+      },
       onEnded: (r: RoomState, res: GameResults) => {
         setRoom(r);
         setResults(res);
@@ -927,23 +945,7 @@ export default function HostPage() {
                 <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{profile.hints[0]}</p>
                 <AccessibilityPanel settings={settings} update={update} />
               </SettingsDrawer>
-              {(room?.phase === 'playing' || room?.phase === 'paused') && (
-                <button
-                  className="btn-secondary"
-                  type="button"
-                  data-testid="host-session-pause-resume"
-                  onClick={() => {
-                    if (!socket || !code) return;
-                    const pausing = room?.phase !== 'paused';
-                    const event = pausing ? 'room.session_pause' : 'room.session_resume';
-                    if (pausing) setHostPausedOnce(true);
-                    else setHostResumedOnce(true);
-                    socket.emit(event, { code, hostToken }, () => undefined);
-                  }}
-                >
-                  {room?.phase === 'paused' ? 'Resume Session' : 'Pause Session (Host)'}
-                </button>
-              )}
+
             </div>
 
             <div className="panel stack">
@@ -1193,7 +1195,8 @@ export default function HostPage() {
       )}
 
       {room?.phase === 'countdown' && (
-        <div className="stage" data-testid="host-countdown" data-phase="countdown">
+        <div className="stage concert-clock-stage" data-testid="host-countdown" data-phase="countdown">
+          <ConcertStage phase="countdown" title={selectedSong?.title ?? "Your next track"} artist={selectedSong?.artist} venueId={stageVenueId} onVenueChange={setStageVenueId} players={room.players} reduceMotion={settings.reduceMotion} />
           <div className="countdown">{room.countdown === 0 ? 'GO' : room.countdown}</div>
           <p style={{ textAlign: 'center', fontSize: '1.5rem' }}>Get ready!</p>
           {room.calibrationOffsetMs != null && (
@@ -1204,15 +1207,27 @@ export default function HostPage() {
         </div>
       )}
 
-      {room?.phase === 'playing' && (
-        <div className="stage" data-testid="host-gameplay" data-phase="playing">
-          <div className="se-follow-spot" aria-hidden="true" />
-          <h2 style={{ textAlign: 'center', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>
-            LIVE ON STAGE
-          </h2>
-          <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '0.75rem' }}>
-            Media: {mediaDescriptor.kind} — {mediaDescriptor.message}
-          </p>
+      {(room?.phase === 'playing' || room?.phase === 'paused') && (
+        <div className="stage concert-clock-stage" data-testid="host-gameplay" data-phase={room.phase}>
+          <div className="concert-play-layout">
+          <ConcertStage
+            phase={room.phase}
+            title={selectedSong?.title ?? "Live session"}
+            artist={selectedSong?.artist}
+            timeMs={gameTimeMs}
+            durationMs={room.gameDurationMs}
+            bpm={selectedSong?.bpm ?? beatmapBpm}
+            crowd={room.crowdMeter}
+            venueId={stageVenueId}
+            onVenueChange={setStageVenueId}
+            players={room.players}
+            reactions={stageReactions}
+            roundKey={room.round_id ?? `round-${room.rematchRound}`}
+            offsetMs={beatmap?.offsetMs ?? 0}
+            reduceMotion={settings.reduceMotion}
+            vocalActive={Boolean(beatmap && ['active', 'closing'].includes(buildKaraokePromptState(beatmap.vocalPrompts, gameTimeMs).phase))}
+          />
+            <div className="concert-live-panel">
           <p style={{ textAlign: 'center', marginBottom: '0.5rem' }} data-testid="host-mode-stage-line">
             {activeMode.label}
             {room.gameMode === 'CallAndResponse' && beatmap
@@ -1224,6 +1239,95 @@ export default function HostPage() {
             {room.gameMode === 'KaraokePerformance' ? ' · phrase prompts (pitch only if mic consented)' : ''}
             {room.gameMode === 'BandRoles' ? ' · band lanes live' : ''}
             {room.gameMode === 'BeatTap' ? ' · note-synced song bed' : ''}
+          </p>
+          {beatmap && selectedSong && (
+            <p
+              className="concert-live-cue"
+              data-testid="host-song-session"
+            >
+              {(() => {
+                const session = openModePlayableSession({
+                  modeId: room.gameMode,
+                  catalogEntry: selectedSong,
+                  beatmap,
+                  difficulty: room.difficulty,
+                });
+                const visual = buildModeStageVisual(session, beatmap, gameTimeMs, room.crowdMeter);
+                const vocal = room.gameMode === 'KaraokePerformance' || room.gameMode === 'BandRoles'
+                  ? buildKaraokePromptState(beatmap.vocalPrompts, gameTimeMs)
+                  : null;
+                return <>
+                  <span className="concert-cue-label">{vocal ? (vocal.phase === 'upcoming' ? 'Up next' : vocal.prompt ? 'Sing it' : 'Listen for your phrase') : 'On cue'}</span>
+                  <strong data-vocal-phase={vocal?.phase}>{vocal ? (vocal.prompt?.text ?? 'Instrumental') : (visual.activeCueLabel ?? 'Listen for the next phrase')}</strong>
+                </>;
+              })()}
+            </p>
+          )}
+          <ConcertNoteHighway notes={beatmap?.notes ?? []} timeMs={gameTimeMs} />
+          <div className="row" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div>
+              <span className="label">Team Score</span>
+              <div style={{ fontSize: '2rem', fontWeight: 800 }}>{room.teamScore}</div>
+            </div>
+            <div style={{ flex: 1, maxWidth: 300, margin: '0 1rem' }}>
+              <span className="label">Crowd Meter</span>
+              <div className="meter">
+                <div className="meter-fill" style={{ width: `${room.crowdMeter}%` }} />
+              </div>
+            </div>
+            <div>
+              <span className="label">Time</span>
+              <div style={{ fontSize: '1.5rem' }}>
+                {Math.floor(gameTimeMs / 1000)}s / {Math.floor(room.gameDurationMs / 1000)}s
+              </div>
+            </div>
+          </div>
+          <div className="grid-2">
+            {(room.players ?? []).map((p) => (
+              <div key={p.id} className="player-card" style={{ borderColor: p.color }}>
+                <div className="player-dot" style={{ background: p.color }} />
+                <div style={{ flex: 1 }}>
+                  <strong>{p.name}</strong>
+                  <div style={{ fontSize: '0.85rem' }}>
+                    {ROLES.find((r) => r.id === p.role)?.label} · Score: {p.score} · Streak:{' '}
+                    {p.streak} · Combo: {p.combo ?? 1}x
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+              {(room?.phase === 'playing' || room?.phase === 'paused') && (
+                <button
+                  className="btn-secondary btn-large"
+                  style={{ marginBottom: '0.75rem' }}
+                  type="button"
+                  data-testid="host-session-pause-resume"
+                  onClick={() => {
+                    if (!socket || !code) return;
+                    const pausing = room?.phase !== 'paused';
+                    const event = pausing ? 'room.session_pause' : 'room.session_resume';
+                    if (pausing) setHostPausedOnce(true);
+                    else setHostResumedOnce(true);
+                    socket.emit(event, { code, hostToken }, () => undefined);
+                  }}
+                >
+                  {room?.phase === 'paused' ? 'Resume Session' : 'Pause Session (Host)'}
+                </button>
+              )}
+          <button
+            className="btn-secondary btn-large"
+            type="button"
+            data-testid="host-force-end-playing"
+            onClick={() => socket.emit('game.force_end', { code, hostToken })}
+          >
+            End Round Now
+          </button>
+            </div>
+          </div>
+          <details className="concert-session-details">
+            <summary>Session details</summary>
+          <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '0.75rem' }}>
+            Media: {mediaDescriptor.kind} — {mediaDescriptor.message}
           </p>
           {room.gameMode === 'KaraokePerformance' ? (
             <p
@@ -1341,99 +1445,15 @@ export default function HostPage() {
               return `AUTHORIZED_MEDIA songSelected=${Boolean(selectedSong)} syncEligible=${assessed.syncEligible} · verifiedLegalClearance=${assessed.verifiedLegalClearance} · commercialEligible=${assessed.commercialEligible} · assertion≠legal clearance`;
             })()}
           </p>
-          {beatmap && selectedSong && (
-            <p
-              className="label"
-              style={{ textAlign: 'center', marginBottom: '0.5rem' }}
-              data-testid="host-song-session"
-            >
-              {(() => {
-                const session = openModePlayableSession({
-                  modeId: room.gameMode,
-                  catalogEntry: selectedSong,
-                  beatmap,
-                  difficulty: room.difficulty,
-                });
-                const visual = buildModeStageVisual(session, beatmap, gameTimeMs, room.crowdMeter);
-                return `${visual.headline} · cue: ${visual.activeCueLabel ?? '—'} · ${session.audioKind}`;
-              })()}
-            </p>
-          )}
-          <div className="beat-lane" data-testid="host-synced-note-lane">
-            {beatmap
-              ? upcomingSyncedNotes(
-                  beatmap.notes.map((n) => ({
-                    noteId: n.id,
-                    timeMs: n.timeMs,
-                    lane: n.type === 'hold' ? 'hold' : n.type === 'swipe' ? 'swipe' : 'tap',
-                    label: n.type,
-                  })),
-                  gameTimeMs,
-                  1800,
-                )
-                  .slice(0, 16)
-                  .map((cue, i) => (
-                    <div
-                      key={cue.noteId}
-                      className="beat-bar"
-                      data-lane={cue.lane}
-                      style={{
-                        animationDelay: `${i * 0.04}s`,
-                        opacity: Math.max(0.35, 1 - (cue.timeMs - gameTimeMs) / 1800),
-                      }}
-                      title={cue.label}
-                    />
-                  ))
-              : Array.from({ length: 16 }).map((_, i) => (
-                  <div key={i} className="beat-bar" style={{ animationDelay: `${i * 0.05}s` }} />
-                ))}
-          </div>
-          <div className="row" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <div>
-              <span className="label">Team Score</span>
-              <div style={{ fontSize: '2rem', fontWeight: 800 }}>{room.teamScore}</div>
-            </div>
-            <div style={{ flex: 1, maxWidth: 300, margin: '0 1rem' }}>
-              <span className="label">Crowd Meter</span>
-              <div className="meter">
-                <div className="meter-fill" style={{ width: `${room.crowdMeter}%` }} />
-              </div>
-            </div>
-            <div>
-              <span className="label">Time</span>
-              <div style={{ fontSize: '1.5rem' }}>
-                {Math.floor(gameTimeMs / 1000)}s / {Math.floor(room.gameDurationMs / 1000)}s
-              </div>
-            </div>
-          </div>
-          <div className="grid-2">
-            {(room.players ?? []).map((p) => (
-              <div key={p.id} className="player-card" style={{ borderColor: p.color }}>
-                <div className="player-dot" style={{ background: p.color }} />
-                <div style={{ flex: 1 }}>
-                  <strong>{p.name}</strong>
-                  <div style={{ fontSize: '0.85rem' }}>
-                    {ROLES.find((r) => r.id === p.role)?.label} · Score: {p.score} · Streak:{' '}
-                    {p.streak} · Combo: {p.combo ?? 1}x
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <button
-            className="btn-secondary btn-large"
-            type="button"
-            data-testid="host-force-end-playing"
-            onClick={() => socket.emit('game.force_end', { code, hostToken })}
-          >
-            End Round Now
-          </button>
+
+          </details>
         </div>
       )}
 
       {room?.phase === 'results' && (
         <div className="stack" data-testid="host-results">
-          <div className="stage" style={{ textAlign: 'center' }}>
+          <div className="stage concert-clock-stage" style={{ textAlign: 'center' }}>
+            <ConcertStage phase="results" title={selectedSong?.title ?? "Your party, your moment"} artist={selectedSong?.artist} crowd={results?.crowdMeter ?? 0} venueId={stageVenueId} onVenueChange={setStageVenueId} players={room.players} reduceMotion={settings.reduceMotion} />
             <h2 style={{ fontFamily: 'var(--font-display)' }}>Celebration</h2>
             <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--se-success-lime)' }}>
               {results?.teamScore ?? 0}

@@ -1,0 +1,37 @@
+{
+  "asset_id": "beatlink-link-room-concert-stage-v1",
+  "classification": "production_candidate",
+  "author": "Codex root implementation session, November 1, 2026",
+  "baseline_product_sha": "ab7a8d924ea3bb0b7b91b8909a64deed6edbdb67",
+  "design_references": [
+    "docs/GAME_DESIGN_DOCUMENT.md: bold concert aesthetic and couch-readable host UI",
+    "apps/web/src/styles/stage-energy.css: existing violet, magenta and cyan visual identity"
+  ],
+  "editable_master_and_runtime_asset": "apps/web/public/brand/concert-ribbon-stage.svg",
+  "export_settings": {
+    "format": "SVG",
+    "viewBox": "0 0 1200 460",
+    "width": 1200,
+    "height": 460,
+    "color_space": "sRGB",
+    "external_images": false,
+    "external_fonts": false,
+    "third_party_asset_sources": []
+  },
+  "original_work": "Hand-authored vector ribbon architecture, linked screen motif, acoustic stacks, lighting rail, fixtures, deck, floor and inlays; CSS lighting movement and React room-clock composition.",
+  "integration": [
+    "HostPage countdown, live gameplay and results",
+    "Real song title, artist, tempo, room crowd energy and song progress",
+    "Shape-coded chart notes positioned using existing gameplay time; no decorative fallback notes"
+  ],
+  "ownership": "Separate exact-SHA source snapshot. Active Cursor checkouts and existing Codex Anime artwork remain untouched.",
+  "review_evidence": "External packet ../evidence and ../INDEPENDENT_ART_REVIEW.md; author tests alone are not independent review.",
+  "limitations": [
+    "This is original 2D stage scenery and UI composition, not a 3D venue or animated character cast.",
+    "Headless browser viewports do not establish physical phone or TV performance, audio synchronization, musical quality, or human enjoyment.",
+    "Current product lifecycle, karaoke exclusivity and runtime-result defects are recorded in the separate BeatLink independent review and remain outside this art patch."
+  ],
+  "HUMAN": false,
+  "RC2": false,
+  "V1": false
+}

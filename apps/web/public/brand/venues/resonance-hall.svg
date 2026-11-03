@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" fill="none">
+  <!-- Original editable BeatLink interior study, Codex 2026-11-02.
+       Fictional acoustic hall; no historical building or approved-cast claim. -->
+  <defs>
+    <linearGradient id="room" x1="600" y1="0" x2="600" y2="460" gradientUnits="userSpaceOnUse"><stop stop-color="#172c36"/><stop offset="1" stop-color="#0b1725"/></linearGradient>
+    <linearGradient id="timber" x1="100" y1="0" x2="1000" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#8b655d"/><stop offset=".5" stop-color="#c49d7a"/><stop offset="1" stop-color="#5d5a61"/></linearGradient>
+    <linearGradient id="brass" x1="250" y1="0" x2="950" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#c3ad78"/><stop offset=".5" stop-color="#f1d6a1"/><stop offset="1" stop-color="#81745b"/></linearGradient>
+    <radialGradient id="shell"><stop stop-color="#577e83" stop-opacity=".5"/><stop offset="1" stop-color="#577e83" stop-opacity="0"/></radialGradient>
+    <linearGradient id="floor" x1="600" y1="310" x2="600" y2="460" gradientUnits="userSpaceOnUse"><stop stop-color="#36505b"/><stop offset="1" stop-color="#142331"/></linearGradient>
+  </defs>
+  <path d="M0 0h1200v460H0z" fill="url(#room)"/>
+  <ellipse cx="600" cy="220" rx="450" ry="270" fill="url(#shell)"/>
+  <!-- Deep acoustic shell: distinct closed architecture rather than an outdoor recolor. -->
+  <path d="M179 322V197C179 38 1021 38 1021 197v125" fill="#152b36" stroke="url(#timber)" stroke-width="30"/>
+  <path d="M225 322V206C225 70 975 70 975 206v116" stroke="#b2927a" stroke-width="4"/>
+  <path d="M267 322V213C267 101 933 101 933 213v109" stroke="url(#timber)" stroke-width="19"/>
+  <path d="M312 322V223C312 133 888 133 888 223v99" stroke="#9a8573" stroke-width="3"/>
+  <path d="M354 322V229C354 163 846 163 846 229v93" stroke="url(#timber)" stroke-width="16"/>
+  <path d="M399 322V239C399 195 801 195 801 239v83" stroke="#ba9f82" stroke-opacity=".4" stroke-width="3"/>
+  <path d="M455 318V251C455 220 745 220 745 251v67" fill="#213f48" stroke="#627b78"/>
+  <!-- Curved fluted wall panels and balcony shadows. -->
+  <path d="M0 16q95 30 137 104v204H0zm1200 0q-95 30-137 104v204h137z" fill="#392f35"/>
+  <g stroke="#9b7d70" stroke-width="6"><path d="M18 33q55 23 94 88v195M44 43q42 24 67 81M44 124v192M72 75q24 20 40 48M72 138v178M100 153v163M1182 33q-55 23-94 88v195M1156 43q-42 24-67 81M1156 124v192M1128 75q-24 20-40 48M1128 138v178M1100 153v163"/></g>
+  <path d="M0 327h166v18H0zm1034 0h166v18h-166z" fill="#0a1724"/>
+  <path d="M0 258h137m926 0h137" stroke="#c6ac82" stroke-width="3"/>
+  <!-- Suspended brass resonators; hand-spaced lengths form the venue signature. -->
+  <g stroke="#6e8586"><path d="M424 0v90M478 0v66M532 0v42M668 0v42M722 0v66M776 0v90"/></g>
+  <g fill="url(#brass)" stroke="#5f674f"><rect x="415" y="90" width="18" height="91" rx="8"/><rect x="469" y="66" width="18" height="83" rx="8"/><rect x="523" y="42" width="18" height="76" rx="8"/><rect x="659" y="42" width="18" height="76" rx="8"/><rect x="713" y="66" width="18" height="83" rx="8"/><rect x="767" y="90" width="18" height="91" rx="8"/></g>
+  <g stroke="#f5dfb5" stroke-opacity=".5"><path d="M420 100v64m54-88v57m54-81v50m136-50v50m54-26v57m54-33v64"/></g>
+  <circle cx="600" cy="116" r="40" fill="#19333d" stroke="url(#brass)" stroke-width="2"/>
+  <path d="M573 114c-15-22-35 19-12 20 22 0 28-39 49-39 22 0 28 39 49 39 22-1 3-42-13-20-15 21-29 21-43 0-13-21-17-21-30 0Z" transform="translate(-10 0) scale(1.025 1)" stroke="#c9b689" stroke-width="2"/>
+  <!-- Low practical lighting does not masquerade as audio-reactive data. -->
+  <g fill="#d2c59b"><path d="M164 234h11v37h-11zm861 0h11v37h-11z"/></g>
+  <g fill="#d5cca4" opacity=".09"><path d="m164 235-41 81h98zm861 0-41 81h98z"/></g>
+  <path d="M0 320h1200v140H0z" fill="url(#floor)"/>
+  <!-- Side audience tiers; deliberately unoccupied until real roster art is added. -->
+  <path d="m0 350 177-21 44 17L0 388zm0 51 250-48 26 17L0 451zm1200-51-177-21-44 17 221 42zm0 51-250-48-26 17 276 81z" fill="#0e1c2a" stroke="#52616a"/>
+  <path d="m21 356 133-16m-130 71 184-37m971-18-133-16m130 71-184-37" stroke="#c0aa7c" stroke-opacity=".3" stroke-width="2"/>
+  <!-- The center stage has a curved timber face and concentric brass inlay. -->
+  <path d="M235 348v36c0 72 730 72 730 0v-36" fill="#483d40" stroke="#8c7966"/>
+  <ellipse cx="600" cy="349" rx="365" ry="53" fill="#446067" stroke="#b2ad8b" stroke-width="2"/>
+  <ellipse cx="600" cy="349" rx="326" ry="42" fill="#314b57" stroke="#baa77c" stroke-opacity=".5"/>
+  <ellipse cx="600" cy="349" rx="270" ry="31" stroke="#7d9694" stroke-opacity=".4"/>
+  <path d="M280 378v20m39-11v18m44-12v18m47-12v17m48-12v17m48-13v17m48-14v17m48-15v17m48-17v17m48-19v17m48-22v17m48-26v17m48-30v17m44-34v17m39-37v20" stroke="#d0b68b" stroke-opacity=".28"/>
+  <path d="M289 365q311 71 622 0" stroke="#b6d1bb" stroke-width="2" stroke-opacity=".7"/>
+  <g fill="#1a303d" stroke="#777f76"><path d="m301 302 43-5 17 31-54 8zm555-5 43 5-6 34-54-8z"/></g>
+</svg>

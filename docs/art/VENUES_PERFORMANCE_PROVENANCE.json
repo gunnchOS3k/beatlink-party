@@ -1,0 +1,100 @@
+{
+  "batch": "original-venues-and-role-performances-20261102",
+  "classification": "original_art_candidate",
+  "source_integrated": true,
+  "runtime_visual_assessed": false,
+  "independent_review": "PENDING_DISTINCT_REVIEW",
+  "human_approved_final_art": false,
+  "source_baseline": "240d77863d06ac495217cced1dd2c094570ff26c",
+  "reconciled_committed_cursor": "ef02d6eeaec2e1b210236264fa1296aa4cd481ab",
+  "reconciliation_commit": "a919d6d",
+  "author": "Codex delegated BeatLink production agent",
+  "created_at_utc": "2026-11-02T20:40:06.889579+00:00",
+  "design_authority": [
+    {
+      "repo": "gunnchOS3k/beatlink-party",
+      "sha": "ef02d6eeaec2e1b210236264fa1296aa4cd481ab",
+      "paths": [
+        "docs/GAME_DESIGN_DOCUMENT.md",
+        "docs/PRODUCT_IDENTITY.md",
+        "docs/PRODUCT_REQUIREMENTS.md"
+      ],
+      "scope": "concert aesthetic, role-based shared stage, phone controller, original product identity; no canonical performer cast specified"
+    },
+    "Existing violet/magenta/cyan Stage Energy tokens and preserved original Link Room architecture",
+    "Owner cross-game production direction attachment1db9c7ae-2737-4c54-acf4-812eec4e8b49"
+  ],
+  "assets": [
+    {
+      "path": "apps/web/public/brand/concert-ribbon-stage.svg",
+      "sha256": "340ab73fb9262e4967054deab0525332a6b99b56bd504d1a9edbe5d2c950bad6",
+      "bytes": 5338
+    },
+    {
+      "path": "apps/web/public/brand/venues/afterglow-terrace.svg",
+      "sha256": "94b8fc5223943cbb37fd0383aa4e73fc64fc73105f874656db5199f9dd7abce7",
+      "bytes": 4947
+    },
+    {
+      "path": "apps/web/public/brand/venues/resonance-hall.svg",
+      "sha256": "e289b9d1506a56c899db3e26dbd68cc2543017b83d1e5b4a48a4c3c20c58af28",
+      "bytes": 5075
+    },
+    {
+      "path": "apps/web/src/components/StagePerformers.tsx",
+      "sha256": "e4944d5919fadfee96463753f484c9a0152c0b4ef853e7e966edfdeae96d66b0",
+      "bytes": 15848
+    },
+    {
+      "path": "apps/web/src/components/stagePerformance.ts",
+      "sha256": "08d56e2b07ddbec0e2ee5e574d4afc1c40870eaf9f50a82118447e440d9dfd39",
+      "bytes": 3560
+    },
+    {
+      "path": "apps/web/src/components/ConcertStage.tsx",
+      "sha256": "981fea1500e3de3d4a0a74d412460edc16e8f22173f3130c83eb737ce06c11de",
+      "bytes": 7566
+    },
+    {
+      "path": "apps/web/src/components/concert-stage.css",
+      "sha256": "3ca7f9eacfdc194842c84dbd7725203cc616c9f2aff54599f49a57f6e7a8e303",
+      "bytes": 9932
+    },
+    {
+      "path": "apps/web/src/pages/HostPage.tsx",
+      "sha256": "4e949f1f027eac8de44126f3fd94b042bf8b96e3b54bfe1a96d45cf4dc3b1e84",
+      "bytes": 60533
+    }
+  ],
+  "original_authorship": {
+    "venues": "Two hand-authored vector architectural environments: rooftop canopy/skyline/lantern terrace and enclosed acoustic shell/brass resonator hall. They are not renamed palette copies or real buildings. Existing Link Room pixels/paths unchanged.",
+    "performers": "Three original articulated2D role representations with layered practical clothing, hair, face/hand detail, stage shoes, microphone/cable, percussion pad/stand/sticks and hype accessories. Source groups define actual rest geometry and joint transforms. Unnamed candidate representations of real seats, not approved fictional cast.",
+    "animation": "Joint poses, beam angles and small light envelopes sampled deterministically from supplied calibrated room time, chart offset and BPM. Accepted score events anchor bounded perfect/great/good/miss response envelopes at observed game-clock time; no second song timer. Vocal mouth is tied to actual active/closing phrase window.",
+    "export_settings": "Editable SVG1200x460 sRGB/vector, no embedded bitmap/external image/font. Performers are editable React SVG vector source with1200x460 stage coordinate overlay. No3D mesh/rig/Blender source is claimed.",
+    "external_sources": [],
+    "new_audio": false
+  },
+  "runtime_integration": {
+    "host": "Cosmetic venue select available countdown/playing/paused/results, with actual connected role roster; existing lyrics and note lane outside scenery preserved.",
+    "pause": "Held calibrated pause elapsed snapshot retained; prior free-running haze/wash/countdown loops removed on this stage. No per-actor timers.",
+    "reduced_motion": "Existing settings reduceMotion and CSS media/document classes suppress pose/limb/head/haze movement; essential score/lyrics/phase info remains.",
+    "score_authority": "Presentation observes game.score_update only. No server score, authority, pitch exclusivity, provider rights or player controller logic changed."
+  },
+  "rights": {
+    "copyrighted_music_added": false,
+    "commercial_sync_claim": false,
+    "approved_character_canon_invented": false,
+    "new_venue_names": "working original candidates"
+  },
+  "limits": [
+    "Source integration and author tests do not establish visible in-game quality. Runtime capture currently waits for root resource permission.",
+    "Stage is2D vector, not a3D venue/model/rig; normal gameplay camera and performance must still be assessed.",
+    "Host100ms server tick samples can produce held key poses; no measured AudioContext playhead/speaker latency is asserted.",
+    "ScoreEvent lacks exact note timestamp/unique outcome identity; VFX are anchored to observed accepted-event game time, not proven original contact time.",
+    "Existing badges, music rights and local-only approvals remain unchanged.",
+    "Outfits are role-family artwork, not a finished user customization system. Audience acting, full award choreography and further venue variety remain production work."
+  ],
+  "HUMAN": false,
+  "RC2": false,
+  "V1": false
+}

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" fill="none">
+  <!-- Original BeatLink Party vector scenery. Authored by Codex, 2026-11-01.
+       Editable master and runtime asset. No external imagery, fonts or performers. -->
+  <defs>
+    <linearGradient id="night" x1="600" y1="0" x2="600" y2="460" gradientUnits="userSpaceOnUse"><stop stop-color="#171432"/><stop offset="1" stop-color="#090a19"/></linearGradient>
+    <linearGradient id="ribbon" x1="245" y1="65" x2="950" y2="340" gradientUnits="userSpaceOnUse"><stop stop-color="#74f4eb"/><stop offset=".38" stop-color="#7b99ff"/><stop offset=".7" stop-color="#bf6bef"/><stop offset="1" stop-color="#ff77b9"/></linearGradient>
+    <linearGradient id="rim" x1="150" y1="365" x2="1050" y2="365" gradientUnits="userSpaceOnUse"><stop stop-color="#28d8dd"/><stop offset=".5" stop-color="#ad91ff"/><stop offset="1" stop-color="#ff669f"/></linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b2a4ff" stop-opacity=".2"/><stop offset="1" stop-color="#8f83ff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="aura"><stop stop-color="#8370dd" stop-opacity=".2"/><stop offset="1" stop-color="#8370dd" stop-opacity="0"/></radialGradient>
+    <linearGradient id="floor" x1="600" y1="335" x2="600" y2="460" gradientUnits="userSpaceOnUse"><stop stop-color="#211d40"/><stop offset="1" stop-color="#0b0b1c"/></linearGradient>
+    <pattern id="mesh" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 0H24V24" stroke="#a7a2dc" stroke-opacity=".045"/></pattern>
+  </defs>
+  <path fill="url(#night)" d="M0 0h1200v460H0z"/>
+  <path fill="url(#mesh)" d="M0 0h1200v460H0z"/>
+  <ellipse cx="600" cy="210" rx="540" ry="270" fill="url(#aura)"/>
+  <!-- The linked ribbon is the stage's architectural motif: two voices meeting. -->
+  <path d="M304 28H896L1048 180L896 332H304L152 180Z" stroke="#32304d" stroke-width="2"/>
+  <path d="M347 45H853L988 180L853 315H347L212 180Z" stroke="url(#ribbon)" stroke-opacity=".3" stroke-width="2"/>
+  <path d="M376 70H824L934 180L824 290H376L266 180Z" stroke="url(#ribbon)" stroke-width="4"/>
+  <path d="M397 90H803L893 180L803 270H397L307 180Z" stroke="url(#ribbon)" stroke-opacity=".17" stroke-width="12"/>
+  <path d="M455 111C358 111 338 249 432 249C505 249 524 111 600 111C677 111 695 249 768 249C862 249 842 111 745 111C673 111 653 249 576 249C501 249 528 111 455 111Z" fill="#15152c" stroke="url(#ribbon)" stroke-width="3"/>
+  <path d="M455 121C373 121 353 239 432 239C496 239 522 101 600 101" stroke="#90d8f3" stroke-opacity=".2" stroke-width="1"/>
+  <path d="M600 259C678 259 701 121 745 121" stroke="#eea6e3" stroke-opacity=".22" stroke-width="1"/>
+  <path d="M580 165L608 180L580 195Z" fill="#e9e8ff"/>
+  <circle cx="600" cy="180" r="45" stroke="#c7b5f5" stroke-opacity=".22"/>
+  <circle cx="600" cy="180" r="51" stroke="#c7b5f5" stroke-opacity=".08" stroke-dasharray="2 10"/>
+  <!-- Suspended lighting rail, hand placed fixtures, and soft light cones. -->
+  <path d="M120 26H1080M120 34H1080" stroke="#3b3654"/>
+  <path d="M180 26L204 34L228 26L252 34L276 26M924 26L948 34L972 26L996 34L1020 26" stroke="#3b3654"/>
+  <path d="M224 50L116 332H462ZM408 50L338 332H606ZM792 50L594 332H862ZM976 50L738 332H1084Z" fill="url(#beam)"/>
+  <g fill="#292642" stroke="#8179a6"><rect x="210" y="36" width="28" height="13" rx="4"/><rect x="394" y="36" width="28" height="13" rx="4"/><rect x="778" y="36" width="28" height="13" rx="4"/><rect x="962" y="36" width="28" height="13" rx="4"/></g>
+  <path d="M216 49H232M400 49H416M784 49H800M968 49H984" stroke="#c8b4fc" stroke-width="3"/>
+  <!-- Left and right acoustic stacks; varying transducers give authored depth. -->
+  <g fill="#101022" stroke="#35334e"><path d="M62 141H119V330H62Z"/><path d="M1081 141H1138V330H1081Z"/></g>
+  <g stroke="#49465f"><circle cx="90" cy="180" r="17"/><circle cx="90" cy="242" r="22"/><circle cx="1110" cy="180" r="17"/><circle cx="1110" cy="242" r="22"/></g>
+  <g fill="#211f37"><circle cx="90" cy="180" r="6"/><circle cx="90" cy="242" r="8"/><circle cx="1110" cy="180" r="6"/><circle cx="1110" cy="242" r="8"/></g>
+  <path d="M72 305H109M1091 305H1128" stroke="url(#rim)" stroke-width="2"/>
+  <!-- Raised oval performance deck and a deliberately quiet foreground. -->
+  <path d="M0 345L600 319L1200 345V460H0Z" fill="url(#floor)"/>
+  <path d="M150 357V373C150 418 1050 418 1050 373V357" fill="#0e0e22" stroke="#2b2841"/>
+  <ellipse cx="600" cy="357" rx="450" ry="40" fill="#24213d" stroke="url(#rim)" stroke-opacity=".65" stroke-width="2"/>
+  <ellipse cx="600" cy="354" rx="399" ry="29" stroke="#9e92cf" stroke-opacity=".12"/>
+  <path d="M330 390L219 460M870 390L981 460M468 397L427 460M732 397L773 460" stroke="#8f80c1" stroke-opacity=".1"/>
+  <path d="M196 374C302 410 900 410 1004 374" stroke="url(#rim)" stroke-width="2" stroke-opacity=".4"/>
+  <!-- Confetti-like inlays are static scenery, not simulated audience feedback. -->
+  <g stroke="#6e6896" stroke-width="1.5"><path d="M161 97h10m-5-5v10M1022 105h10m-5-5v10M171 267h8m-4-4v8M1015 272h8m-4-4v8"/><path d="M516 44l4-4 4 4-4 4ZM678 298l4-4 4 4-4 4Z"/></g>
+  <g fill="#8c81aa"><circle cx="298" cy="121" r="1.5"/><circle cx="905" cy="122" r="1.5"/><circle cx="365" cy="305" r="1.5"/><circle cx="836" cy="305" r="1.5"/></g>
+</svg>

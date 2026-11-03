@@ -6,6 +6,7 @@ import {
   GAME_SESSION_CONTRACT_VERSION,
   PEDESTRIAN_PURSUIT_APPLICATION_ID,
   acknowledge,
+  bindRuntimeProducer,
   disconnectGuest,
   endGame,
   guestPayload,
@@ -23,10 +24,11 @@ import {
   submitRuntimeRaceResult,
 } from './gameSessionContract.mjs';
 
-function runtimeResult(opened, redeemed) {
+function runtimeResult(opened, redeemed, roundId) {
   const result = {
     applicationId: PEDESTRIAN_PURSUIT_APPLICATION_ID,
     roomCode: opened.session.roomCode,
+    roundId,
     courseId: 'verdant_cascade_circuit',
     hostMemberId: opened.session.hostId,
     guestMemberId: redeemed.memberId,
@@ -52,7 +54,7 @@ describe('pedestrian game-session contract on the room transport', () => {
     resetAuthority();
     resetGameSessions();
     assert.equal(GAME_SESSION_CONTRACT_NAME, 'gunnchos.beatlink.game_session');
-    assert.equal(GAME_SESSION_CONTRACT_VERSION, 1);
+    assert.equal(GAME_SESSION_CONTRACT_VERSION, 2);
 
     const opened = openGameSessionOnRoom(PEDESTRIAN_PURSUIT_APPLICATION_ID);
     assert.equal(opened.status, 200);
@@ -73,12 +75,18 @@ describe('pedestrian game-session contract on the room transport', () => {
     assert.equal(rematchGame(redeemed.memberSession).status, 403);
     assert.equal(endGame(redeemed.memberSession).status, 403);
     assert.equal(endGame(opened.session.hostId).status, 403);
+    const playing = startGame(opened.hostSession);
+    assert.equal(playing.status, 200);
     assert.equal(publishResult(opened.hostSession, { label: 'shared-result' }).status, 422);
     assert.equal(publishResult(redeemed.memberSession, { runtimeDigest: 'nope' }).status, 403);
 
-    const produced = runtimeResult(opened, redeemed);
-    assert.equal(submitRuntimeRaceResult({ ...produced, producedBy: 'host-packet' }).status, 422);
-    const stored = submitRuntimeRaceResult(produced);
+    const produced = runtimeResult(opened, redeemed, playing.session.roundId);
+    // Positive fixture installs a trusted process-local adapter capability;
+    // production HTTP has no binding adapter and fails closed by default.
+    const bound = bindRuntimeProducer({ roomCode: opened.session.roomCode, roundId: playing.session.roundId, courseId: produced.courseId });
+    assert.equal(bound.status, 200);
+    assert.equal(submitRuntimeRaceResult({ ...produced, producedBy: 'host-packet' }, bound.runtimeSession).status, 422);
+    const stored = submitRuntimeRaceResult(produced, bound.runtimeSession);
     assert.equal(stored.status, 200);
     const published = publishResult(opened.hostSession, { runtimeDigest: produced.runtimeDigest });
     assert.equal(published.status, 200);
@@ -94,13 +102,13 @@ describe('pedestrian game-session contract on the room transport', () => {
     assert.equal(restored.status, 200);
     assert.equal(restored.payload.guestConnected, true);
 
-    const decision = publishRematchOrExit(opened.hostSession, 'exit');
+    const decision = publishRematchOrExit(opened.hostSession, 'rematch');
     assert.equal(decision.status, 200);
     assert.equal(publishRematchOrExit(redeemed.memberSession, 'rematch').status, 403);
     acknowledge(opened.hostSession, decision.event.eventId);
     const decisionGuest = acknowledge(redeemed.memberSession, decision.event.eventId);
     assert.equal(decisionGuest.bothAcknowledged, true);
-    assert.equal(decisionGuest.event.choice, 'exit');
+    assert.equal(decisionGuest.event.choice, 'rematch');
 
     assert.equal(rematchGame(opened.hostSession).session.phase, 'lobby');
     assert.equal(endGame(opened.hostSession).session.phase, 'closed');

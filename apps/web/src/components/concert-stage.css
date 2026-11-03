@@ -1,0 +1,541 @@
+.concert {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #49405e;
+  border-radius: 20px;
+  background: #0c0c1d;
+  margin-bottom: 1.5rem;
+}
+.concert-art {
+  position: relative;
+  overflow: hidden;
+}
+.concert-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.concert-venue,
+.concert-edition {
+  position: absolute;
+  top: 14%;
+  color: #aba5c9;
+  font-size: clamp(0.5rem, 0.8vw, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1.7;
+}
+.concert-venue {
+  left: 3%;
+  writing-mode: vertical-rl;
+}
+.concert-edition {
+  right: 3%;
+  text-align: right;
+  top: auto;
+  bottom: 8%;
+}
+.concert-haze {
+  position: absolute;
+  top: 8%;
+  width: 40%;
+  height: 70%;
+  pointer-events: none;
+  opacity: var(--beam-opacity, 0.15);
+  transform-origin: 50% 0;
+  transform: rotate(var(--beam-angle, 0deg));
+}
+.concert-haze-left {
+  left: 8%;
+  background: linear-gradient(155deg, #72e9e522, transparent 60%);
+  clip-path: polygon(25% 0, 35% 0, 100% 100%, 0 100%);
+}
+.concert-haze-right {
+  right: 8%;
+  background: linear-gradient(205deg, #ee89ca22, transparent 60%);
+  clip-path: polygon(65% 0, 75% 0, 100% 100%, 0 100%);
+  transform: rotate(calc(var(--beam-angle, 0deg) * -1));
+}
+.stage-performers {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.concert-scene-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.3rem 1rem;
+  border-top: 1px solid #393449;
+  background: #0d1323;
+  font-size: 0.72rem;
+  color: #c1c6d5;
+}
+.concert-scene-tools label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+.concert-scene-tools select {
+  min-height: 44px;
+  max-width: 100%;
+  border: 1px solid #647084;
+  border-radius: 8px;
+  padding: 0 0.5rem;
+  background: #172338;
+  color: #f3f0fa;
+  font: inherit;
+}
+.concert-scene-tools small {
+  font-size: 0.64rem;
+  color: #aab7c8;
+}
+.concert-clock-stage::after {
+  animation: none;
+  transform: none;
+  opacity: 0.35;
+}
+.concert-clock-stage .countdown {
+  animation: none;
+}
+.concert[data-motion-reduced="true"] .stage-pose,
+.concert[data-motion-reduced="true"] .stage-limb,
+.concert[data-motion-reduced="true"] .stage-head,
+.a11y-reduce-motion .stage-pose,
+.a11y-reduce-motion .stage-limb,
+.a11y-reduce-motion .stage-head {
+  transform: none !important;
+}
+.concert[data-motion-reduced="true"] .concert-haze,
+.a11y-reduce-motion .concert-haze {
+  opacity: 0.15;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-pose,
+  .stage-limb,
+  .stage-head {
+    transform: none !important;
+  }
+  .concert-haze {
+    opacity: 0.15;
+    transform: none;
+  }
+}
+.concert-marquee {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: #121126;
+  border-top: 1px solid #312b48;
+}
+.concert-track {
+  min-width: 0;
+}
+.concert-kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #bdb4d7;
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+.concert-track h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.6vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: #f4efff;
+}
+.concert-artist {
+  color: #bdb4d7;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+.concert-rhythm {
+  display: grid;
+  gap: 0.6rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+.concert-rhythm > span {
+  color: #bdb4d7;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+}
+.concert-beats {
+  display: flex;
+  gap: 6px;
+}
+.concert-beats i {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #4b4261;
+  border-radius: 50%;
+  color: #bdb4d7;
+  font: 600 0.68rem var(--font-body);
+}
+.concert-beats i[data-current="true"] {
+  border-color: #8de5dd;
+  color: #e7fffc;
+  background: #234849;
+}
+.concert-phase {
+  font-size: 0.7rem;
+  color: #c6eccc;
+  letter-spacing: 0.14em;
+  flex-shrink: 0;
+}
+.concert-progress {
+  height: 3px;
+  background: #2d2840;
+}
+.concert-progress > span {
+  height: 100%;
+  display: block;
+  background: linear-gradient(90deg, #74e3dd, #df95db);
+}
+.concert-crowd {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+  font-size: 0.75rem;
+  color: #bdb4d7;
+  margin: 0;
+}
+.concert-crowd strong {
+  color: #def9d3;
+  font-variant-numeric: tabular-nums;
+}
+.concert-highway {
+  margin: 1.5rem 0;
+  border: 1px solid #4b4261;
+  background: #0e0d21;
+  border-radius: 16px;
+  padding: 1.1rem 1.25rem;
+  overflow: hidden;
+}
+.concert-highway-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #e3dcef;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.concert-next {
+  color: #c2b7d7;
+  font-weight: 400;
+}
+.concert-note-field {
+  position: relative;
+  height: 115px;
+  --lane-start: max(74px, 3.5rem);
+  margin: 1rem 16px 1.2rem 0;
+}
+.concert-note-rail {
+  position: absolute;
+  left: var(--lane-start);
+  right: 0;
+  border-bottom: 1px solid #332c48;
+}
+.concert-note-rail > span {
+  position: absolute;
+  right: calc(100% + 14px);
+  transform: translateY(-50%);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: #bdb4d7;
+  letter-spacing: 0.07em;
+}
+.concert-hit-line {
+  position: absolute;
+  z-index: 1;
+  left: var(--lane-start);
+  height: 104px;
+  border-left: 2px solid #eeebf8;
+}
+.concert-hit-line > span {
+  position: absolute;
+  top: 105px;
+  left: -13px;
+  color: #d2c8df;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.concert-note {
+  position: absolute;
+  left: calc(var(--lane-start) + (100% - var(--lane-start)) * var(--distance));
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border: 1px solid #f3afd2;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  color: #ffe3f0;
+  background: #713358;
+}
+.concert-note-hold {
+  border-color: #a4b9ff;
+  color: #e7edff;
+  background: #3d427e;
+  border-radius: 5px;
+  width: 32px;
+}
+.concert-note-swipe {
+  border-color: #98e7dd;
+  color: #c4fff7;
+  background: #1b4c4c;
+  border-radius: 5px;
+  font-size: 1.5rem;
+}
+.concert-highway-help {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #c2b7d7;
+  font-size: 0.7rem;
+  margin: 0;
+}
+.concert-highway-help b {
+  font-weight: 500;
+  margin-left: auto;
+  color: #e9e3f4;
+}
+.concert-play-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.concert-play-layout > .concert {
+  margin: 0;
+}
+.concert-live-panel {
+  min-width: 0;
+}
+.concert-live-cue {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem;
+  border-left: 2px solid #c69bea;
+  background: #19152c;
+  margin: 0.75rem 0;
+  overflow-wrap: anywhere;
+}
+.concert-cue-label {
+  color: #c5b6d8;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.concert-live-cue strong {
+  color: #f4efff;
+  font: 600 clamp(1rem, 1.4vw, 1.4rem) var(--font-display);
+}
+.concert-live-panel .grid-2 {
+  grid-template-columns: minmax(0, 1fr);
+}
+.concert-live-panel .player-card,
+.concert-live-panel .player-card > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.concert-live-panel > .row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: 0.75rem;
+}
+.concert-live-panel > .row > div {
+  min-width: 0;
+  margin: 0 !important;
+  overflow-wrap: anywhere;
+}
+.concert-live-panel .concert-highway {
+  margin-top: 0.75rem;
+}
+.concert-live-panel .player-card {
+  margin-bottom: 0.75rem;
+}
+.concert-session-details {
+  margin-top: 1.5rem;
+  border-top: 1px solid #49405e;
+  padding-top: 0.75rem;
+  color: #c2b7d7;
+  font-size: 0.8rem;
+}
+.concert-session-details summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: list-item;
+  align-content: center;
+  width: fit-content;
+}
+.concert-session-details summary:focus-visible {
+  outline: 3px solid var(--se-electric-cyan);
+  outline-offset: 3px;
+}
+.concert-session-details > p {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1000px) {
+  .concert-play-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.stage[data-phase="playing"] > h2 {
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: #bdb4d7;
+}
+@media (max-width: 600px) {
+  .page-host {
+    padding: 12px;
+  }
+  .page-host .stage.concert-clock-stage {
+    padding: 12px;
+  }
+  .concert-scene-tools,
+  .concert-marquee,
+  .concert-crowd,
+  .concert-highway,
+  .concert-live-cue {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .concert-scene-tools label {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+  }
+  .concert-scene-tools select {
+    flex: 1 1 9rem;
+    min-width: 0;
+  }
+  .concert-beats {
+    flex-wrap: wrap;
+  }
+  .concert-highway-heading {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .concert-next {
+    margin-left: auto;
+  }
+  .concert-live-panel .player-card {
+    padding: 12px;
+    gap: 12px;
+  }
+  .concert-note {
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+  }
+  .concert-live-panel .btn-large {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .concert-marquee {
+    padding: 1.1rem 12px;
+    gap: 0.75rem;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .concert-rhythm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+  .concert-beats i {
+    width: max(22px, 1.65em);
+    height: max(22px, 1.65em);
+  }
+  .concert-venue {
+    letter-spacing: 0.05em;
+  }
+  .concert-edition {
+    display: none;
+  }
+  .concert-crowd {
+    padding: 0.75rem 12px;
+  }
+  .concert-highway {
+    padding: 1rem 12px;
+  }
+  .concert-next {
+    max-width: 48%;
+    text-align: right;
+  }
+  .concert-highway-help {
+    gap: 0.5rem;
+  }
+  .concert-highway-help b {
+    width: 100%;
+    margin: 0;
+  }
+  .stage[data-phase] {
+    padding: 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .concert *,
+  .concert *::before,
+  .concert *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .concert-beats i[data-current="true"] {
+    background: transparent;
+    color: #bdb4d7;
+    border-color: #4b4261;
+  }
+}
+.a11y-reduce-motion .concert-beats i[data-current="true"] {
+  background: transparent;
+  color: #bdb4d7;
+  border-color: #4b4261;
+}
+.a11y-high-contrast .concert {
+  border: 2px solid currentColor;
+}
+.a11y-high-contrast .concert-marquee,
+.a11y-high-contrast .concert-highway {
+  background: #000;
+}
+.a11y-high-contrast .concert-kicker,
+.a11y-high-contrast .concert-artist,
+.a11y-high-contrast .concert-next,
+.a11y-high-contrast .concert-crowd {
+  color: #fff;
+}
+@media (forced-colors: active) {
+  .concert-art {
+    display: none;
+  }
+  .concert,
+  .concert-highway {
+    border: 1px solid CanvasText;
+  }
+  .concert-note {
+    border: 2px solid CanvasText;
+  }
+  .concert-hit-line {
+    border-color: CanvasText;
+  }
+}

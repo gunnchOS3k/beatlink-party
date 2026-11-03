@@ -3,6 +3,7 @@ export {
   GAME_SESSION_CONTRACT_VERSION,
   PEDESTRIAN_PURSUIT_APPLICATION_ID,
   acknowledge,
+  bindRuntimeProducer,
   disconnectGuest,
   endGame,
   guestPayload,
