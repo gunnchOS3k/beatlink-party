@@ -95,6 +95,32 @@ test('Wave007 multi-client party loop (mandatory)', async ({ browser }) => {
   await expect(performer.getByText(/Welcome/i)).toBeVisible({ timeout: 15000 });
   mark(4, 'performer_joined_ui', true);
 
+  const hostSecret = await host.evaluate(() => {
+    try {
+      const raw = localStorage.getItem('beatlink_host');
+      const parsed = raw ? JSON.parse(raw) : null;
+      return typeof parsed?.hostToken === 'string' ? parsed.hostToken : '';
+    } catch {
+      return '';
+    }
+  });
+  const guestLeak = await performer.evaluate((secret) => {
+    if (!secret) return true;
+    const page = document.documentElement.innerText;
+    const storage = `${sessionStorage.getItem('beatlink_member') || ''}${localStorage.getItem('beatlink_player') || ''}`;
+    return page.includes(secret) || storage.includes(secret);
+  }, hostSecret);
+  mark(30, 'host_session_absent_from_guest', hostSecret.length > 0 && guestLeak === false);
+  const guestEnd = await performer.evaluate(async (code) => {
+    const res = await fetch(`http://127.0.0.1:3001/rooms/${code}/end`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hostId: 'guest-presented-host-id' }),
+    });
+    return res.status;
+  }, roomCode);
+  mark(31, 'guest_host_end_rejected', guestEnd === 403, `status=${guestEnd}`);
+
   // 5 audience joins via UI
   await audience.goto(`${BASE}/join?seat=audience`);
   viewportMeasurements.push(await measureViewport(audience, 'audience-join-412'));
@@ -301,6 +327,11 @@ test('Wave007 multi-client party loop (mandatory)', async ({ browser }) => {
   await host.waitForURL(/\/($|\?)/, { timeout: 15000 });
   const closedRes = await fetch(`http://127.0.0.1:3001/rooms/${roomCode}`);
   mark(29, 'host_closed_room', closedRes.status === 404, `status=${closedRes.status}`);
+  const audienceClosed = await audience.evaluate(async (code) => {
+    const res = await fetch(`http://127.0.0.1:3001/rooms/${code}`);
+    return res.status;
+  }, roomCode);
+  mark(32, 'guest_sees_room_closed', audienceClosed === 404, `status=${audienceClosed}`);
 
   // Responsive viewports
   for (const vp of [

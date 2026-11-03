@@ -4,7 +4,11 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches:
+      - main
+      - fix/loopback-room-lifecycle
+      - cursor/pr34-musical-product
+      - eng/**
   workflow_dispatch:
 
 permissions:
@@ -51,6 +55,12 @@ jobs:
             exit 1
           fi
           echo "MAIN_BRANCH_POLICY_OK"
+
+      - name: Validate Links RTM (GUNNCHOS3K_PVS schema)
+        run: |
+          set -euo pipefail
+          pip install 'jsonschema>=4.20'
+          python3 scripts/validate_links_rtm.py
 
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile

@@ -15,7 +15,7 @@
       "reconnects": 2,
       "hostMigrated": true,
       "shutdownOk": true,
-      "wallMs": 0,
+      "wallMs": 6,
       "ok": true
     },
     {
@@ -30,7 +30,7 @@
       "reconnects": 3,
       "hostMigrated": true,
       "shutdownOk": true,
-      "wallMs": 2,
+      "wallMs": 6,
       "ok": true
     },
     {
@@ -45,7 +45,7 @@
       "reconnects": 5,
       "hostMigrated": true,
       "shutdownOk": true,
-      "wallMs": 5,
+      "wallMs": 7,
       "ok": true
     },
     {
@@ -53,14 +53,14 @@
       "performersJoined": 8,
       "audienceJoined": 300,
       "joinLatencyMsP50": 0,
-      "joinLatencyMsP95": 0,
+      "joinLatencyMsP95": 1,
       "influenceAccepted": 40,
       "influenceRejected": 0,
       "disconnects": 15,
       "reconnects": 15,
       "hostMigrated": true,
       "shutdownOk": true,
-      "wallMs": 15,
+      "wallMs": 153,
       "ok": true
     }
   ],

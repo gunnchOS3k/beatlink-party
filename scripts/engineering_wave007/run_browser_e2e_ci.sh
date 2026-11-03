@@ -93,4 +93,40 @@ if data.get("playwright_ran") is not True:
 print("browser e2e artifact ok")
 PY
 
-exit "$PW_EXIT"
+if [[ "$PW_EXIT" -ne 0 ]]; then
+  exit "$PW_EXIT"
+fi
+
+echo "[wave007-e2e] running five-mode party-loop Playwright"
+set +e
+pnpm exec playwright test tests/e2e/five_modes_party_loop.playwright.spec.ts --project=chromium
+FIVE_EXIT=$?
+set -e
+
+if [[ ! -f "$ART_DIR/FIVE_MODES_BROWSER_RESULT.json" ]]; then
+  python3 - <<'PY'
+import json, pathlib
+p = pathlib.Path("artifacts/engineering_wave007/FIVE_MODES_BROWSER_RESULT.json")
+p.write_text(json.dumps({
+  "playwright_ran": False,
+  "playwright_skipped": True,
+  "ok": False,
+  "error": "missing_five_modes_browser_result",
+  "modes_completed": [],
+}, indent=2) + "\n")
+PY
+  exit 1
+fi
+
+python3 - <<'PY'
+import json, pathlib, sys
+p = pathlib.Path("artifacts/engineering_wave007/FIVE_MODES_BROWSER_RESULT.json")
+data = json.loads(p.read_text())
+if data.get("ok") is not True or data.get("all_five_completed") is not True:
+    print("five-mode browser loop incomplete — failing wave007", file=sys.stderr)
+    print(json.dumps(data.get("modes"), indent=2), file=sys.stderr)
+    sys.exit(1)
+print("five-mode browser e2e artifact ok:", ",".join(data.get("modes_completed") or []))
+PY
+
+exit "$FIVE_EXIT"

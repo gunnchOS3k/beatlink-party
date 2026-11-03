@@ -34,14 +34,16 @@ export function buildBeatLinkVisualPackHarness(): BeatLinkVisualPackManifest {
       { id: 'audience_seat', kind: 'screen', capture: 'DEFERRED' },
       { id: 'results_awards', kind: 'screen', capture: 'DEFERRED' },
       { id: 'five_mode_transitions', kind: 'flow', capture: 'DEFERRED' },
+      { id: 'beat_tap_stage', kind: 'stage', capture: 'DEFERRED' },
     ],
     deferred_heavy_work: [
       'repeated video capture of five-mode session',
+      'Beat Tap stage art / lighting pass (procedural≠finished)',
       'large Android/iOS export batches',
       'additional QEMU device soaks',
       'heavy multiplayer load simulations beyond unit harness',
     ],
     notes:
-      'Harness + historical landing/host captures only. No invented pixel critique. Heavy capture deferred under Product-Use QEMU rule.',
+      'Harness + historical landing/host captures only. Beat Tap stage surface listed DEFERRED — art/stage unfinished. No invented pixel critique. Rights not weakened. Heavy capture deferred under Product-Use QEMU rule.',
   };
 }

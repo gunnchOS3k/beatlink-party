@@ -1,0 +1,27 @@
+{
+  "schema": "beat.s17_band_roles_digital_continue.v1",
+  "human_false": true,
+  "rc2_false": true,
+  "v1_false": true,
+  "ci_exact_head": {
+    "sha": "b0af8f4",
+    "pr": 35,
+    "public_actions_html": "green (favicon-success; 0 failed /pull/35/checks)"
+  },
+  "rights": {
+    "LINK_EQUALS_RIP_PERMISSION": false,
+    "GAMEPLAY_SYNC_AUTHORIZED": false,
+    "karaoke_mode_active_on_surface": false,
+    "rights_not_weakened": true
+  },
+  "iv_packet": {
+    "preserved_at": "ab7a8d9",
+    "untouched_this_continue": true,
+    "status": "PREPARED — not executed"
+  },
+  "tests": {
+    "party_band_roles_loop_honesty": "PASS"
+  },
+  "notes": "S17 Band Roles digital continue after exact-head CI green on b0af8f4.",
+  "base_tip": "b0af8f4"
+}

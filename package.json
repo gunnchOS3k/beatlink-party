@@ -24,6 +24,7 @@
     "test:watch": "vitest",
     "emit:digital-rc": "vitest run scripts/emit-digital-rc.test.ts",
     "validate:game-rc": "python3 scripts/validate_game_rc_contracts.py",
+    "validate:links-rtm": "python3 scripts/validate_links_rtm.py",
     "compose:redis": "docker compose up -d redis",
     "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
     "typecheck": "pnpm --filter @beatlink/shared build && pnpm --filter @beatlink/game-engine build && pnpm --filter @beatlink/device-ux build && pnpm -r typecheck",

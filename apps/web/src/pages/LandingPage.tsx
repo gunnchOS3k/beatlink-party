@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateRoom, useSocket } from '../lib/socket';
-import { isBackendConfigured } from '../lib/api';
-import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed } from '../lib/partyCreateGate';
+import { API_URL, isBackendConfigured } from '../lib/api';
+import { PARTY_CREATE_OWNER_ACTION, partyCreateAllowed, partyHttpCreateAllowed } from '../lib/partyCreateGate';
+import { createHostParty } from '../lib/partySession';
 import { GlyphJoin, GlyphParty } from '../brand/glyphs';
 import {
   BrandMark,
@@ -17,7 +18,8 @@ export default function LandingPage() {
   const createRoom = useCreateRoom();
   const { connected } = useSocket();
   const backendReady = isBackendConfigured();
-  const canCreate = partyCreateAllowed(connected) && backendReady;
+  const canHttpCreate = partyHttpCreateAllowed(API_URL, backendReady);
+  const canCreate = canHttpCreate || (partyCreateAllowed(connected) && backendReady);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +37,7 @@ export default function LandingPage() {
     setCreating(true);
     setError(null);
     try {
-      const { code } = await createRoom();
+      const { code } = canHttpCreate ? await createHostParty() : await createRoom();
       navigate(`/host/${code}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create room');

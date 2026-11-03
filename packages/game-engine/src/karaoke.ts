@@ -68,5 +68,6 @@ export function buildKaraokePromptState(
 }
 
 export function canSubmitVocalPhrase(state: KaraokePromptState): boolean {
-  return state.phase === 'active' || state.phase === 'closing' || state.phase === 'upcoming';
+  // Match server window (prompt start −200ms … end +200ms). Upcoming lead-in is not submittable.
+  return state.phase === 'active' || state.phase === 'closing';
 }

@@ -14,8 +14,16 @@ import {
 import { resolveContentPath, assertAnalysisKaraokeEligible } from './contentPaths.js';
 import { assertModesBetaDepth } from './modes/index.js';
 
+/** Launch-legal families. public_domain allowed only when ownership is verified (audit). */
 const LAUNCH_LICENSES: CatalogLicense[] = [
   'public_domain',
+  'synthetic_original',
+  'creative_commons',
+  'creator_owned',
+];
+
+/** Required families for digital beta content — do not require unverified PD stamps. */
+const REQUIRED_LAUNCH_LICENSE_FAMILIES: CatalogLicense[] = [
   'synthetic_original',
   'creative_commons',
   'creator_owned',
@@ -80,14 +88,22 @@ export function assertOfflineLaunchCatalogComplete(songs: SongCatalogEntry[]): {
     if (!modesCovered.has(mode)) failures.push(`mode_uncovered:${mode}`);
   }
 
-  for (const required of [
-    'public_domain',
-    'synthetic_original',
-    'creative_commons',
-    'creator_owned',
-  ] as const) {
+  for (const required of REQUIRED_LAUNCH_LICENSE_FAMILIES) {
     if (![...licensesPresent].includes(required)) {
       failures.push(`license_family_missing:${required}`);
+    }
+  }
+
+  // Honesty: first-party originals must not wear an unverified public_domain stamp.
+  for (const song of songs) {
+    if (
+      song.license === 'public_domain' &&
+      song.rights?.ownershipClass !== 'verified_public_domain'
+    ) {
+      failures.push(`${song.id}:pd_without_verified_ownership_class`);
+    }
+    if (song.rights?.commercialEligible === true) {
+      failures.push(`${song.id}:commercial_eligible_must_stay_false`);
     }
   }
 

@@ -7,6 +7,12 @@ import {
   SyntheticMicPermissionAdapter,
 } from '../packages/game-engine/src/karaokeMic.js';
 import { buildKaraokePromptState, canSubmitVocalPhrase } from '../packages/game-engine/src/karaoke.js';
+import {
+  microphonePitchAnalysisClaim,
+  openLiveMicPipeline,
+  startLiveMicContinuousAnalysis,
+} from '../packages/game-engine/src/liveMicPipeline.js';
+import { synthesizeKaraokeTone } from '../packages/game-engine/src/karaokeDsp.js';
 
 describe('karaoke digital path', () => {
   it('defaults to no-recording mode without capturing audio', async () => {
@@ -51,5 +57,38 @@ describe('karaoke digital path', () => {
     expect(adapter.enableNoRecordingMode()).toBe('no_recording');
     expect(await adapter.query()).toBe('no_recording');
     expect(await adapter.request()).toBe('no_recording');
+  });
+
+  it('never authorizes MICROPHONE_PITCH_ANALYSIS from synthetic tone alone', async () => {
+    expect(
+      microphonePitchAnalysisClaim({ micConsent: 'granted', continuousLive: false }),
+    ).toBe(false);
+    expect(
+      microphonePitchAnalysisClaim({ micConsent: 'no_recording', continuousLive: true }),
+    ).toBe(false);
+    expect(
+      microphonePitchAnalysisClaim({ micConsent: 'granted', continuousLive: true }),
+    ).toBe(true);
+
+    const pipeline = openLiveMicPipeline({ preferNoRecording: false, targetPitchHz: 220 });
+    const tone = synthesizeKaraokeTone({
+      durationMs: 400,
+      pitchHz: 220,
+      phraseWindowsMs: [{ startMs: 0, endMs: 400 }],
+    });
+    const frame = pipeline.ingestSyntheticPcm(tone);
+    expect(frame.features.pitchHz).toBeGreaterThan(0);
+    // Synthetic probe can produce DSP features for unit tests — but UI claim stays false
+    // unless continuous live analysis is attached.
+    expect(
+      microphonePitchAnalysisClaim({
+        micConsent: 'granted',
+        continuousLive: false,
+      }),
+    ).toBe(false);
+    pipeline.stop();
+
+    // Node/CI has no AudioContext — continuous live analysis must refuse rather than fake.
+    expect(startLiveMicContinuousAnalysis({} as MediaStream, { onFrame: () => undefined })).toBeNull();
   });
 });

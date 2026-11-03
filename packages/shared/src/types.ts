@@ -30,10 +30,41 @@ export type RoomPhase =
 
 export type TimingGrade = 'perfect' | 'great' | 'good' | 'miss';
 
-export type MusicPlatform = 'youtube' | 'spotify' | 'apple_music' | 'internal' | 'unknown';
+export type MusicPlatform =
+  | 'youtube'
+  | 'spotify'
+  | 'apple_music'
+  | 'soundcloud'
+  | 'bandcamp'
+  | 'vimeo'
+  | 'audius'
+  | 'direct_https'
+  | 'internal'
+  | 'unknown';
+
+/**
+ * Link / capability states — API credentials ≠ music rights.
+ * Do not assign GAMEPLAY_SYNC_AUTHORIZED (or legacy PLAYABLE_AUTHORIZED_PLATFORM)
+ * merely because YOUTUBE_API_KEY / provider env vars are set.
+ */
+export type LinkCapabilityState =
+  | 'METADATA_AVAILABLE'
+  | 'OFFICIAL_EMBED_AVAILABLE'
+  | 'DIRECT_AUDIO_RIGHTS_VERIFIED'
+  | 'GAMEPLAY_SYNC_AUTHORIZED'
+  | 'BLOCKED_OR_UNSUPPORTED';
+
+/** Honest classification for provider adapters (embed listen-first vs playable audio). */
+export type LinkMediaClassification =
+  | 'metadata_only'
+  | 'embed_only'
+  | 'deep_link_only'
+  | 'playable_audio'
+  | 'blocked';
 
 export type PlaybackStatus =
   | 'PLAYABLE_APPROVED'
+  /** @deprecated Never grant from API keys alone. Reserved for future official sync SDK + rights. Prefer LinkCapabilityState. */
   | 'PLAYABLE_AUTHORIZED_PLATFORM'
   | 'METADATA_ONLY'
   | 'NEEDS_USER_UPLOAD'
@@ -151,6 +182,18 @@ export interface RoomState {
   pastedLinkUrl: string | null;
   /** Last successful link resolve snapshot, broadcast to peers. */
   linkResolveResult: LinkResolveResult | null;
+  /**
+   * Private creator-draft media bound to this room (unpublished).
+   * Playback uses draft audio bytes + draft chart — not launch catalog assets.
+   */
+  privateMedia?: {
+    draftId: string;
+    trackId: string;
+    contentSha256: string;
+    chartRevision: number;
+    /** Loopback-relative path serving the retained draft WAV. */
+    audioPath: string;
+  } | null;
   /** First-class selectable mode for this room round. */
   gameMode: GameModeId;
   /** Difficulty applied to mode scoring / chart density. */
@@ -245,6 +288,16 @@ export type CatalogLicense =
   /** Creator-owned original — offline launch path with attestation metadata. */
   | 'creator_owned';
 
+/** Timed phrase target for karaoke pitch path — original placeholders only. */
+export interface CatalogKaraokePhrase {
+  id: string;
+  text: string;
+  startMs: number;
+  durationMs: number;
+  /** Melody target in Hz for consented live DSP (never implies commercial lyrics). */
+  targetPitchHz: number;
+}
+
 /** Offline karaoke metadata — placeholder prompts only; never copyrighted lyrics. */
 export interface CatalogKaraokeMeta {
   prompts: string[];
@@ -252,12 +305,31 @@ export interface CatalogKaraokeMeta {
   noRecording: true;
   pitchHintHz?: number | null;
   language?: string;
+  /** Timed phrase/note targets for pitch path — preferred over pitchHintHz alone. */
+  phrases?: CatalogKaraokePhrase[];
 }
 
 export interface CatalogChartMeta {
   beatmapId: string;
   difficulties: DifficultyId[];
   noteRoles: PlayerRole[];
+}
+
+/** Who owns the composition — separate from the outbound license label. */
+export type OwnershipClass =
+  | 'first_party_original'
+  | 'creator_attested'
+  | 'third_party_licensed'
+  | 'verified_public_domain'
+  | 'unverified';
+
+export interface ThirdPartyLicenseRecord {
+  kind: 'creative_commons' | 'royalty_free' | 'licensed_pack' | 'public_domain' | 'other';
+  version?: string | null;
+  deedUrl?: string | null;
+  owner?: string | null;
+  /** Evidence note — never a stream rip claim. */
+  evidence?: string | null;
 }
 
 export interface CatalogRightsMeta {
@@ -276,6 +348,27 @@ export interface CatalogRightsMeta {
     | 'demo';
   /** Optional CC deed URL (never a download/rip endpoint). */
   ccDeedUrl?: string | null;
+  /** Exact license version string when applicable (e.g. CC-BY-4.0). */
+  licenseVersion?: string | null;
+  /** Author / studio of record for this asset. */
+  author?: string | null;
+  /** Ownership / permission evidence note (never a stream rip claim). */
+  ownershipEvidence?: string | null;
+  /** Relative path to the per-asset rights record JSON. */
+  rightsRecordPath?: string | null;
+  /** Ownership class — must not be inferred solely from a license string. */
+  ownershipClass?: OwnershipClass | null;
+  /** Human-readable license label that must match ownership + deed evidence. */
+  licenseLabel?: string | null;
+  /**
+   * Commercial use gate. Metadata alone never sets this true — requires verified
+   * attribution / commercial review. Default false for launch catalog.
+   */
+  commercialEligible?: boolean;
+  /** Whether attribution text has been human-verified (not generator-asserted only). */
+  attributionVerified?: boolean;
+  /** Third-party license deed when ownershipClass is third_party_licensed or CC release. */
+  thirdPartyLicense?: ThirdPartyLicenseRecord | null;
 }
 
 export interface SongCatalogEntry {
@@ -297,6 +390,12 @@ export interface SongCatalogEntry {
   analysisEligible?: boolean;
   /** Marks track as part of the offline legal launch set. */
   launchEligible?: boolean;
+  /** Relative path under content/ for the original/authorized audio asset. */
+  audioAssetPath?: string | null;
+  /** SHA-256 hex of the audio asset bytes (or recipe payload when procedural-only). */
+  assetSha256?: string | null;
+  /** Composition / arrangement hash for procedural beds without a WAV. */
+  compositionSha256?: string | null;
 }
 
 export interface RightsAttestation {
@@ -320,6 +419,18 @@ export interface LinkResolveResult {
   artworkUrl: string | null;
   durationMs: number | null;
   playbackStatus: PlaybackStatus;
+  /**
+   * Primary eligibility signal for links.
+   * API key presence alone never elevates this to GAMEPLAY_SYNC_AUTHORIZED.
+   */
+  capabilityState: LinkCapabilityState;
+  /** Honest media class — embed/listen-first vs rights-verified playable audio. */
+  mediaClassification: LinkMediaClassification;
+  /**
+   * True when provider env credentials exist (metadata enrichment / future SDK wiring).
+   * Informational only — not music rights and not gameplay sync authorization.
+   */
+  providerCredentialsPresent: boolean;
   analysisEligible: boolean;
   lyricsEligible: boolean;
   matchedCatalogId: string | null;
@@ -340,6 +451,8 @@ export interface VocalPrompt {
   timeMs: number;
   text: string;
   durationMs: number;
+  /** Optional melody target for consented live pitch DSP. */
+  targetPitchHz?: number | null;
 }
 
 export interface HypeEvent {
@@ -381,6 +494,17 @@ export interface PlayerInputEvent {
   sectionId?: string;
   /** PredictionTrivia — chosen section id or label (case-insensitive match). */
   predictionChoice?: string;
+  /**
+   * Karaoke honesty: true only while continuous consented mic DSP is live.
+   * Synthetic tone probes must never set this.
+   */
+  pitchAnalysisActive?: boolean;
+  /** Karaoke pitch match 0..1 from ephemeral live DSP (discarded after score). */
+  pitchMatch?: number;
+  /** Fraction of phrase frames that were voiced (client report; server-bounded). */
+  voicedCoverage?: number;
+  /** Number of DSP frames contributing to the phrase pitch aggregate. */
+  phraseFrames?: number;
   /** Client event identity for server idempotency (Wave007). */
   event_id?: string;
   idempotency_key?: string;
@@ -435,6 +559,7 @@ export type TelemetryEventName =
   | 'event_lifecycle'
   | 'event_scale_sim'
   | 'content_path'
+  | 'source_eligibility_router'
   | 'rc_packaging'
   | 'rc_update'
   | 'rc_rollback'

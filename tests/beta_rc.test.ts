@@ -296,10 +296,13 @@ describe('Beta — rights/legal content paths', () => {
     };
 
     const rf = catalog.songs.find((s) => s.license === 'royalty_free')!;
-    const pd = catalog.songs.find((s) => s.license === 'public_domain')!;
+    // Former "PD" stubs were reclassified — metadata alone never grants public_domain.
+    const firstParty = catalog.songs.find(
+      (s) => s.license === 'synthetic_original' && s.id.startsWith('pd-'),
+    )!;
     const licensed = catalog.songs.find((s) => s.license === 'licensed_pack')!;
     expect(rf).toBeTruthy();
-    expect(pd).toBeTruthy();
+    expect(firstParty).toBeTruthy();
     expect(licensed).toBeTruthy();
 
     const rfPath = resolveContentPath({ catalogEntry: rf });
@@ -335,6 +338,9 @@ describe('Beta — rights/legal content paths', () => {
         artworkUrl: null,
         durationMs: rf.durationMs,
         playbackStatus: 'METADATA_ONLY',
+        capabilityState: 'GAMEPLAY_SYNC_AUTHORIZED',
+        mediaClassification: 'playable_audio',
+        providerCredentialsPresent: false,
         analysisEligible: false,
         lyricsEligible: false,
         matchedCatalogId: rf.id,
@@ -355,6 +361,9 @@ describe('Beta — rights/legal content paths', () => {
         artworkUrl: null,
         durationMs: null,
         playbackStatus: 'METADATA_ONLY',
+        capabilityState: 'OFFICIAL_EMBED_AVAILABLE',
+        mediaClassification: 'embed_only',
+        providerCredentialsPresent: false,
         analysisEligible: false,
         lyricsEligible: false,
         matchedCatalogId: null,

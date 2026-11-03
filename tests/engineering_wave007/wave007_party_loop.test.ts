@@ -91,6 +91,9 @@ describe('Wave007 BeatLink party loop (integrity repair)', () => {
       linkResult: {
         platform: 'spotify',
         playbackStatus: 'METADATA_ONLY',
+        capabilityState: 'OFFICIAL_EMBED_AVAILABLE',
+        mediaClassification: 'embed_only',
+        providerCredentialsPresent: false,
         title: 'Demo',
         artist: null,
         album: null,

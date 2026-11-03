@@ -1,0 +1,51 @@
+{
+  "schema": "beatlink.asset_rights.v2",
+  "trackId": "launch-creator-band-stomp",
+  "title": "Creator Band Stomp",
+  "artist": "BeatLink Creator Attestation Desk",
+  "author": "BeatLink Creator Attestation Desk",
+  "license": "creator_owned",
+  "licenseVersion": "creator-attested-v1",
+  "licenseLabel": "Creator-owned (attested; not auto-published third-party)",
+  "sourceKind": "creator_owned",
+  "ownershipClass": "creator_attested",
+  "attribution": "BeatLink Creator Attestation Desk — creator-attested-v1",
+  "attributionVerified": false,
+  "commercialEligible": false,
+  "commercialEligibilityNote": "false until verified human attribution + commercial review — metadata alone never grants commercial",
+  "thirdPartyLicense": null,
+  "ownershipEvidence": "First-party procedural composition (BeatLink studio generator v2); assetSha256=fc7805a3b29dd7d6f23cf4caf5fa3f1b0b6f54c0f3fa404ada19678124206679; ownershipClass=creator_attested. Not a third-party PD scrape.",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": null,
+  "audioAssetPath": "songs/audio/launch-creator-band-stomp.wav",
+  "assetSha256": "fc7805a3b29dd7d6f23cf4caf5fa3f1b0b6f54c0f3fa404ada19678124206679",
+  "compositionSha256": "dae998411a5b231040a8000a6c4372e97b774759ac9e8e41cb49e2527c48dd08",
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationMs": 99000,
+  "bpm": 126,
+  "generatedBy": "scripts/generate_launch_songs.mjs",
+  "productionNotes": {
+    "structure": [
+      "intro",
+      "verse",
+      "pre",
+      "chorus",
+      "bridge",
+      "chorus",
+      "outro"
+    ],
+    "layers": [
+      "kick",
+      "hat",
+      "bass",
+      "pad_triad",
+      "lead_phrase_sync",
+      "sparkle"
+    ],
+    "mix": "stereo_width_by_section",
+    "master": "soft_knee_tanh_v2",
+    "chartSync": "phrase_pitch_and_bar_quantized_windows"
+  }
+}

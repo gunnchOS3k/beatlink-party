@@ -1,0 +1,20 @@
+{
+  "schema": "beat.s23_start_gate_host_wiring_digital_continue.v1",
+  "human_false": true,
+  "rc2_false": true,
+  "v1_false": true,
+  "rights": {
+    "LINK_EQUALS_RIP_PERMISSION": false,
+    "GAMEPLAY_SYNC_AUTHORIZED": false,
+    "scoredStartAllowed": false,
+    "scoredStartFromSyncEligible": false,
+    "syncEligible_not_legal_clearance": true,
+    "rights_not_weakened": true
+  },
+  "iv_packet": {
+    "preserved_at": "ab7a8d9",
+    "untouched_this_continue": true,
+    "codex_launched": false
+  },
+  "base_tip": "ef02d6e"
+}

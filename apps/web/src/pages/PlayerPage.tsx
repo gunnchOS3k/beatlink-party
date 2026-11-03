@@ -11,16 +11,36 @@ import type {
 } from '@beatlink/shared';
 import { ROLES } from '@beatlink/shared';
 import {
+  applyServerClockResync,
+  assessPartyTiming,
   buildKaraokePromptState,
   buildPredictionChoices,
   buildTimelineSync,
   calibratedGameTimeMs,
   canSubmitVocalPhrase,
+  createMicMatrixState,
   describeCombo,
   isCallAndResponseWindow,
+  micMatrixBanner,
   nextPredictionSection,
+  LiveGetUserMediaAdapter,
+  microphonePitchAnalysisClaim,
+  scorePhrasePitchCoverage,
+  startLiveMicContinuousAnalysis,
+  assessKaraokeSecureContext,
+  assessKaraokePhraseContinuity,
+  assessKaraokeRevokeContinuity,
+  assessPartyKaraokeHonesty,
+  assessPartyKaraokeAudiencePitchGate,
+  assessKaraokeVocalistHandoff,
+  assessKaraokePitchExclusivity,
+  assessKaraokeSecureContextContinuity,
+  planMobileHostPresentation,
+  type LiveMicContinuousHandle,
+  type MicMatrixState,
 } from '@beatlink/game-engine';
 import { useJoinRoom, useRoomEvents, useSocket } from '../lib/socket';
+import { joinGuestParty } from '../lib/partySession';
 import {
   AccessibilityPanel,
   DeviceRolePicker,
@@ -64,6 +84,23 @@ export default function PlayerPage() {
   const [hostOffer, setHostOffer] = useState(false);
   const [deviceCalibStatus, setDeviceCalibStatus] = useState<string | null>(null);
   const [deviceCalibBusy, setDeviceCalibBusy] = useState(false);
+  /** Karaoke mic: default no-recording; pitch claim only during continuous live DSP. */
+  const [micConsent, setMicConsent] = useState<'prompt' | 'granted' | 'denied' | 'no_recording'>(
+    'no_recording',
+  );
+  const [pitchAnalysisActive, setPitchAnalysisActive] = useState(false);
+  const [lastPitchHz, setLastPitchHz] = useState<number | null>(null);
+  const [micMatrix, setMicMatrix] = useState<MicMatrixState>(() => createMicMatrixState());
+  const [timingResyncNote, setTimingResyncNote] = useState<string | null>(null);
+  const micAdapterRef = useRef<LiveGetUserMediaAdapter | null>(null);
+  const liveAnalysisRef = useRef<LiveMicContinuousHandle | null>(null);
+  const lastPitchMatchRef = useRef<number | null>(null);
+  const phraseFramesRef = useRef<Array<{ pitched: boolean; pitchMatch: number }>>([]);
+  const activePhraseIdRef = useRef<string | null>(null);
+  const targetPitchHzRef = useRef(220);
+  const hiddenSinceRef = useRef<number | null>(null);
+  const gameStartTimeRef = useRef(0);
+  gameStartTimeRef.current = gameStartTime;
   const inputSeqRef = useRef(0);
   const playerIdRef = useRef<string | undefined>(undefined);
   playerIdRef.current = player?.id;
@@ -135,6 +172,68 @@ export default function PlayerPage() {
     return () => clearInterval(id);
   }, [joined, room?.phase, gameStartTime]);
 
+  // Party timing: background/resume + drift → authoritative server clock resync.
+  // Browser dual-client only — not a physical phone claim.
+  useEffect(() => {
+    if (!joined || room?.phase !== 'playing' || !code) return;
+
+    const applyTick = (payload: { gameTimeMs?: number; calibratedMs?: number }) => {
+      const serverGameTimeMs = payload.gameTimeMs;
+      if (typeof serverGameTimeMs !== 'number' || !Number.isFinite(serverGameTimeMs)) return;
+      const start = gameStartTimeRef.current;
+      const clientGameTimeMs = start ? Date.now() - start : 0;
+      const fromBackground = hiddenSinceRef.current != null;
+      const assessment = assessPartyTiming({
+        scenario: fromBackground ? 'background_resume' : 'steady',
+        clientGameTimeMs,
+        serverGameTimeMs,
+        hiddenMs: fromBackground ? Date.now() - (hiddenSinceRef.current ?? Date.now()) : undefined,
+      });
+      if (assessment.requiresResync) {
+        const next = applyServerClockResync({ serverGameTimeMs });
+        setGameStartTime(next.gameStartTime);
+        setRawElapsedMs(next.rawElapsedMs);
+        setTimingResyncNote(
+          `resync ${assessment.reason} drift=${assessment.absDriftMs}ms claimedPassed=false`,
+        );
+      }
+      hiddenSinceRef.current = null;
+    };
+
+    const onTick = (payload: { gameTimeMs?: number; calibratedMs?: number }) => applyTick(payload);
+    socket.on('game.tick', onTick);
+
+    const onVisibility = () => {
+      if (typeof document === 'undefined') return;
+      if (document.visibilityState === 'hidden') {
+        hiddenSinceRef.current = Date.now();
+        return;
+      }
+      // Resume from background — request authoritative clock.
+      socket.emit('game.tick', { code });
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    // Soft periodic drift check while playing (host already ticks; players need pull).
+    const soft = setInterval(() => {
+      socket.emit('game.tick', { code });
+    }, 2000);
+
+    return () => {
+      socket.off('game.tick', onTick);
+      document.removeEventListener('visibilitychange', onVisibility);
+      clearInterval(soft);
+    };
+  }, [joined, room?.phase, code, socket]);
+
+  useEffect(() => {
+    return () => {
+      liveAnalysisRef.current?.stop();
+      liveAnalysisRef.current = null;
+      micAdapterRef.current?.stopTracks();
+    };
+  }, []);
+
   useEffect(() => {
     if (!beatmap || !player) return;
     const prompt =
@@ -144,6 +243,34 @@ export default function PlayerPage() {
       );
     setCurrentPrompt(prompt ?? null);
   }, [beatmap, gameTimeMs, player, karaokeState]);
+
+  // Keep live DSP target on the active song phrase — never a fixed 220/196 probe.
+  useEffect(() => {
+    const nextId = currentPrompt?.id ?? null;
+    const hz =
+      currentPrompt?.targetPitchHz && currentPrompt.targetPitchHz > 0
+        ? currentPrompt.targetPitchHz
+        : 220;
+    targetPitchHzRef.current = hz;
+    if (nextId !== activePhraseIdRef.current) {
+      activePhraseIdRef.current = nextId;
+      phraseFramesRef.current = [];
+      lastPitchMatchRef.current = null;
+    }
+    liveAnalysisRef.current?.setTargetPitchHz(hz);
+  }, [currentPrompt]);
+
+  // Drop pitch claim when leaving play (results / rematch / lobby).
+  useEffect(() => {
+    if (room?.phase === 'playing') return;
+    liveAnalysisRef.current?.stop();
+    liveAnalysisRef.current = null;
+    lastPitchMatchRef.current = null;
+    phraseFramesRef.current = [];
+    activePhraseIdRef.current = null;
+    setPitchAnalysisActive(false);
+    setLastPitchHz(null);
+  }, [room?.phase]);
 
   function claimHost() {
     if (!player) return;
@@ -168,6 +295,15 @@ export default function PlayerPage() {
     const playerToken = parsed?.roomCode === code ? parsed.playerToken : undefined;
 
     try {
+      const storedMember = sessionStorage.getItem('beatlink_member');
+      const parsedMember = storedMember ? JSON.parse(storedMember) : null;
+      if (parsedMember?.code !== code) {
+        const joined = await joinGuestParty(code);
+        sessionStorage.setItem(
+          'beatlink_member',
+          JSON.stringify({ code, memberId: joined.memberId, memberSession: joined.memberSession }),
+        );
+      }
       const result = await joinRoom(code, name.trim(), playerId, playerToken);
       setPlayer(result.player);
       setRoom(result.room);
@@ -257,8 +393,199 @@ export default function PlayerPage() {
     sendInput('swipe', { noteId: note?.id });
   }
 
+  function resolvePhraseTargetHz(prompt: VocalPrompt | null | undefined): number {
+    if (prompt?.targetPitchHz && prompt.targetPitchHz > 0) return prompt.targetPitchHz;
+    return 220;
+  }
+
+  function stopLiveKaraokeAnalysis() {
+    liveAnalysisRef.current?.stop();
+    liveAnalysisRef.current = null;
+    lastPitchMatchRef.current = null;
+    phraseFramesRef.current = [];
+    activePhraseIdRef.current = null;
+    setPitchAnalysisActive(false);
+    setLastPitchHz(null);
+  }
+
+  async function requestKaraokeMicConsent() {
+    const secure = assessKaraokeSecureContext({
+      isSecureContext: typeof window !== 'undefined' ? window.isSecureContext === true : false,
+      protocol: typeof window !== 'undefined' ? window.location.protocol : undefined,
+      hostname: typeof window !== 'undefined' ? window.location.hostname : undefined,
+    });
+    // Insecure origins never authorize pitch — a11y tap fallback remains.
+    if (!secure.micPathEligible) {
+      setMicConsent('denied');
+      setPitchAnalysisActive(false);
+      setMicMatrix((prev) => ({
+        ...prev,
+        permission: 'denied',
+        microphonePitchAnalysis: false,
+        a11yFallbackActive: true,
+      }));
+      return;
+    }
+    if (!micAdapterRef.current) {
+      micAdapterRef.current = new LiveGetUserMediaAdapter();
+    }
+    const adapter = micAdapterRef.current;
+    adapter.allowEphemeralCapture();
+    stopLiveKaraokeAnalysis();
+    const state = await adapter.request();
+    if (state === 'granted') {
+      setMicConsent('granted');
+      setMicMatrix((prev) => ({
+        ...prev,
+        permission: 'granted',
+        microphonePitchAnalysis: false,
+        a11yFallbackActive: true,
+      }));
+      // Genuine continuous path only: live mic PCM → DSP → phrase scoring.
+      // Never authorize pitchAnalysisActive from a synthetic tone probe.
+      const stream = adapter.getStream();
+      targetPitchHzRef.current = resolvePhraseTargetHz(currentPrompt);
+      const handle =
+        stream != null
+          ? startLiveMicContinuousAnalysis(stream, {
+              targetPitchHz: () => targetPitchHzRef.current,
+              intervalMs: 80,
+              frameDurationMs: 80,
+              onFrame: (frame) => {
+                const pitched = frame.features.voiced && frame.features.pitchHz > 0;
+                // Silence is not a fabricated match — only retain voiced coverage frames.
+                if (activePhraseIdRef.current) {
+                  phraseFramesRef.current.push({
+                    pitched,
+                    pitchMatch: pitched ? frame.score.pitchMatch : 0,
+                  });
+                  // Bound memory — keep ~8s of 80ms ticks.
+                  if (phraseFramesRef.current.length > 100) {
+                    phraseFramesRef.current.splice(0, phraseFramesRef.current.length - 100);
+                  }
+                }
+                const coverage = scorePhrasePitchCoverage(phraseFramesRef.current);
+                lastPitchMatchRef.current = coverage.phrasePitchMatch;
+                setLastPitchHz(pitched ? frame.features.pitchHz : null);
+
+                // Mic matrix honesty: silence drops pitch claim; grant alone never enough.
+                const liveNow = liveAnalysisRef.current?.live === true;
+                const claim =
+                  liveNow &&
+                  pitched &&
+                  microphonePitchAnalysisClaim({
+                    micConsent: 'granted',
+                    continuousLive: true,
+                  });
+                setMicMatrix((prev) => ({
+                  ...prev,
+                  permission: 'granted',
+                  microphonePitchAnalysis: claim === true,
+                  signalKind: pitched ? 'real_vocal_ephemeral' : 'silence',
+                  sampleRate: 48000,
+                  lastLatencyMs: 80,
+                  withinLatencyBudget: true,
+                  a11yFallbackActive: !claim,
+                }));
+                setPitchAnalysisActive(claim === true);
+              },
+              onLifecycleEnd: () => {
+                setPitchAnalysisActive(false);
+                setLastPitchHz(null);
+                lastPitchMatchRef.current = null;
+                setMicMatrix((prev) => ({
+                  ...prev,
+                  microphonePitchAnalysis: false,
+                  a11yFallbackActive: true,
+                  signalKind: 'none',
+                }));
+              },
+            })
+          : null;
+      // Await a tick so live reflects AudioContext running state when available.
+      await new Promise((r) => setTimeout(r, 30));
+      const claim = microphonePitchAnalysisClaim({
+        micConsent: 'granted',
+        continuousLive: handle?.live === true,
+      });
+      if (handle && claim) {
+        liveAnalysisRef.current = handle;
+        setPitchAnalysisActive(true);
+        setMicMatrix((prev) => ({
+          ...prev,
+          permission: 'granted',
+          microphonePitchAnalysis: true,
+          signalKind: 'real_vocal_ephemeral',
+          a11yFallbackActive: false,
+        }));
+      } else if (handle) {
+        // Permission alone is not a pitch claim — keep timing-only honesty.
+        liveAnalysisRef.current = handle;
+        setPitchAnalysisActive(handle.live === true);
+        if (!handle.live) {
+          setLastPitchHz(null);
+        }
+      } else {
+        setPitchAnalysisActive(false);
+        setLastPitchHz(null);
+      }
+    } else if (state === 'denied') {
+      setMicConsent('denied');
+      setMicMatrix((prev) => ({
+        ...prev,
+        permission: 'denied',
+        microphonePitchAnalysis: false,
+        a11yFallbackActive: true,
+        signalKind: 'none',
+      }));
+      stopLiveKaraokeAnalysis();
+    } else {
+      setMicConsent(state === 'no_recording' ? 'no_recording' : 'prompt');
+      setMicMatrix((prev) => ({
+        ...prev,
+        permission: state === 'no_recording' ? 'no_recording' : 'prompt',
+        microphonePitchAnalysis: false,
+        a11yFallbackActive: true,
+      }));
+      stopLiveKaraokeAnalysis();
+    }
+  }
+
+  function disableKaraokeMic() {
+    stopLiveKaraokeAnalysis();
+    micAdapterRef.current?.enableNoRecordingMode();
+    micAdapterRef.current?.stopTracks();
+    setMicConsent('no_recording');
+    setMicMatrix((prev) => ({
+      ...prev,
+      permission: 'no_recording',
+      microphonePitchAnalysis: false,
+      a11yFallbackActive: true,
+      signalKind: 'none',
+    }));
+  }
+
   function handleVocal() {
-    sendInput('vocal_phrase', { promptId: currentPrompt?.id });
+    const liveNow =
+      pitchAnalysisActive &&
+      liveAnalysisRef.current?.live === true &&
+      micConsent === 'granted';
+    const coverage = scorePhrasePitchCoverage(phraseFramesRef.current);
+    const pitchMatch = liveNow ? coverage.phrasePitchMatch : undefined;
+    sendInput('vocal_phrase', {
+      promptId: currentPrompt?.id,
+      // Client honesty flag — true only while continuous consented mic DSP is live.
+      // Server bounds this scalar; it is not independent physical-mic attestation.
+      pitchAnalysisActive: liveNow,
+      ...(pitchMatch != null && liveNow ? { pitchMatch } : {}),
+      ...(liveNow
+        ? {
+            voicedCoverage: coverage.voicedCoverage,
+            phraseFrames: coverage.frames,
+          }
+        : {}),
+    });
+    phraseFramesRef.current = [];
   }
 
   function handleVocalFallbackTap() {
@@ -451,8 +778,33 @@ export default function PlayerPage() {
             {calibrationOffsetMs}ms
           </p>
         )}
+        {timingResyncNote && (
+          <p
+            style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.7rem', marginBottom: '0.5rem' }}
+            data-testid="party-timing-resync"
+          >
+            {timingResyncNote}
+          </p>
+        )}
 
         <div className={`feedback ${feedbackClass}`}>{feedback}</div>
+
+        <p
+          className="label"
+          style={{ textAlign: 'center', marginBottom: '0.5rem' }}
+          data-testid="active-mode-banner"
+        >
+          {room.gameMode === 'BeatTap' && 'Mode · Beat Tap — hit the judgment line'}
+          {room.gameMode === 'CallAndResponse' && 'Mode · Call & Response — wait for the echo window'}
+          {room.gameMode === 'KaraokePerformance' &&
+            (pitchAnalysisActive
+              ? 'Mode · Karaoke — timing + consented live mic pitch path'
+              : 'Mode · Karaoke — phrase timing (pitch off until mic consent)')}
+          {room.gameMode === 'BandRoles' &&
+            'Mode · Band Roles — stay in your lane; cover all three seats for Band locked'}
+          {room.gameMode === 'PredictionTrivia' &&
+            'Mode · Prediction Trivia — lock the next section before it starts'}
+        </p>
 
         {room.gameMode === 'CallAndResponse' && beatmap && (
           <p style={{ textAlign: 'center', marginBottom: '0.75rem' }}>
@@ -478,11 +830,12 @@ export default function PlayerPage() {
                   <p>
                     Lock before <strong>{target.label}</strong> starts
                   </p>
-                  <div className="role-grid">
+                  <div className="role-grid" data-testid="prediction-choices">
                     {choices.map((choice) => (
                       <button
                         key={choice}
                         className="btn-secondary btn-large"
+                        data-testid={`prediction-choice-${choice.replace(/\s+/g, '-').toLowerCase()}`}
                         onClick={() => handlePrediction(target.id, choice)}
                       >
                         {choice}
@@ -532,6 +885,24 @@ export default function PlayerPage() {
                 </div>
               )}
             </div>
+            <div className="row" style={{ gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                className="btn-secondary"
+                type="button"
+                data-testid="karaoke-mic-consent"
+                onClick={() => void requestKaraokeMicConsent()}
+              >
+                Allow mic (live pitch DSP)
+              </button>
+              <button
+                className="btn-secondary"
+                type="button"
+                data-testid="karaoke-mic-disable"
+                onClick={disableKaraokeMic}
+              >
+                Keep no-recording
+              </button>
+            </div>
             <button
               className="btn-primary btn-large"
               onClick={handleVocal}
@@ -552,8 +923,120 @@ export default function PlayerPage() {
               style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center' }}
               data-testid="vocal-path-truth"
             >
-              VOCAL_PROMPT_TIMING_MODE — MICROPHONE_PITCH_ANALYSIS=false ·
-              GENERAL_VOCAL_RECOGNITION=false. No audio stored. No fake pitch meter.
+              {pitchAnalysisActive
+                ? `VOCAL_TIMING+PITCH_PATH — MICROPHONE_PITCH_ANALYSIS=true (consent=${micConsent}${
+                    lastPitchHz != null ? ` · lastHz≈${Math.round(lastPitchHz)}` : ''
+                  }) · GENERAL_VOCAL_RECOGNITION=false · no audio stored · continuous live DSP only (never synthetic tone)`
+                : `VOCAL_PROMPT_TIMING_MODE — MICROPHONE_PITCH_ANALYSIS=false · mic=${micConsent} · GENERAL_VOCAL_RECOGNITION=false. No audio stored. Pitch off until continuous consented mic DSP.`}
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="mic-matrix-banner"
+            >
+              {micMatrixBanner(micMatrix)}
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-secure-context-banner"
+            >
+              {
+                assessKaraokeSecureContext({
+                  isSecureContext:
+                    typeof window !== 'undefined' ? window.isSecureContext === true : false,
+                  protocol: typeof window !== 'undefined' ? window.location.protocol : undefined,
+                  hostname: typeof window !== 'undefined' ? window.location.hostname : undefined,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-phrase-continuity-banner"
+            >
+              {
+                assessKaraokePhraseContinuity({
+                  prompts: beatmap?.vocalPrompts ?? [],
+                  sampleTimesMs: [Math.max(0, gameTimeMs - 50), gameTimeMs, gameTimeMs + 50],
+                  pitchAnalysisActive,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-revoke-continuity-banner"
+            >
+              {assessKaraokeRevokeContinuity().honestyBanner}
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="party-karaoke-honesty-banner"
+            >
+              {
+                assessPartyKaraokeHonesty({
+                  performerCount: 1,
+                  audienceCount: 0,
+                  maxPerformers: 8,
+                  scriptedAudience: true,
+                  karaokeModeActive: true,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-vocalist-handoff-banner"
+            >
+              {
+                assessKaraokeVocalistHandoff({
+                  fromSeatId: 'prior-vocalist',
+                  toSeatId: player.role === 'vocalist' ? 'self' : String(player.role),
+                  priorPitchActive: pitchAnalysisActive,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-pitch-exclusivity-banner"
+            >
+              {
+                assessKaraokePitchExclusivity([
+                  { seatId: String(player.id ?? 'self'), pitchActive: pitchAnalysisActive },
+                ]).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="karaoke-secure-context-continuity-banner"
+            >
+              {
+                assessKaraokeSecureContextContinuity({
+                  wasPitchActive: pitchAnalysisActive,
+                  isSecureContext:
+                    typeof window !== 'undefined' ? window.isSecureContext === true : false,
+                  protocol: typeof window !== 'undefined' ? window.location.protocol : undefined,
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="party-karaoke-audience-pitch-gate-banner"
+            >
+              {
+                assessPartyKaraokeAudiencePitchGate({
+                  seatKind: 'performer',
+                  claim: {
+                    inputType: 'vocal_phrase',
+                    pitchAnalysisActive,
+                    pitchMatch: 0.5,
+                    voicedCoverage: 0.2,
+                    phraseFrames: 4,
+                  },
+                }).honestyBanner
+              }
+            </p>
+            <p
+              style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}
+              data-testid="player-mobile-presentation-banner"
+            >
+              {planMobileHostPresentation({ playerRoleId: deviceRole }).honestyBanner}
             </p>
           </div>
         )}
@@ -602,9 +1085,22 @@ export default function PlayerPage() {
     );
   }
 
-  if (room?.phase === 'results' && results) {
-    const myResult = results.players.find((p) => p.id === player?.id);
-    const myAwards = results.awards.filter((a) => a.playerId === player?.id);
+  if (room?.phase === 'results') {
+    // Reconnect may arrive after game.ended — fall back to seated player stats on room.state.
+    const myResult =
+      results?.players.find((p) => p.id === player?.id) ??
+      (player
+        ? {
+            id: player.id,
+            name: player.name,
+            role: player.role,
+            teamId: player.teamId,
+            score: player.score,
+            accuracy: player.accuracy,
+            maxStreak: player.maxStreak,
+          }
+        : undefined);
+    const myAwards = results?.awards.filter((a) => a.playerId === player?.id) ?? [];
     return (
       <div className="page page-player stack" data-testid="player-results">
         <div className="panel" style={{ textAlign: 'center' }}>
@@ -613,7 +1109,7 @@ export default function PlayerPage() {
             {myResult?.score ?? 0}
           </div>
           <p data-testid="performer-ledger-checksum">
-            Ledger: {results.ledgerChecksum ?? 'n/a'}
+            Ledger: {results?.ledgerChecksum ?? 'n/a'}
           </p>
           <p>Accuracy: {myResult?.accuracy ?? 0}% · Best streak: {myResult?.maxStreak ?? 0}</p>
         </div>

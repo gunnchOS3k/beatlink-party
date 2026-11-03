@@ -13,3 +13,13 @@ export function partyCreateAllowed(socketConnected: boolean): boolean {
 
 export const PARTY_CREATE_OWNER_ACTION =
   "Create a Party stays off until the Node room server socket is connected. Wave007 starts apps/server on 127.0.0.1:3001. Set VITE_API_URL and VITE_WS_URL to that origin. Do not point them at a Cloudflare Worker, and do not add a new paid host.";
+
+export function partyHttpCreateAllowed(apiUrl: string, backendConfigured: boolean): boolean {
+  if (!backendConfigured) return false;
+  try {
+    const host = new URL(apiUrl).hostname;
+    return host === "127.0.0.1" || host === "localhost" || host === "::1";
+  } catch {
+    return false;
+  }
+}

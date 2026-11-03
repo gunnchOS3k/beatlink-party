@@ -8,9 +8,9 @@
   "performer_context_id": "performer-mobile-390",
   "audience_context_id": "audience-mobile-412",
   "canonical_room_code_same": true,
-  "room_code": "WXL2J",
-  "scenario_steps_passed": 28,
-  "scenario_steps_total": 28,
+  "room_code": "CP6KA",
+  "scenario_steps_passed": 32,
+  "scenario_steps_total": 32,
   "steps": [
     {
       "step": 1,
@@ -26,12 +26,23 @@
       "step": 3,
       "name": "lobby_room_code_visible",
       "ok": true,
-      "detail": "WXL2J"
+      "detail": "CP6KA"
     },
     {
       "step": 4,
       "name": "performer_joined_ui",
       "ok": true
+    },
+    {
+      "step": 30,
+      "name": "host_session_absent_from_guest",
+      "ok": true
+    },
+    {
+      "step": 31,
+      "name": "guest_host_end_rejected",
+      "ok": true,
+      "detail": "status=403"
     },
     {
       "step": 5,
@@ -109,13 +120,13 @@
       "step": 19,
       "name": "round_ends",
       "ok": true,
-      "detail": "a507aa8c9cb5f87b"
+      "detail": "9adb9add123521ec"
     },
     {
       "step": 20,
       "name": "outcome_hash_consistent",
       "ok": true,
-      "detail": "a507aa8c9cb5f87b vs a507aa8c9cb5f87b"
+      "detail": "9adb9add123521ec vs 9adb9add123521ec"
     },
     {
       "step": 21,
@@ -160,7 +171,19 @@
       "step": 28,
       "name": "prior_result_immutable",
       "ok": true,
-      "detail": "a507aa8c9cb5f87b"
+      "detail": "9adb9add123521ec"
+    },
+    {
+      "step": 29,
+      "name": "host_closed_room",
+      "ok": true,
+      "detail": "status=404"
+    },
+    {
+      "step": 32,
+      "name": "guest_sees_room_closed",
+      "ok": true,
+      "detail": "status=404"
     }
   ],
   "vocal_path_classification": "VOCAL_PROMPT_TIMING_MODE",

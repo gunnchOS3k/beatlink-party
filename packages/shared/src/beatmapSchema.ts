@@ -15,6 +15,7 @@ export const vocalPromptSchema = z.object({
   timeMs: z.number().min(0),
   text: z.string().min(1),
   durationMs: z.number().min(100),
+  targetPitchHz: z.number().positive().nullable().optional(),
 });
 
 export const hypeEventSchema = z.object({

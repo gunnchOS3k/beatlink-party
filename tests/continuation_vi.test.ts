@@ -51,13 +51,14 @@ describe('Continuation VI — offline legal launch catalog', () => {
       ].sort(),
     );
     for (const lic of [
-      'public_domain',
       'synthetic_original',
       'creative_commons',
       'creator_owned',
     ] as const) {
       expect(gate.licensesPresent).toContain(lic);
     }
+    // Unverified public_domain stamps are not required (and must not be faked via metadata).
+    expect(gate.failures.some((f) => f.includes('pd_without_verified'))).toBe(false);
   });
 });
 

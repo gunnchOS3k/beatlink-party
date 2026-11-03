@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { BrandMark, SurfaceShell } from '../components/StageChrome';
+import { joinGuestParty } from '../lib/partySession';
 
 export default function JoinPage() {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ export default function JoinPage() {
   const seat = searchParams.get('seat') === 'audience' ? 'audience' : 'player';
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const qCode = (searchParams.get('code') ?? '').trim().toUpperCase();
@@ -24,10 +26,22 @@ export default function JoinPage() {
     }
   }, [navigate, searchParams, seat]);
 
-  function handleJoin(e: React.FormEvent) {
+  async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
     if (!code.trim() || !name.trim()) return;
     const room = code.trim().toUpperCase();
+    if (seat !== 'audience') {
+      try {
+        const joined = await joinGuestParty(room);
+        sessionStorage.setItem(
+          'beatlink_member',
+          JSON.stringify({ code: room, memberId: joined.memberId, memberSession: joined.memberSession }),
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Join failed');
+        return;
+      }
+    }
     if (seat === 'audience') {
       navigate(`/audience/${room}?name=${encodeURIComponent(name.trim())}`);
     } else {
@@ -86,6 +100,7 @@ export default function JoinPage() {
             data-testid="join-name"
           />
         </div>
+        {error ? <p className="compliance-banner" data-testid="join-error">{error}</p> : null}
         <button type="submit" className="btn-primary btn-large" data-testid="join-submit">
           {seat === 'audience' ? 'Enter as Spectator' : 'Join Room'}
         </button>

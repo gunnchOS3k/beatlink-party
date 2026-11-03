@@ -4,7 +4,13 @@ import type { LinkResolveResult, PlaybackStatus, SongCatalogEntry } from '@beatl
  * Authorized / local media only.
  * Providers never rip, download, or copy copyrighted audio streams.
  */
-export type MediaKind = 'procedural_metronome' | 'catalog_approved' | 'authorized_embed' | 'metadata_only';
+export type MediaKind =
+  | 'procedural_metronome'
+  /** Lawful catalog / original synthetic song bed synced to beatmap notes (not a stream rip). */
+  | 'procedural_song_bed'
+  | 'catalog_approved'
+  | 'authorized_embed'
+  | 'metadata_only';
 
 export interface MediaDescriptor {
   kind: MediaKind;
@@ -55,6 +61,33 @@ export class ProceduralMetronomeProvider implements MediaProvider {
   }
 }
 
+/**
+ * Authorized original / PD / CC / demo catalog song bed.
+ * Host synthesizes a note-synced musical bed — never a ripped commercial stem.
+ */
+export class ProceduralSongBedProvider implements MediaProvider {
+  readonly id = 'procedural_song_bed';
+
+  resolve(input: MediaResolveInput): MediaDescriptor {
+    const entry = input.catalogEntry;
+    if (!entry) {
+      return new ProceduralMetronomeProvider().resolve(input);
+    }
+    return {
+      kind: 'procedural_song_bed',
+      songId: entry.id,
+      title: entry.title,
+      artist: entry.artist,
+      bpm: entry.bpm,
+      durationMs: entry.durationMs,
+      playbackStatus: 'PLAYABLE_APPROVED',
+      embed: null,
+      message:
+        'Authorized catalog song bed — host Web Audio synthesizes note-synced tones from the beatmap (no streaming rip, no DRM bypass).',
+    };
+  }
+}
+
 /** User-authorized catalog / official embed metadata only. */
 export class AuthorizedCatalogEmbedProvider implements MediaProvider {
   readonly id = 'authorized_catalog_embed';
@@ -65,7 +98,7 @@ export class AuthorizedCatalogEmbedProvider implements MediaProvider {
 
     if (entry && (!link || link.playbackStatus === 'PLAYABLE_APPROVED')) {
       return {
-        kind: 'catalog_approved',
+        kind: 'procedural_song_bed',
         songId: entry.id,
         title: entry.title,
         artist: entry.artist,
@@ -73,20 +106,30 @@ export class AuthorizedCatalogEmbedProvider implements MediaProvider {
         durationMs: entry.durationMs,
         playbackStatus: 'PLAYABLE_APPROVED',
         embed: null,
-        message: 'Approved demo catalog entry — procedural playback path.',
+        message:
+          'Approved catalog entry — procedural song bed synced to chart notes (lawful original/PD/CC/demo path).',
       };
     }
 
     if (link) {
-      const authorizedPlayback = link.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM';
+      // Official embed is listen/reference only — never gameplay from API keys.
+      const cap = link.capabilityState;
+      const embedCapable =
+        cap === 'OFFICIAL_EMBED_AVAILABLE' ||
+        // Legacy: PLAYABLE_AUTHORIZED_PLATFORM was wrongly assigned from API keys.
+        (!cap && link.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM');
       return {
-        kind: authorizedPlayback ? 'authorized_embed' : 'metadata_only',
+        kind: embedCapable ? 'authorized_embed' : 'metadata_only',
         songId: link.matchedCatalogId,
         title: link.title ?? entry?.title ?? 'Linked track',
         artist: link.artist ?? entry?.artist ?? null,
         bpm: entry?.bpm ?? input.fallbackBpm ?? null,
         durationMs: link.durationMs ?? entry?.durationMs ?? null,
-        playbackStatus: link.playbackStatus,
+        // Downgrade legacy PLAYABLE_AUTHORIZED_PLATFORM (API-key mistake) to METADATA_ONLY.
+        playbackStatus:
+          link.playbackStatus === 'PLAYABLE_AUTHORIZED_PLATFORM'
+            ? 'METADATA_ONLY'
+            : link.playbackStatus,
         embed: {
           platform: link.platform,
           sourceId: link.sourceId,
@@ -112,7 +155,8 @@ export class AuthorizedCatalogEmbedProvider implements MediaProvider {
 
 export function selectMediaProvider(input: MediaResolveInput): MediaProvider {
   if (input.catalogEntry && (!input.linkResult || input.linkResult.playbackStatus === 'PLAYABLE_APPROVED')) {
-    return new ProceduralMetronomeProvider();
+    // Prefer note-synced song bed over metronome-only for catalog performances.
+    return new ProceduralSongBedProvider();
   }
   if (input.linkResult) return new AuthorizedCatalogEmbedProvider();
   return new ProceduralMetronomeProvider();

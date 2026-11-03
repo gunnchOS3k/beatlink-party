@@ -5,5 +5,8 @@
   "VOCAL_PATH_CLASSIFICATION": "VOCAL_PROMPT_TIMING_MODE",
   "MICROPHONE_PITCH_ANALYSIS": false,
   "score_before_end": "Score: 0",
+  "chart": "demo-neon-groove",
+  "chart_license": "demo_generated_royalty_free",
+  "score_zero_reason": "A tap scores only within 200ms of a generated note. This click is not aimed at a note, so Score: 0 is a miss.",
   "ok": true
 }

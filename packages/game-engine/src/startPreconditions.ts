@@ -13,6 +13,7 @@ export type StartBlockerCode =
   | 'PLAYER_NO_ROLE'
   | 'NO_SONG'
   | 'NO_BEATMAP'
+  | 'LINK_SYNC_DENIED'
   | 'COUNTDOWN_ALREADY'
   | 'NOT_CALIBRATING'
   | 'HOST_REQUIRED';
@@ -29,6 +30,16 @@ export interface StartGateInput {
   /** When present (server), null means beatmap missing. Clients omit this field. */
   beatmap?: unknown | null;
   players?: Array<Pick<Player, 'name' | 'ready' | 'role' | 'connected'>> | null;
+  /**
+   * When a direct-HTTPS (or other) link snapshot is the intended track source and
+   * capability is not GAMEPLAY_SYNC_AUTHORIZED with a matched catalog id, scored
+   * start is denied — playback/preview permission alone is insufficient.
+   */
+  linkResolveResult?: {
+    capabilityState?: string | null;
+    matchedCatalogId?: string | null;
+    platform?: string | null;
+  } | null;
 }
 
 export interface StartGateResult {
@@ -98,6 +109,22 @@ export function evaluateStartPreconditions(
     blockers.push({
       code: 'NO_BEATMAP',
       message: 'Beatmap not ready for the selected song',
+    });
+  }
+
+  const link = room.linkResolveResult;
+  if (
+    link &&
+    link.platform === 'direct_https' &&
+    (link.capabilityState === 'DIRECT_AUDIO_RIGHTS_VERIFIED' ||
+      link.capabilityState === 'BLOCKED_OR_UNSUPPORTED') &&
+    !link.matchedCatalogId &&
+    !room.selectedSongId
+  ) {
+    blockers.push({
+      code: 'LINK_SYNC_DENIED',
+      message:
+        'Direct HTTPS playback may be permitted, but scored gameplay is denied without syncEligible + matching authorized catalog hash',
     });
   }
 

@@ -1,0 +1,56 @@
+{
+  "schema": "beatlink.asset_rights.v2",
+  "trackId": "launch-cc-multi-party",
+  "title": "CC Multi-Mode Party",
+  "artist": "BeatLink CC Desk",
+  "author": "BeatLink CC Desk",
+  "license": "creative_commons",
+  "licenseVersion": "CC-BY-4.0",
+  "licenseLabel": "CC-BY-4.0 (first-party release; attribution required)",
+  "sourceKind": "creative_commons",
+  "ownershipClass": "first_party_original",
+  "attribution": "BeatLink CC Desk — CC-BY-4.0",
+  "attributionVerified": true,
+  "commercialEligible": false,
+  "commercialEligibilityNote": "false until verified human attribution + commercial review — metadata alone never grants commercial",
+  "thirdPartyLicense": {
+    "kind": "creative_commons",
+    "version": "CC-BY-4.0",
+    "deedUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "owner": "BeatLink CC Desk"
+  },
+  "ownershipEvidence": "First-party procedural composition (BeatLink studio generator v2); assetSha256=1271a71b24c68cf4abf09e07a0159b415ce47785dbf32b6a0343d55b33a75fff; ownershipClass=first_party_original. Not a third-party PD scrape.",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "audioAssetPath": "songs/audio/launch-cc-multi-party.wav",
+  "assetSha256": "1271a71b24c68cf4abf09e07a0159b415ce47785dbf32b6a0343d55b33a75fff",
+  "compositionSha256": "d70faa9e70bc8b394b8db78fee12df93d86570711a00f04435fff2b27b893d83",
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationMs": 114000,
+  "bpm": 118,
+  "generatedBy": "scripts/generate_launch_songs.mjs",
+  "productionNotes": {
+    "structure": [
+      "intro",
+      "verse",
+      "pre",
+      "chorus",
+      "bridge",
+      "chorus",
+      "outro"
+    ],
+    "layers": [
+      "kick",
+      "hat",
+      "bass",
+      "pad_triad",
+      "lead_phrase_sync",
+      "sparkle"
+    ],
+    "mix": "stereo_width_by_section",
+    "master": "soft_knee_tanh_v2",
+    "chartSync": "phrase_pitch_and_bar_quantized_windows"
+  }
+}

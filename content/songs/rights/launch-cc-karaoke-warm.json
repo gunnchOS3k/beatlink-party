@@ -1,0 +1,56 @@
+{
+  "schema": "beatlink.asset_rights.v2",
+  "trackId": "launch-cc-karaoke-warm",
+  "title": "Warm CC Karaoke",
+  "artist": "BeatLink CC Desk",
+  "author": "BeatLink CC Desk",
+  "license": "creative_commons",
+  "licenseVersion": "CC0-1.0",
+  "licenseLabel": "CC0-1.0 (first-party dedication)",
+  "sourceKind": "creative_commons",
+  "ownershipClass": "first_party_original",
+  "attribution": "BeatLink CC Desk — CC0-1.0",
+  "attributionVerified": true,
+  "commercialEligible": false,
+  "commercialEligibilityNote": "false until verified human attribution + commercial review — metadata alone never grants commercial",
+  "thirdPartyLicense": {
+    "kind": "creative_commons",
+    "version": "CC0-1.0",
+    "deedUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "owner": "BeatLink CC Desk"
+  },
+  "ownershipEvidence": "First-party procedural composition (BeatLink studio generator v2); assetSha256=6140c95c711cb1872391afc981693d8216bc4663a9019d879a5bec18cb19ec62; ownershipClass=first_party_original. Not a third-party PD scrape.",
+  "ripForbidden": true,
+  "drmBypassForbidden": true,
+  "ccDeedUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "audioAssetPath": "songs/audio/launch-cc-karaoke-warm.wav",
+  "assetSha256": "6140c95c711cb1872391afc981693d8216bc4663a9019d879a5bec18cb19ec62",
+  "compositionSha256": "892f2b9bbb3990926066909bf19fd57ebc3743ba5d9081da27d191213b49472a",
+  "sampleRate": 44100,
+  "channels": 2,
+  "durationMs": 108000,
+  "bpm": 96,
+  "generatedBy": "scripts/generate_launch_songs.mjs",
+  "productionNotes": {
+    "structure": [
+      "intro",
+      "verse",
+      "pre",
+      "chorus",
+      "bridge",
+      "chorus",
+      "outro"
+    ],
+    "layers": [
+      "kick",
+      "hat",
+      "bass",
+      "pad_triad",
+      "lead_phrase_sync",
+      "sparkle"
+    ],
+    "mix": "stereo_width_by_section",
+    "master": "soft_knee_tanh_v2",
+    "chartSync": "phrase_pitch_and_bar_quantized_windows"
+  }
+}

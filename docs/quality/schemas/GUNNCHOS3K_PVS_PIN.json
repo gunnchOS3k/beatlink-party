@@ -1,0 +1,8 @@
+{
+  "contract_id": "GUNNCHOS3K_PVS",
+  "contract_version": "1.0.0",
+  "contract_source_repo": "gunnchOS3k/gunnchos-site",
+  "contract_source_sha": "935eb3a20548b1a4b726f2ba305df94ff496be16",
+  "schema_path": "docs/quality/schemas/requirements_to_evidence_matrix.schema.json",
+  "notes": "Pinned to packet PVS source SHA GUNNCHOS3K_PVS@1.0.0 @ 935eb3a (2026-10-30 S5)."
+}

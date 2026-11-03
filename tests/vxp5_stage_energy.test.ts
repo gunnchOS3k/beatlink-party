@@ -54,6 +54,9 @@ describe('VXP-5 Stage Energy digital gates', () => {
 
     const meta = {
       playbackStatus: 'METADATA_ONLY',
+      capabilityState: 'METADATA_AVAILABLE',
+      mediaClassification: 'metadata_only',
+      providerCredentialsPresent: false,
       platform: 'spotify',
       message: 'metadata only',
       fallbackOptions: [],
@@ -62,12 +65,15 @@ describe('VXP-5 Stage Energy digital gates', () => {
 
     const blocked = {
       playbackStatus: 'BLOCKED_BY_POLICY',
+      capabilityState: 'BLOCKED_OR_UNSUPPORTED',
+      mediaClassification: 'blocked',
+      providerCredentialsPresent: false,
       platform: 'youtube',
       message: 'blocked',
       fallbackOptions: [],
     } as unknown as LinkResolveResult;
-    expect(linkEligibility(blocked).label).toBe('NOT ELIGIBLE');
-    expect(MUSIC_COMPLIANCE_SUMMARY).toMatch(/metadata-only/i);
+    expect(linkEligibility(blocked).label).toBe('BLOCKED OR UNSUPPORTED');
+    expect(MUSIC_COMPLIANCE_SUMMARY).toMatch(/metadata|embed/i);
   });
 
   it('landing leads with Create a Party / Join a Party', () => {

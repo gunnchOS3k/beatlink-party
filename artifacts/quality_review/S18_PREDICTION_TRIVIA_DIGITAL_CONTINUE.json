@@ -1,0 +1,10 @@
+{
+  "schema": "beat.s18_prediction_trivia_digital_continue.v1",
+  "human_false": true,
+  "rc2_false": true,
+  "v1_false": true,
+  "ci_exact_head": {"sha": "f979644", "pr": 35, "public_actions_html": "green"},
+  "rights": {"LINK_EQUALS_RIP_PERMISSION": false, "GAMEPLAY_SYNC_AUTHORIZED": false, "rights_not_weakened": true},
+  "iv_packet": {"preserved_at": "ab7a8d9", "untouched_this_continue": true},
+  "base_tip": "f979644"
+}
